@@ -1,0 +1,16 @@
+// imports.dart
+// 1
+export "dart:io";
+export "package:flutter/material.dart";
+export "package:path_provider/path_provider.dart";
+export "package:shared_preferences/shared_preferences.dart";
+// 2
+export "./main.dart";
+export "./seiten/home.dart";
+export "./klassen/partieKlasse.dart";
+export "./klassen/partienProvider.dart";
+export "./seiten/partie.dart";
+export "./widgets/neuePartieButton.dart";
+// 3
+export "package:provider/provider.dart";
+export "package:flutter_chess_board/flutter_chess_board.dart";
