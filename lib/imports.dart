@@ -10,7 +10,10 @@ export "./seiten/home.dart";
 export "./klassen/partieKlasse.dart";
 export "./klassen/partienProvider.dart";
 export "./seiten/partie.dart";
-export "./widgets/neuePartieButton.dart";
+export "./widgets/partieErstellenButton.dart";
+export "./speicher/datenbank.dart";
+export "./meinBuilder.dart";
+export "./widgets/beschriftung.dart";
 // 3
 export "package:provider/provider.dart";
 export "package:flutter_chess_board/flutter_chess_board.dart";

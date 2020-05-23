@@ -1,14 +1,14 @@
-// neuePartieButton.dart
-// hi
+// partieErstellenButton.dart
 import "../imports.dart";
 
-class NeuePartieButton extends StatefulWidget {
+class PartieErstellenButton extends StatefulWidget {
+
   @override
-  _NeuePartieButtonState createState() => _NeuePartieButtonState();
+  _PartieErstellenButtonState createState() => _PartieErstellenButtonState();
 }
 
-class _NeuePartieButtonState extends State<NeuePartieButton> {
-  TextEditingController neuePartieController = TextEditingController();
+class _PartieErstellenButtonState extends State<PartieErstellenButton> {
+  TextEditingController _neuePartieNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -22,33 +22,30 @@ class _NeuePartieButtonState extends State<NeuePartieButton> {
       onPressed: () {
         showDialog(
             context: context,
-            builder: (BuildContext context) {
+            builder: (context) {
               return AlertDialog(
+                content: TextField(
+                  controller: _neuePartieNameController,
+                  decoration: InputDecoration(hintText: "der Name der Partie"),
+                ),
                 actions: <Widget>[
                   FlatButton(
                     child: Text("Erstellen"),
                     onPressed: () {
-                      PartieKlasse neuePartieErstellt = PartieKlasse(
-                        name: neuePartieController.text,
+                      PartieKlasse neuePartie = PartieKlasse(
                         id: DateTime.now().millisecondsSinceEpoch.toString(),
+                        name: _neuePartieNameController.text,
                         pgn: "",
                       );
-                      print("pups");
+                      partienProvider.neuePartieErstellt(partie: neuePartie);
                       Navigator.pop(context);
                     },
                   ),
                   FlatButton(
                     child: Text("Abbrechen"),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  )
+                    onPressed: () => Navigator.pop(context),
+                  ),
                 ],
-                content: TextField(
-                  controller: neuePartieController,
-                  decoration:
-                      InputDecoration(hintText: "Name der neuen Partie"),
-                ),
               );
             });
       },
