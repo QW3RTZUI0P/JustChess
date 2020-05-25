@@ -4,7 +4,7 @@ import "../imports.dart";
 class VertikaleZahlen extends StatelessWidget {
   final double height;
 
-  VertikaleZahlen({this.height});
+  const VertikaleZahlen({this.height});
 
   @override
   Widget build(BuildContext context) {
@@ -12,16 +12,56 @@ class VertikaleZahlen extends StatelessWidget {
       height: this.height,
       child: Column(
         mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          Text("8"),
-          Text("7"),
-          Text("6"),
-          Text("5"),
-          Text("4"),
-          Text("3"),
-          Text("2"),
-          Text("1"),
+          const Text(
+            "8",
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const Text(
+            "7",
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const Text(
+            "6",
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const Text(
+            "5",
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const Text(
+            "4",
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const Text(
+            "3",
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const Text(
+            "2",
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const Text(
+            "1",
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
@@ -31,24 +71,77 @@ class VertikaleZahlen extends StatelessWidget {
 class HorizontaleBuchstaben extends StatelessWidget {
   final double width;
 
-  HorizontaleBuchstaben({this.width});
+  const HorizontaleBuchstaben({this.width});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: this.width,
+      width: this.width + MediaQuery.of(context).textScaleFactor + 5,
       child: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          Flexible(child: Text("a")),
-          Text("b"),
-          Text("c"),
-          Text("d"),
-          Text("e"),
-          Text("f"),
-          Text("g"),
-          Text("h"),
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              const Text(" "),
+              const SizedBox(width: 6.0),
+            ],
+          ),
+          Flexible(
+                      child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                const Text(
+                  "a",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Text(
+                  "b",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Text(
+                  "c",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Text(
+                  "d",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Text(
+                  "e",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Text(
+                  "f",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Text(
+                  "g",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Text(
+                  "h",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

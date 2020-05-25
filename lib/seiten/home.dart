@@ -19,10 +19,8 @@ class _HomeState extends State<Home> {
     return Scaffold(
         appBar: AppBar(
           title: Text("JustChess"),
-          actions: <Widget>[
-            PartieErstellenButton(),
-          ],
         ),
+        floatingActionButton: PartieErstellenButton(),
         body: SafeArea(
             child: widget.partien.isEmpty
                 ? Center(
@@ -36,6 +34,8 @@ class _HomeState extends State<Home> {
                         ),
                         child: ListTile(
                           title: Text(widget.partien[index].name),
+                          subtitle: Text(
+                              "Anzahl der Züge: ${widget.partien[index].anzahlDerZuege.toString()}"),
                           trailing: Icon(Icons.arrow_forward_ios),
                           onTap: () {
                             Navigator.push(

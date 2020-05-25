@@ -36,7 +36,7 @@ class PartienProvider with ChangeNotifier {
   Future<void> partieUpgedatet(
       {PartieKlasse altePartie, PartieKlasse neuePartie}) {
     int index = this.datenbank.partien.indexOf(altePartie);
-    this.datenbank.partien[index].pgn = neuePartie.pgn; 
+    this.datenbank.partien[index].pgn = neuePartie.pgn;
     DatenbankFileRoutinen().schreibeDokument(
       datenbankZuJson(this.datenbank),
     );
@@ -52,6 +52,7 @@ class DatenbankFileRoutinen {
 
   Future<File> get _lokalesDokument async {
     final pfad = await _lokalerPfad;
+    print(pfad);
     return File('$pfad/gespeichertePartien.json');
   }
 

@@ -77,8 +77,11 @@ class _PartieErstellenDialogState extends State<PartieErstellenDialog> {
               id: DateTime.now().millisecondsSinceEpoch.toString(),
               name: _neuePartieNameController.text,
               pgn: "",
+              benutzerIstWeiss: this.benutzerIstWeiss,
+              anzahlDerZuege: 0.0,
             );
             partienProvider.neuePartieErstellt(partie: neuePartie);
+            _neuePartieNameController.text = "";
             Navigator.pop(context);
           },
         ),
