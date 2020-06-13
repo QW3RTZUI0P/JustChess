@@ -78,7 +78,7 @@ class _PartieErstellenDialogState extends State<PartieErstellenDialog> {
               name: _neuePartieNameController.text,
               pgn: "",
               benutzerIstWeiss: this.benutzerIstWeiss,
-              anzahlDerZuege: 0.0,
+              anzahlDerZuege: 0,
             );
             partienProvider.neuePartieErstellt(partie: neuePartie);
             _neuePartieNameController.text = "";

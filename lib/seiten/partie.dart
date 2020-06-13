@@ -33,90 +33,108 @@ class _PartieState extends State<Partie> with AfterLayoutMixin<Partie> {
     Size size = MediaQuery.of(context).size;
     PartieKlasse partie = this.partieInKlasse;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(partie.name),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            String pgn = chessBoardController.game.pgn();
-            partie.pgn = pgn;
-            // speichert die Partie automatisch
-            partienProvider.partieUpgedatet(
-              altePartie: widget.aktuellePartie,
-              neuePartie: partie,
-            );
-            Navigator.pop(context);
-          },
+    var appBar = AppBar(
+      title: Text(partie.name),
+      leading: IconButton(
+        icon: Icon(
+          Icons.arrow_back_ios,
+          color: Colors.white,
         ),
+        onPressed: () {
+          String pgn = chessBoardController.game.pgn();
+          partie.pgn = pgn;
+          // speichert die Partie automatisch
+          partienProvider.partieUpgedatet(
+            altePartie: widget.aktuellePartie,
+            neuePartie: partie,
+          );
+          Navigator.pop(context);
+        },
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  VertikaleZahlen(
-                    height: size.width * 0.9,
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  ChessBoard(
-                    size: size.width * 0.9,
-                    whiteSideTowardsUser: partie.benutzerIstWeiss,
-                    onMove: (move) {
-                      partie.anzahlDerZuege += 0.5;
-                      print(move);
-                    },
-                    onCheckMate: (color) {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          content: Text("$color hat gewonnen!"),
-                          actions: <Widget>[
-                            FlatButton(
-                              child: Text("Ok"),
-                              onPressed: () => Navigator.pop(context),
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                    onDraw: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          content: Text("Unentschieden / Remis / Patt"),
-                          actions: <Widget>[
-                            FlatButton(
-                              child: Text("Ok"),
-                              onPressed: () => Navigator.pop(context),
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                    chessBoardController: chessBoardController,
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              Center(
-                child: HorizontaleBuchstaben(
-                  width: size.width * 0.9,
-                ),
+    );
+    var chessBoard = ChessBoard(
+      size: size.width * 0.9,
+      whiteSideTowardsUser: partie.benutzerIstWeiss,
+      onMove: (move) {
+        // partie.anzahlDerZuege += 0.5;
+        print(move);
+      },
+      onCheckMate: (color) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: Text("$color hat gewonnen!"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Ok"),
+                onPressed: () => Navigator.pop(context),
               )
             ],
+          ),
+        );
+      },
+      onDraw: () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: Text("Unentschieden / Remis / Patt"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Ok"),
+                onPressed: () => Navigator.pop(context),
+              )
+            ],
+          ),
+        );
+      },
+      chessBoardController: chessBoardController,
+    );
+    return Scaffold(
+      appBar: appBar,
+      body: SafeArea(
+        child: Scrollbar(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(8),
+            child: Container(
+              height: size.height - appBar.preferredSize.height - 16,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      chessBoard.whiteSideTowardsUser
+                          ? VertikaleZahlenWeiss(
+                              height: size.width * 0.9,
+                            )
+                          : VertikaleZahlenSchwarz(
+                              height: size.width * 0.9,
+                            ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      chessBoard,
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  chessBoard.whiteSideTowardsUser
+                      ? Center(
+                          child: HorizontaleBuchstabenWeiss(
+                            width: size.width * 0.9,
+                          ),
+                        )
+                      : Center(
+                          child: HorizontaleBuchstabenSchwarz(
+                            width: size.width * 0.9,
+                          ),
+                        ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

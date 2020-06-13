@@ -5,14 +5,14 @@ class PartieKlasse {
   final String name;
   String pgn;
   bool benutzerIstWeiss;
-  double anzahlDerZuege;
+  int anzahlDerZuege;
 
   PartieKlasse({
     this.id = "",
     this.name = "",
     this.pgn = "",
     this.benutzerIstWeiss = true,
-    this.anzahlDerZuege = 0.0,
+    this.anzahlDerZuege = 0,
   });
 
   factory PartieKlasse.vonJson(Map<String, dynamic> json) => PartieKlasse(
