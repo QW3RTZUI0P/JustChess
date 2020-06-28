@@ -3,8 +3,12 @@ import "../imports.dart";
 
 class Partie extends StatefulWidget {
   final PartieKlasse aktuellePartie;
+  final GameBloc gameBloc;
 
-  Partie({this.aktuellePartie});
+  Partie({
+    this.aktuellePartie,
+    this.gameBloc,
+  });
 
   @override
   _PartieState createState() => _PartieState();
@@ -20,6 +24,8 @@ class _PartieState extends State<Partie> with AfterLayoutMixin<Partie> {
     this.partieInKlasse = widget.aktuellePartie;
   }
 
+ 
+
   @override
   // Funktion aus dem Package after_layout
   void afterFirstLayout(BuildContext context) {
@@ -29,7 +35,6 @@ class _PartieState extends State<Partie> with AfterLayoutMixin<Partie> {
 
   @override
   Widget build(BuildContext context) {
-    PartienProvider partienProvider = Provider.of<PartienProvider>(context);
     Size size = MediaQuery.of(context).size;
     PartieKlasse partie = this.partieInKlasse;
 
@@ -43,18 +48,20 @@ class _PartieState extends State<Partie> with AfterLayoutMixin<Partie> {
         onPressed: () {
           String pgn = chessBoardController.game.pgn();
           partie.pgn = pgn;
+          widget.gameBloc.cloudFirestoreDatabase
+              .updateGame(game: widget.aktuellePartie);
           // speichert die Partie automatisch
-          partienProvider.partieUpgedatet(
-            altePartie: widget.aktuellePartie,
-            neuePartie: partie,
-          );
+          // partienProvider.partieUpgedatet(
+          //   altePartie: widget.aktuellePartie,
+          //   neuePartie: partie,
+          // );
           Navigator.pop(context);
         },
       ),
     );
     var chessBoard = ChessBoard(
       size: size.width * 0.9,
-      whiteSideTowardsUser: partie.benutzerIstWeiss,
+      whiteSideTowardsUser: partie.player01IsWhite,
       onMove: (move) {
         // partie.anzahlDerZuege += 0.5;
         print(move);

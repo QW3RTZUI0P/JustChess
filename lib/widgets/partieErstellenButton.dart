@@ -2,6 +2,10 @@
 import "../imports.dart";
 
 class PartieErstellenButton extends StatefulWidget {
+
+  GameBloc gameBloc;
+  PartieErstellenButton({this.gameBloc});
+
   @override
   _PartieErstellenButtonState createState() => _PartieErstellenButtonState();
 }
@@ -19,7 +23,7 @@ class _PartieErstellenButtonState extends State<PartieErstellenButton> {
         showDialog(
             context: context,
             builder: (context) {
-              return PartieErstellenDialog();
+              return PartieErstellenDialog(gameBloc: widget.gameBloc,);
             });
       },
     );

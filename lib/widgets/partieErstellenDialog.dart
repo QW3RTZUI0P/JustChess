@@ -3,11 +3,16 @@ import "../imports.dart";
 
 // Dialog der angezeigt wird, wenn der PartieErstellenButton gedrückt wird
 class PartieErstellenDialog extends StatefulWidget {
+
+  GameBloc gameBloc;
+  PartieErstellenDialog({this.gameBloc});
+
   @override
   _PartieErstellenDialogState createState() => _PartieErstellenDialogState();
 }
 
 class _PartieErstellenDialogState extends State<PartieErstellenDialog> {
+
   TextEditingController _neuePartieNameController = TextEditingController();
   int radioButtonGroupValue = 0;
   bool benutzerIstWeiss = true;
@@ -30,7 +35,6 @@ class _PartieErstellenDialogState extends State<PartieErstellenDialog> {
 
   @override
   Widget build(BuildContext context) {
-    PartienProvider partienProvider = Provider.of<PartienProvider>(context);
 
     return AlertDialog(
       content: Column(
@@ -72,15 +76,15 @@ class _PartieErstellenDialogState extends State<PartieErstellenDialog> {
       actions: <Widget>[
         FlatButton(
           child: Text("Erstellen"),
-          onPressed: () {
+          onPressed: () async {
             PartieKlasse neuePartie = PartieKlasse(
-              id: DateTime.now().millisecondsSinceEpoch.toString(),
               name: _neuePartieNameController.text,
               pgn: "",
-              benutzerIstWeiss: this.benutzerIstWeiss,
-              anzahlDerZuege: 0,
+              player01: widget.gameBloc.currentUserID,
+              player01IsWhite: this.benutzerIstWeiss,
+              moveCount: 0,
             );
-            partienProvider.neuePartieErstellt(partie: neuePartie);
+            widget.gameBloc.addGame(game: neuePartie,);
             _neuePartieNameController.text = "";
             Navigator.pop(context);
           },
