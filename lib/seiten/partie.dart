@@ -30,7 +30,7 @@ class _PartieState extends State<Partie> with AfterLayoutMixin<Partie> {
   // Funktion aus dem Package after_layout
   void afterFirstLayout(BuildContext context) {
     // lädt den letzten gespeicherten Spielstand automatisch auf das Schachfeld
-    chessBoardController.loadPGN(this.partieInKlasse.pgn);
+    chessBoardController.loadPGN(this.partieInKlasse.pgn ?? "");
   }
 
   @override
@@ -39,7 +39,7 @@ class _PartieState extends State<Partie> with AfterLayoutMixin<Partie> {
     PartieKlasse partie = this.partieInKlasse;
 
     var appBar = AppBar(
-      title: Text(partie.name),
+      title: Text(partie.name ?? ""),
       leading: IconButton(
         icon: Icon(
           Icons.arrow_back_ios,
@@ -49,7 +49,9 @@ class _PartieState extends State<Partie> with AfterLayoutMixin<Partie> {
           String pgn = chessBoardController.game.pgn();
           partie.pgn = pgn;
           widget.gameBloc.cloudFirestoreDatabase
-              .updateGame(game: widget.aktuellePartie);
+              .updateGameFromFirestore(game: partie);
+          print("pgn " + partie.pgn);
+          print("id " + partie.id);
           // speichert die Partie automatisch
           // partienProvider.partieUpgedatet(
           //   altePartie: widget.aktuellePartie,

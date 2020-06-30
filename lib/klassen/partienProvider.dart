@@ -103,7 +103,7 @@ class Datenbank {
     return Datenbank(
       partien: List<PartieKlasse>.from(
             json["partien"].map(
-              (x) => PartieKlasse.vonJson(x),
+              (x) => PartieKlasse.fromJson(x),
             ),
           ) ??
           [],
@@ -111,5 +111,5 @@ class Datenbank {
   }
 
   Map<String, dynamic> zuJson() =>
-      {"partien": List<dynamic>.from(partien.map((partie) => partie.zuJson()))};
+      {"partien": List<dynamic>.from(partien.map((partie) => partie.toJson()))};
 }

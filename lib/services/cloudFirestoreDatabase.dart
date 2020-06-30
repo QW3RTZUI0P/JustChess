@@ -1,38 +1,54 @@
 // cloudFirestoreDatabase.dart
 import 'package:JustChess/imports.dart';
 
+// abstract class to make CloudFirestoreDatabase platform independent
 abstract class CloudFirestoreDatabaseApi {
-  void addGameID({String userID, String gameID});
-  void deleteGameID({String userID, String gameID});
-  // holt die Liste der gameIDs aus dem Dokument des angemeldeten users
-  Stream<List<String>> getGameIDs({String userID});
-  void addUser({String userID, String username});
-  // holt die Partie mit der gegebenen ID
-  Future<PartieKlasse> getGame({String gameID});
-  // fügt der gameID Liste des Users die neue gameID hinzu und
-  // - erstellt eine neue Partie in der games collection
-  // oder
-  // - fügt die userID einem existierenden game hinzu
-  void addGame({PartieKlasse game});
+  // fetches the gameIDs of the current user
+  Future<List<dynamic>> getGameIDsFromFirestore({@required String userID});
+  // adds a gameID to the gameIDs value of the current user's object in the user collection
+  void addGameIDToFirestore({@required String userID, @required String gameID});
+  // deletes a gameID to the gameIDs value of the current user's object in the user collection
+  void deleteGameIDFromFirestore(
+      {@required String userID, @required String gameID});
+  // adds a user object with all the important values to the users collection
+  void addUserToFirestore({@required String userID, @required String username});
+  // fetches the game with the given gameID
+  Future<PartieKlasse> getGameFromFirestore({@required String gameID});
+  // adds a game in the games collection
+  void addGameToFirestore({@required PartieKlasse game});
   // updatet ein game in der games collection
-  void updateGame({PartieKlasse game});
+  void updateGameFromFirestore({@required PartieKlasse game});
   // löscht ein game in der games collection
-  void deleteGame({String id});
+  void deleteGameFromFirestore({@required String gameID});
 }
 
-// implementiert CloudFirestoreDatabaseApi
-// übernimmt die Kommunikation mit der Cloud Firestore Datenbank in Firebase
+// implements CloudFirestoreDatabaseApi
+// manages the communication with the CloudFirestore database in Firebase
 class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   Firestore _firestore = Firestore.instance;
   String _userCollection = "users";
   String _gamesCollection = "games";
 
-  // functions in the user collection
-  // adds a gameID to the gameIDs value in the users collection
-  void addGameID({String userID, String gameID}) async {
+  //
+  //
+  // functions in the users collection:
+  // functions for getting values:
+  // fetches all the current gameIDs from the Users object in the users collection
+  Future<List<dynamic>> getGameIDsFromFirestore(
+      {@required String userID}) async {
     DocumentSnapshot snapshot =
         await _firestore.collection(_userCollection).document(userID).get();
-    List<String> gameIDs = []; //= snapshot.data["gameIDs"] ?? [];
+    return snapshot.data["gameIDs"];
+  }
+
+  //
+  // functions for manipulating values:
+  // adds a gameID to the gameIDs value in the users collection
+  void addGameIDToFirestore(
+      {@required String userID, @required String gameID}) async {
+    DocumentSnapshot snapshot =
+        await _firestore.collection(_userCollection).document(userID).get();
+    List<dynamic> gameIDs = snapshot.data["gameIDs"] ?? [];
     gameIDs.add(gameID);
     await _firestore.collection(_userCollection).document(userID).updateData({
       "gameIDs": gameIDs,
@@ -40,33 +56,24 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   }
 
   // deletes a gameID
-  void deleteGameID({String userID, String gameID}) async {
+  void deleteGameIDFromFirestore(
+      {@required String userID, @required String gameID}) async {
     DocumentSnapshot snapshot =
         await _firestore.collection(_userCollection).document(userID).get();
-    List<String> gameIDs = snapshot.data["gameIDs"];
+    List<dynamic> gameIDs = snapshot.data["gameIDs"];
+    String username = snapshot.data["username"];
     gameIDs.remove(gameID);
-    await _firestore
-        .collection(_userCollection)
-        .document(userID)
-        .updateData({"gameIDs": gameIDs});
-  }
-
-  // fetches all the current gameIDs from the Users object in the users collection
-  Stream<List<String>> getGameIDs({String userID}) {
-    return _firestore
-        .collection(_userCollection)
-        .document(userID)
-        .snapshots()
-        .map((documentSnapshot) {
-      List<String> gameIDs = documentSnapshot.data["gameIDs"];
-      return gameIDs;
+    print(gameIDs.toString());
+    await _firestore.collection(_userCollection).document(userID).updateData({
+      "gameIDs": gameIDs,
+      "username": username,
     });
   }
 
   // adds an user to the users collection
-  void addUser({
-    String userID,
-    String username,
+  void addUserToFirestore({
+    @required String userID,
+    @required String username,
   }) async {
     await _firestore
         .collection(_userCollection)
@@ -74,38 +81,34 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
         .setData({"username": username, "gameIDs": []});
   }
 
-  // function in the games collection
-  Future<PartieKlasse> getGame({String gameID}) async {
+  //
+  //
+  // functions in the games collection:
+  // functions for getting values:
+  Future<PartieKlasse> getGameFromFirestore({@required String gameID}) async {
     DocumentSnapshot snapshot =
         await _firestore.collection(_gamesCollection).document(gameID).get();
-    PartieKlasse game = PartieKlasse.vonDocumentSnapshot(snapshot);
+    PartieKlasse game = PartieKlasse.fromDocumentSnapshot(snapshot);
     return game;
   }
 
-  void addGame({PartieKlasse game}) async {
+  //
+  // functions for manipulating values:
+  void addGameToFirestore({@required PartieKlasse game}) async {
     // adds a game to the games collection
-    await _firestore.collection(_gamesCollection).document(game.id).setData({
-      "id": game.id,
-      "name": game.name,
-      "pgn": game.pgn,
-      "player01": game.player01,
-      "player02": game.player02,
-      "player01IsWhite": game.player01IsWhite,
-      "moveCount": game.moveCount,
-    });
+    await _firestore.collection(_gamesCollection).document(game.id).setData(
+          game.toJson(),
+        );
   }
 
-  void updateGame({PartieKlasse game}) async {
-    await _firestore.collection(_gamesCollection).document(game.id).updateData({
-      "name": game.name,
-      "pgn": game.pgn,
-      "player02": game.player02,
-      "moveCount": game.moveCount,
-    });
+  void updateGameFromFirestore({@required PartieKlasse game}) async {
+    await _firestore.collection(_gamesCollection).document(game.id).updateData(
+          game.toJson(),
+        );
   }
 
-  void deleteGame({String id}) async {
-    await _firestore.collection(_gamesCollection).document(id).delete();
+  void deleteGameFromFirestore({@required String gameID}) async {
+    await _firestore.collection(_gamesCollection).document(gameID).delete();
   }
 }
 

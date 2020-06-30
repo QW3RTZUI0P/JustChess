@@ -21,6 +21,10 @@ class PartieKlasse {
   String player02;
   bool player01IsWhite;
   int moveCount;
+  // default is false
+  // if the first player deletes this game, this will change to true
+  // if the second player deletes this game, this game will actually be deleted
+  bool canBeDeleted;
 
   PartieKlasse({
     this.id,
@@ -30,10 +34,11 @@ class PartieKlasse {
     this.player02 = "",
     this.player01IsWhite = true,
     this.moveCount = 0,
+    this.canBeDeleted = false,
   });
 
-  // wandelt einen Snapshot aus Cloud Firestore zu einer PartieKlasse um
-  factory PartieKlasse.vonDocumentSnapshot(DocumentSnapshot snapshot) {
+  // transforms a DocumentSnapshot from Cloud Firestore to a PartieKlasse object
+  factory PartieKlasse.fromDocumentSnapshot(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = snapshot.data ?? {};
     return PartieKlasse(
       id: data["id"],
@@ -43,25 +48,32 @@ class PartieKlasse {
       player02: data["player02"],
       player01IsWhite: data["player01IsWhite"],
       moveCount: data["moveCount"],
+      canBeDeleted: data["canBeDeleted"] ?? false,
 
     );
   }
 
   // Funktionen um die Partien aus dem lokalen Json-File zu extrahieren oder sie in das Json-File zu schreiben
-  factory PartieKlasse.vonJson(Map<String, dynamic> json) => PartieKlasse(
+  factory PartieKlasse.fromJson(Map<String, dynamic> json) => PartieKlasse(
         id: json["id"],
         name: json["name"],
         pgn: json["pgn"],
-        player01IsWhite: json["benutzerIstWeiss"],
-        moveCount: json["anzahlDerZuege"],
+        player01: json["player01"],
+        player02: json["player02"],
+        player01IsWhite: json["player01IsWhite"],
+        moveCount: json["moveCount"],
+        canBeDeleted: json["canBeDeleted"],
       );
 
-  Map<String, dynamic> zuJson() => {
+  Map<String, dynamic> toJson() => {
         "id": this.id,
         "name": this.name,
         "pgn": this.pgn,
-        "benutzerIstWeiss": this.player01IsWhite,
-        "anzahlDerZuege": this.moveCount,
+        "player01": this.player01,
+        "player02": this.player02,
+        "player01IsWhite": this.player01IsWhite,
+        "moveCount": this.moveCount,
+        "canBeDeleted": this.canBeDeleted,
       };
 
   // erstellt eine einzigartige ID für die Partie

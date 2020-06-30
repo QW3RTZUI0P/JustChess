@@ -1,6 +1,8 @@
 // home.dart
 import "../imports.dart";
 
+// TODO: machen, dass die Partien auch gesichert werden, wenn man die App schließt
+
 class Home extends StatefulWidget {
   List<PartieKlasse> partien = [];
   var partieGeloescht;
@@ -26,7 +28,14 @@ class _HomeState extends State<Home> {
   }
 
   @override
+  void dispose() {
+    _gameBloc.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    print("gameBloc games " + _gameBloc.games.toString());
     return Scaffold(
       appBar: AppBar(
         title: Text("JustChess"),
@@ -41,64 +50,53 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
-      floatingActionButton: PartieErstellenButton(gameBloc: this._gameBloc,),
+      floatingActionButton: PartieErstellenButton(
+        gameBloc: this._gameBloc,
+      ),
       body: SafeArea(
         child: StreamBuilder(
-                initialData: [],
-                stream: _gameBloc.games,
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    print("connecting");
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } 
-                  else if (snapshot.hasData) {
-                    print(snapshot.data.toString() + " snapshot.data");
-                    return Scrollbar(
-                      child: ListView.separated(
-                          itemBuilder: (BuildContext context, int index) {
-                            return Dismissible(
-                              key: Key(
-                                snapshot.data[index].id,
-                              ),
-                              child: ListTile(
-                                title: Text(snapshot.data[index].name),
-                                subtitle: Text(
-                                    "Anzahl der Züge: ${snapshot.data[index].moveCount.toString()}"),
-                                trailing: Icon(Icons.arrow_forward_ios),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      fullscreenDialog: false,
-                                      builder: (context) => Partie(
-                                        aktuellePartie: snapshot.data[index],
-                                        gameBloc: this._gameBloc,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              background: Icon(Icons.delete),
-                              secondaryBackground: Icon(Icons.delete),
-                              onDismissed: (direction) =>
-                                  widget.partieGeloescht(
-                                      partie: widget.partien[index]),
-                            );
-                          },
-                          separatorBuilder: (BuildContext context, int index) =>
-                              Divider(),
-                          itemCount: snapshot.data.length),
-                    );
-                  } else {
-                    return Center(
-                      child: Text("Partien hinzufügen"),
-                    );
-                  }
-                },
-              ),
+            initialData: [],
+            stream: _gameBloc.gamesListStream,
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.data == null || snapshot.data == []) {
+                return Center(
+                  child: Text("Noch keine Partien hinzugefügt"),
+                );
+              } else {
+                return ListView.separated(
+                    itemBuilder: (BuildContext context, int index) {
+                      return Dismissible(
+                          key: Key(
+                            snapshot.data[index].id,
+                          ),
+                          child: ListTile(
+                            title: Text(snapshot.data[index].name ?? ""),
+                            subtitle: Text(
+                                "Anzahl der Züge: ${snapshot.data[index].moveCount.toString()}"),
+                            trailing: Icon(Icons.arrow_forward_ios),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  fullscreenDialog: false,
+                                  builder: (context) => Partie(
+                                    aktuellePartie: snapshot.data[index],
+                                    gameBloc: this._gameBloc,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          background: Icon(Icons.delete),
+                          secondaryBackground: Icon(Icons.delete),
+                          onDismissed: (direction) => _gameBloc.deleteGameSink
+                              .add(snapshot.data[index]));
+                    },
+                    separatorBuilder: (BuildContext context, int index) =>
+                        Divider(),
+                    itemCount: snapshot.data.length);
+              }
+            }),
       ),
     );
   }

@@ -30,6 +30,7 @@ export "./widgets/meinBuilder.dart";
 export "./widgets/beschriftung.dart";
 // services
 export "./services/authentication.dart";
+export "./services/cloudFirestoreDatabase.dart";
 // blocs
 export "./blocs/authenticationBloc.dart";
 export "./blocs/gameBloc.dart";

@@ -3,6 +3,9 @@ import 'package:JustChess/services/cloudFirestoreDatabase.dart';
 
 import "../imports.dart";
 
+// TODO: Email Verifizierung einbauen
+// TODO: Benachrichtigung, wenn Email oder Benutzername schon in Benutzung sind
+
 class LoginBloc {
   final AuthenticationApi authenticationService;
   final CloudFirestoreDatabaseApi cloudFirestoreDatabase;
@@ -19,7 +22,7 @@ class LoginBloc {
     //   await authenticationService.sendEmailVerification();
     // });
     // creates a new User object in the users collection in Cloud firestore
-    cloudFirestoreDatabase.addUser(userID: userID, username: username);
+    cloudFirestoreDatabase.addUserToFirestore(userID: userID, username: username);
 
     print("Account created");
 
