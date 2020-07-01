@@ -19,15 +19,17 @@ export "./seiten/home.dart";
 export "./seiten/partie.dart";
 export "./seiten/registrierung.dart";
 export "./seiten/anmeldung.dart";
+export "./seiten/partieErstellen.dart";
+export "./seiten/friends.dart";
 // klassen
 export "./klassen/partieKlasse.dart";
 export "./klassen/partienProvider.dart";
 export "./klassen/validatoren.dart";
+export "./klassen/invitation.dart";
 // widgets
 export "./widgets/partieErstellenButton.dart";
-export "./widgets/partieErstellenDialog.dart";
-export "./widgets/meinBuilder.dart";
 export "./widgets/beschriftung.dart";
+export "./widgets/menu.dart";
 // services
 export "./services/authentication.dart";
 export "./services/cloudFirestoreDatabase.dart";
@@ -35,6 +37,7 @@ export "./services/cloudFirestoreDatabase.dart";
 export "./blocs/authenticationBloc.dart";
 export "./blocs/gameBloc.dart";
 export "./blocs/loginBloc.dart";
+export "./blocs/friendsBloc.dart";
 // 3
 export "package:provider/provider.dart";
 export "package:flutter_chess_board/flutter_chess_board.dart";

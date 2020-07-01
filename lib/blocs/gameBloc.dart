@@ -36,7 +36,7 @@ class GameBloc {
   Stream<PartieKlasse> get deleteGameStream => deleteGameController.stream;
 
   final StreamController<List<PartieKlasse>> gamesListController =
-      StreamController<List<PartieKlasse>>();
+      StreamController<List<PartieKlasse>>.broadcast();
   Sink<List<PartieKlasse>> get gamesListSink => gamesListController.sink;
   Stream<List<PartieKlasse>> get gamesListStream => gamesListController.stream;
 

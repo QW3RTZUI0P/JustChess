@@ -14,13 +14,14 @@ class LoginBloc {
     this.cloudFirestoreDatabase,
   });
 
-  Future<String> createAccount({String email, String password, String username}) async {
+  Future<String> createAccount({@required String email, @required String password, @required String username}) async {
     // creates a new user account in Firebase Auth
     String userID = await authenticationService
         .createUserWithEmailAndPassword(email: email, password: password);
     //     .then((_) async {
     //   await authenticationService.sendEmailVerification();
     // });
+
     // creates a new User object in the users collection in Cloud firestore
     cloudFirestoreDatabase.addUserToFirestore(userID: userID, username: username);
 
@@ -29,10 +30,20 @@ class LoginBloc {
     return userID;
   }
 
-  Future<String> signIn({String email, String password}) async {
+  Future<String> signIn({@required String email, @required String password}) async {
     String userID = await authenticationService.signInWithEmailAndPassword(
         email: email, password: password);
         print("Signed in");
         return userID;
   }
+
+  Future<bool> isUsernameAvailable({@required String username}) async {
+    List<dynamic> usernames = await cloudFirestoreDatabase.getUsernamesList();
+    if (usernames.contains(username)) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
 }

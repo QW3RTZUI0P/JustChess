@@ -5,6 +5,8 @@ import 'package:JustChess/imports.dart';
 abstract class CloudFirestoreDatabaseApi {
   // fetches the gameIDs of the current user
   Future<List<dynamic>> getGameIDsFromFirestore({@required String userID});
+  Future<List<dynamic>> getUsernamesList();
+  Future<dynamic> getUserIDForUsername({@required String username});
   // adds a gameID to the gameIDs value of the current user's object in the user collection
   void addGameIDToFirestore({@required String userID, @required String gameID});
   // deletes a gameID to the gameIDs value of the current user's object in the user collection
@@ -12,6 +14,8 @@ abstract class CloudFirestoreDatabaseApi {
       {@required String userID, @required String gameID});
   // adds a user object with all the important values to the users collection
   void addUserToFirestore({@required String userID, @required String username});
+  Future<List<dynamic>> getInvitations({@required String userID});
+  Future<List<dynamic>> getFriends({@required String userID});
   // fetches the game with the given gameID
   Future<PartieKlasse> getGameFromFirestore({@required String gameID});
   // adds a game in the games collection
@@ -20,6 +24,10 @@ abstract class CloudFirestoreDatabaseApi {
   void updateGameFromFirestore({@required PartieKlasse game});
   // löscht ein game in der games collection
   void deleteGameFromFirestore({@required String gameID});
+  void addFriendToFirestore(
+      {@required String userID, @required String nameOfTheFriend});
+  // void inviteOpponentToGame(
+  //     {@required String gameID, @required String opponentUserID});
 }
 
 // implements CloudFirestoreDatabaseApi
@@ -39,6 +47,37 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
     DocumentSnapshot snapshot =
         await _firestore.collection(_userCollection).document(userID).get();
     return snapshot.data["gameIDs"];
+  }
+
+  // gets a list with all the usernames in use
+  Future<List<dynamic>> getUsernamesList() async {
+    DocumentSnapshot snapshot = await _firestore
+        .collection(_userCollection)
+        .document("usernames")
+        .get();
+    List<dynamic> usernamesList = snapshot["usernames"];
+    return usernamesList;
+  }
+
+  // gets the uid for the given username
+  Future<String> getUserIDForUsername({@required String username}) async {
+    DocumentSnapshot snapshot = await _firestore
+        .collection(_userCollection)
+        .document("usernames")
+        .get();
+    String userID = snapshot.data["userIDs"][username];
+    return userID;
+  }
+
+  Future<List<dynamic>> getInvitations({@required String userID}) async {
+    return [];
+  }
+
+  Future<List<dynamic>> getFriends({@required String userID}) async {
+    DocumentSnapshot snapshot =
+        await _firestore.collection(_userCollection).document(userID).get();
+    List<dynamic> friendsList = snapshot.data["friends"] ?? [];
+    return friendsList;
   }
 
   //
@@ -75,10 +114,38 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
     @required String userID,
     @required String username,
   }) async {
+    await _firestore.collection(_userCollection).document(userID).setData({
+      "username": username,
+      "gameIDs": [],
+      "invitations": [],
+      "friends": [],
+    });
+    DocumentSnapshot snapshot = await _firestore
+        .collection(_userCollection)
+        .document("usernames")
+        .get();
+    List<dynamic> usernames = snapshot["usernames"];
+    Map<String, dynamic> userIDs = snapshot["userIDs"];
+    usernames.add(username);
+    userIDs.addEntries([MapEntry(username, userID)]);
+    await _firestore
+        .collection(_userCollection)
+        .document("usernames")
+        .updateData({"usernames": usernames, "userIDs": userIDs});
+  }
+
+  void addFriendToFirestore(
+      {@required String userID, @required String nameOfTheFriend}) async {
+    DocumentSnapshot snapshot =
+        await _firestore.collection(_userCollection).document(userID).get();
+
+    Map<String, dynamic> newMap = snapshot.data;
+    newMap["friends"].add(nameOfTheFriend);
+    print("s "+newMap["friends"].toString());
     await _firestore
         .collection(_userCollection)
         .document(userID)
-        .setData({"username": username, "gameIDs": []});
+        .updateData(newMap);
   }
 
   //
@@ -110,6 +177,30 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   void deleteGameFromFirestore({@required String gameID}) async {
     await _firestore.collection(_gamesCollection).document(gameID).delete();
   }
+
+  // void inviteOpponentToGame({
+  //   @required String gameID,
+  //   @required String opponentUserID,
+  //   @required String opponentUsername,
+  //   @required String invitatorUserID,
+  //   @required String invitatorUsename,
+  // }) async {
+  //   Invitation invitation = Invitation(
+  //     fromID: invitatorUserID,
+  //     toID: opponentUserID,
+  //     fromUsername: invitatorUsename,
+  //     toUsername: opponentUsername,
+  //     gameID: gameID,
+  //   );
+  //   DocumentSnapshot snapshot = await _firestore
+  //       .collection(_userCollection)
+  //       .document(opponentUserID)
+  //       .get();
+  //   Map<String, dynamic> data = snapshot.data;
+  //   data["invitations"].add(
+  //     invitation.toJson(),
+  //   );
+  // }
 }
 
 // // DAS HIER ALLES IST SCHEIßE!!!!!!!!!!!!!!

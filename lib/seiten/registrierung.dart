@@ -151,14 +151,36 @@ class _RegistrierungState extends State<Registrierung> with Validatoren {
                 // TODO: implement Sign In With Apple
                 RaisedButton(
                   child: Text("Registrieren"),
-                  onPressed: () {
+                  onPressed: () async {
                     // TODO: implementieren, was passiert wenn der Account schon benutzt wird
+                    // TODO: make username control prettier
+                    // TODO: implement email is in use control
                     if (_formKey.currentState.validate()) {
-                      _loginBloc.createAccount(
+                      if (await _loginBloc.isUsernameAvailable(
+                          username: _benutzernameController.text)) {
+                        _loginBloc.createAccount(
                           email: _emailController.text,
                           password: _passwortController.text,
                           username: _benutzernameController.text,
-                          );
+                        );
+                      } else {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title:
+                                    Text("Der Benutzername ist schon vergeben"),
+                                content: Text(
+                                    "Wähle bitte einen anderen Benutzernamen"),
+                                actions: <Widget>[
+                                  FlatButton(
+                                    child: Text("OK"),
+                                    onPressed: () => Navigator.pop(context),
+                                  ),
+                                ],
+                              );
+                            });
+                      }
                     }
                   },
                 ),

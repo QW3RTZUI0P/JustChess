@@ -2,6 +2,7 @@
 import "../imports.dart";
 
 // TODO: machen, dass die Partien auch gesichert werden, wenn man die App schließt
+// TODO: add ability to delete account
 
 class Home extends StatefulWidget {
   List<PartieKlasse> partien = [];
@@ -53,12 +54,15 @@ class _HomeState extends State<Home> {
       floatingActionButton: PartieErstellenButton(
         gameBloc: this._gameBloc,
       ),
+      drawer: Menu(),
       body: SafeArea(
         child: StreamBuilder(
             initialData: [],
             stream: _gameBloc.gamesListStream,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.data == null || snapshot.data == []) {
+              if (snapshot.data == null ||
+                  snapshot.data == [] ||
+                  snapshot.data.isEmpty) {
                 return Center(
                   child: Text("Noch keine Partien hinzugefügt"),
                 );
