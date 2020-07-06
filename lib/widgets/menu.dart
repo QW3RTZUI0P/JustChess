@@ -7,6 +7,17 @@ class Menu extends StatefulWidget {
 }
 
 class _MenuState extends State<Menu> {
+
+  AuthenticationBloc authenticationBloc;
+  GameBloc _gameBloc;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    this.authenticationBloc = AuthenticationBlocProvider.of(context).authenticationBloc;
+    this._gameBloc = GameBlocProvider.of(context).gameBloc;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -33,7 +44,16 @@ class _MenuState extends State<Menu> {
                     }),
               );
             },
-          )
+          ),
+          ListTile(
+            title: Text("Ausloggen"),
+            onTap: () async {
+              _gameBloc.games.clear();
+              _gameBloc.currentUserID = "";
+              
+              authenticationBloc.authenticationService.signOut();
+            },
+          ),
         ],
       ),
     );

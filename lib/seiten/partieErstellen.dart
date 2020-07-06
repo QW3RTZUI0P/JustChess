@@ -14,7 +14,6 @@ class _PartieErstellenState extends State<PartieErstellen> {
   GameBloc _gameBloc;
 
   TextEditingController _neuePartieNameController = TextEditingController();
-  TextEditingController _opponentController = TextEditingController();
   int radioButtonGroupValue = 0;
   bool benutzerIstWeiss = true;
 
@@ -41,22 +40,26 @@ class _PartieErstellenState extends State<PartieErstellen> {
   }
 
   void createGame() async {
+    String opponentID = await _gameBloc.cloudFirestoreDatabase
+        .getUserIDForUsername(username: widget.opponent);
     PartieKlasse neuePartie = PartieKlasse(
       name: _neuePartieNameController.text,
       pgn: "",
       player01: _gameBloc.currentUserID,
       player01IsWhite: this.benutzerIstWeiss,
+      player02: opponentID,
       moveCount: 0,
+      canBeDeleted: false,
     );
     neuePartie.erstelleID();
     _gameBloc.addGameSink.add(neuePartie);
-    if (widget.opponent.isEmpty == false) {
-      String opponentsUserID = await _gameBloc.cloudFirestoreDatabase
-          .getUserIDForUsername(username: widget.opponent);
-      neuePartie.player02 = opponentsUserID;
-      _gameBloc.cloudFirestoreDatabase
-          .addGameIDToFirestore(userID: opponentsUserID, gameID: neuePartie.id);
-    }
+    // if (widget.opponent.isEmpty == false) {
+    //   String opponentsUserID = await _gameBloc.cloudFirestoreDatabase
+    //       .getUserIDForUsername(username: widget.opponent);
+    //   neuePartie.player02 = opponentsUserID;
+    //   _gameBloc.cloudFirestoreDatabase
+    //       .addGameIDToFirestore(userID: opponentsUserID, gameID: neuePartie.id);
+    // }r
     _neuePartieNameController.text = "";
     Navigator.pop(context);
   }

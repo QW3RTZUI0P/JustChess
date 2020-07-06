@@ -21,6 +21,7 @@ export "./seiten/registrierung.dart";
 export "./seiten/anmeldung.dart";
 export "./seiten/partieErstellen.dart";
 export "./seiten/friends.dart";
+export "./seiten/findNewFriend.dart";
 // klassen
 export "./klassen/partieKlasse.dart";
 export "./klassen/partienProvider.dart";

@@ -29,6 +29,12 @@ class GameBloc {
   Sink<PartieKlasse> get addGameSink => addGameController.sink;
   Stream<PartieKlasse> get addGameStream => addGameController.stream;
 
+  // controls the updated games
+  final StreamController<PartieKlasse> updateGameController =
+      StreamController<PartieKlasse>();
+  Sink<PartieKlasse> get updateGameSink => updateGameController.sink;
+  Stream<PartieKlasse> get updateGameStream => updateGameController.stream;
+
   // controls the deleting of the games
   final StreamController<PartieKlasse> deleteGameController =
       StreamController<PartieKlasse>();
@@ -61,6 +67,18 @@ class GameBloc {
     }
   }
 
+  void refresh() async {
+    games.clear();
+    this.currentUserID = await authenticationService.currentUserUid();
+    List<dynamic> gameIDs = await cloudFirestoreDatabase
+            .getGameIDsFromFirestore(userID: this.currentUserID) ??
+        [];
+    print("gameIDs: " + gameIDs.toString());
+    for (String currentGameID in gameIDs) {
+      gameIDSink.add(currentGameID);
+    }
+  }
+
   // starts the listeners for the three streams
   void _startListeners() async {
     this.gameIDStream.listen((gameID) async {
@@ -83,9 +101,20 @@ class GameBloc {
       this.gameIDs.add(addedGame.id);
       this.localGameSink.add(addedGame);
       // adds values to Firebase
+
       this.cloudFirestoreDatabase.addGameIDToFirestore(
-          userID: this.currentUserID, gameID: addedGame.id);
+          userID: addedGame.player01, gameID: addedGame.id);
+      this.cloudFirestoreDatabase.addGameIDToFirestore(
+          userID: addedGame.player02, gameID: addedGame.id);
       this.cloudFirestoreDatabase.addGameToFirestore(game: addedGame);
+    });
+    this.updateGameStream.listen((updatedGame) {
+      PartieKlasse outdatedGame =
+          this.games.where((game) => game.id == updatedGame.id).elementAt(0);
+      int index = this.games.indexOf(outdatedGame);
+      this.games.replaceRange(index, index + 1, [updatedGame]);
+      this.gamesListSink.add(this.games);
+      cloudFirestoreDatabase.updateGameFromFirestore(game: updatedGame);
     });
     // only .listen function that is smart
     this.deleteGameStream.listen((deletedGame) {
@@ -98,14 +127,15 @@ class GameBloc {
         cloudFirestoreDatabase.deleteGameFromFirestore(gameID: deletedGame.id);
         cloudFirestoreDatabase.deleteGameIDFromFirestore(
             userID: currentUserID, gameID: deletedGame.id);
-        
       } else {
-        PartieKlasse changedGame = deletedGame;
+        PartieKlasse changedGame = PartieKlasse.from(deletedGame);
         changedGame.canBeDeleted = true;
         cloudFirestoreDatabase.updateGameFromFirestore(game: changedGame);
         // deletes gameID in the users object
         cloudFirestoreDatabase.deleteGameIDFromFirestore(
             userID: currentUserID, gameID: deletedGame.id);
+        this.games.remove(deletedGame);
+        this.gamesListSink.add(this.games);
       }
     });
   }
@@ -155,6 +185,7 @@ class GameBloc {
     gameIDController.close();
     localGameController.close();
     addGameController.close();
+    updateGameController.close();
     deleteGameController.close();
     gamesListController.close();
   }

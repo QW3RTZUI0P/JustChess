@@ -3,6 +3,8 @@ import "../imports.dart";
 
 // TODO: machen, dass die Partien auch gesichert werden, wenn man die App schließt
 // TODO: add ability to delete account
+// TODO: add routes to MaterialApp and make everything Navigator.pushNamed
+// TODO: add the sources for the app icon to the "about" page
 
 class Home extends StatefulWidget {
   List<PartieKlasse> partien = [];
@@ -20,6 +22,8 @@ class _HomeState extends State<Home> {
   AuthenticationBloc _authenticationBloc;
   GameBloc _gameBloc;
 
+  
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -30,10 +34,10 @@ class _HomeState extends State<Home> {
 
   @override
   void dispose() {
-    _gameBloc.dispose();
     super.dispose();
   }
 
+  // TODO: create invitations
   @override
   Widget build(BuildContext context) {
     print("gameBloc games " + _gameBloc.games.toString());
@@ -43,10 +47,10 @@ class _HomeState extends State<Home> {
         actions: <Widget>[
           IconButton(
             icon: Icon(
-              Icons.exit_to_app,
+              Icons.refresh,
             ),
             onPressed: () {
-              _authenticationBloc.authenticationService.signOut();
+              _gameBloc.refresh();
             },
           )
         ],
@@ -70,31 +74,33 @@ class _HomeState extends State<Home> {
                 return ListView.separated(
                     itemBuilder: (BuildContext context, int index) {
                       return Dismissible(
-                          key: Key(
-                            snapshot.data[index].id,
-                          ),
-                          child: ListTile(
-                            title: Text(snapshot.data[index].name ?? ""),
-                            subtitle: Text(
-                                "Anzahl der Züge: ${snapshot.data[index].moveCount.toString()}"),
-                            trailing: Icon(Icons.arrow_forward_ios),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  fullscreenDialog: false,
-                                  builder: (context) => Partie(
-                                    aktuellePartie: snapshot.data[index],
-                                    gameBloc: this._gameBloc,
-                                  ),
+                        key: Key(
+                          snapshot.data[index].id,
+                        ),
+                        child: ListTile(
+                          title: Text(snapshot.data[index].name ?? ""),
+                          subtitle: Text(
+                              "Anzahl der Züge: ${snapshot.data[index].moveCount.toString()}"),
+                          trailing: Icon(Icons.arrow_forward_ios),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                fullscreenDialog: false,
+                                builder: (context) => Partie(
+                                  aktuellePartie: snapshot.data[index],
+                                  gameBloc: _gameBloc,
                                 ),
-                              );
-                            },
-                          ),
-                          background: Icon(Icons.delete),
-                          secondaryBackground: Icon(Icons.delete),
-                          onDismissed: (direction) => _gameBloc.deleteGameSink
-                              .add(snapshot.data[index]));
+                              ),
+                            );
+                          },
+                        ),
+                        background: Icon(Icons.delete),
+                        secondaryBackground: Icon(Icons.delete),
+                        onDismissed: (direction) => setState(() {
+                          _gameBloc.deleteGameSink.add(snapshot.data[index]);
+                        }),
+                      );
                     },
                     separatorBuilder: (BuildContext context, int index) =>
                         Divider(),

@@ -2,7 +2,7 @@
 import "../imports.dart";
 
 class PartieErstellenButton extends StatefulWidget {
-  GameBloc gameBloc;
+  final GameBloc gameBloc;
   PartieErstellenButton({this.gameBloc});
 
   @override
@@ -22,8 +22,13 @@ class _PartieErstellenButtonState extends State<PartieErstellenButton> {
           context,
           MaterialPageRoute(
             fullscreenDialog: true,
+            
             builder: (BuildContext context) {
-              return PartieErstellen();
+              // TODO: decide whether to show the list of friends when creating a new game
+              // or to show a separate page
+              // TODO: make friensBloc lazy or something like this, so that it doesn't fetch the friends list all the time
+              return Friends();
+              // return PartieErstellen();
             },
           ),
         );

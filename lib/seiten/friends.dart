@@ -34,37 +34,40 @@ class _FriendsState extends State<Friends> {
           IconButton(
             icon: Icon(Icons.person_add),
             onPressed: () {
-              TextEditingController _newFriendController =
-                  TextEditingController();
-              showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  content: TextField(
-                    controller: _newFriendController,
-                    decoration:
-                        InputDecoration(hintText: "der Name des Freundes"),
-                  ),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text("OK"),
-                      onPressed: () {
-                        this
-                            ._gameBloc
-                            .cloudFirestoreDatabase
-                            .addFriendToFirestore(
-                              userID: _gameBloc.currentUserID,
-                              nameOfTheFriend: _newFriendController.text,
-                            );
-                            Navigator.pop(context);
-                      },
-                    ),
-                    FlatButton(
-                      child: Text("Abbrechen"),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
-              );
+              Navigator.push(context, MaterialPageRoute(fullscreenDialog: true, builder: (BuildContext context) {
+                return FindNewFriend(friendsBloc: this._friendsBloc,);
+              }),);
+              // TextEditingController _newFriendController =
+              //     TextEditingController();
+              // showDialog(
+              //   context: context,
+              //   builder: (_) => AlertDialog(
+              //     content: TextField(
+              //       controller: _newFriendController,
+              //       decoration:
+              //           InputDecoration(hintText: "der Name des Freundes"),
+              //     ),
+              //     actions: <Widget>[
+              //       FlatButton(
+              //         child: Text("OK"),
+              //         onPressed: () {
+              //           this
+              //               ._gameBloc
+              //               .cloudFirestoreDatabase
+              //               .addFriendToFirestore(
+              //                 userID: _gameBloc.currentUserID,
+              //                 nameOfTheFriend: _newFriendController.text,
+              //               );
+              //               Navigator.pop(context);
+              //         },
+              //       ),
+              //       FlatButton(
+              //         child: Text("Abbrechen"),
+              //         onPressed: () => Navigator.pop(context),
+              //       ),
+              //     ],
+              //   ),
+              // );
             },
           )
         ],

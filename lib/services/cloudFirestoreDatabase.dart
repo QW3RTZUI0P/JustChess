@@ -5,7 +5,7 @@ import 'package:JustChess/imports.dart';
 abstract class CloudFirestoreDatabaseApi {
   // fetches the gameIDs of the current user
   Future<List<dynamic>> getGameIDsFromFirestore({@required String userID});
-  Future<List<dynamic>> getUsernamesList();
+  Future<List<String>> getUsernamesList();
   Future<dynamic> getUserIDForUsername({@required String username});
   // adds a gameID to the gameIDs value of the current user's object in the user collection
   void addGameIDToFirestore({@required String userID, @required String gameID});
@@ -15,7 +15,7 @@ abstract class CloudFirestoreDatabaseApi {
   // adds a user object with all the important values to the users collection
   void addUserToFirestore({@required String userID, @required String username});
   Future<List<dynamic>> getInvitations({@required String userID});
-  Future<List<dynamic>> getFriends({@required String userID});
+  Future<List<dynamic>> getFriendsList({@required String userID});
   // fetches the game with the given gameID
   Future<PartieKlasse> getGameFromFirestore({@required String gameID});
   // adds a game in the games collection
@@ -50,12 +50,15 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   }
 
   // gets a list with all the usernames in use
-  Future<List<dynamic>> getUsernamesList() async {
+  Future<List<String>> getUsernamesList() async {
     DocumentSnapshot snapshot = await _firestore
         .collection(_userCollection)
         .document("usernames")
         .get();
-    List<dynamic> usernamesList = snapshot["usernames"];
+    List<String> usernamesList = List.generate(
+      snapshot["usernames"].length,
+      (index) => snapshot["usernames"][index].toString(),
+    );
     return usernamesList;
   }
 
@@ -73,7 +76,8 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
     return [];
   }
 
-  Future<List<dynamic>> getFriends({@required String userID}) async {
+  // gets the List of friends of the user with the given userID
+  Future<List<dynamic>> getFriendsList({@required String userID}) async {
     DocumentSnapshot snapshot =
         await _firestore.collection(_userCollection).document(userID).get();
     List<dynamic> friendsList = snapshot.data["friends"] ?? [];
@@ -141,7 +145,7 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
 
     Map<String, dynamic> newMap = snapshot.data;
     newMap["friends"].add(nameOfTheFriend);
-    print("s "+newMap["friends"].toString());
+    print("s " + newMap["friends"].toString());
     await _firestore
         .collection(_userCollection)
         .document(userID)

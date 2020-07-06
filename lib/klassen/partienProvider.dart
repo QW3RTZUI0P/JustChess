@@ -2,6 +2,7 @@
 import "../imports.dart";
 import "dart:convert";
 
+// not necessary, can be deleted
 class PartienProvider with ChangeNotifier {
   Datenbank datenbank = Datenbank();
 
@@ -17,7 +18,7 @@ class PartienProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> neuePartieErstellt({PartieKlasse partie}) {
+  void neuePartieErstellt({PartieKlasse partie}) {
     this.datenbank.partien.add(partie);
     DatenbankFileRoutinen().schreibeDokument(
       datenbankZuJson(this.datenbank),

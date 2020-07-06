@@ -37,6 +37,20 @@ class PartieKlasse {
     this.canBeDeleted = false,
   });
 
+  // creates a copy of the given object
+  factory PartieKlasse.from(PartieKlasse otherGame) {
+    return PartieKlasse(
+      id: otherGame.id,
+      name: otherGame.name,
+      pgn: otherGame.pgn,
+      player01: otherGame.player01,
+      player02: otherGame.player02,
+      player01IsWhite: otherGame.player01IsWhite,
+      moveCount: otherGame.moveCount,
+      canBeDeleted: otherGame.canBeDeleted,
+    );
+  }
+
   // transforms a DocumentSnapshot from Cloud Firestore to a PartieKlasse object
   factory PartieKlasse.fromDocumentSnapshot(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = snapshot.data ?? {};
@@ -49,7 +63,6 @@ class PartieKlasse {
       player01IsWhite: data["player01IsWhite"],
       moveCount: data["moveCount"],
       canBeDeleted: data["canBeDeleted"] ?? false,
-
     );
   }
 
@@ -77,7 +90,7 @@ class PartieKlasse {
       };
 
   // erstellt eine einzigartige ID für die Partie
-    void erstelleID() {
+  void erstelleID() {
     this.id = this.player01 + DateTime.now().millisecondsSinceEpoch.toString();
   }
 }
