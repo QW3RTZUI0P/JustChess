@@ -1,6 +1,7 @@
 // friends.dart
-import "../imports.dart";
+import "../../imports.dart";
 
+// TODO: enable auto reload after adding a friend
 class Friends extends StatefulWidget {
   @override
   _FriendsState createState() => _FriendsState();
@@ -14,8 +15,8 @@ class _FriendsState extends State<Friends> {
   void initState() {
     super.initState();
     this._friendsBloc = FriendsBloc(
-      cloudFirestoreDatabase: CloudFirestoreDatabase(),
       authenticationService: AuthenticationService(),
+      cloudFirestoreDatabase: CloudFirestoreDatabase(),
     );
   }
 
@@ -34,46 +35,21 @@ class _FriendsState extends State<Friends> {
           IconButton(
             icon: Icon(Icons.person_add),
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(fullscreenDialog: true, builder: (BuildContext context) {
-                return FindNewFriend(friendsBloc: this._friendsBloc,);
-              }),);
-              // TextEditingController _newFriendController =
-              //     TextEditingController();
-              // showDialog(
-              //   context: context,
-              //   builder: (_) => AlertDialog(
-              //     content: TextField(
-              //       controller: _newFriendController,
-              //       decoration:
-              //           InputDecoration(hintText: "der Name des Freundes"),
-              //     ),
-              //     actions: <Widget>[
-              //       FlatButton(
-              //         child: Text("OK"),
-              //         onPressed: () {
-              //           this
-              //               ._gameBloc
-              //               .cloudFirestoreDatabase
-              //               .addFriendToFirestore(
-              //                 userID: _gameBloc.currentUserID,
-              //                 nameOfTheFriend: _newFriendController.text,
-              //               );
-              //               Navigator.pop(context);
-              //         },
-              //       ),
-              //       FlatButton(
-              //         child: Text("Abbrechen"),
-              //         onPressed: () => Navigator.pop(context),
-              //       ),
-              //     ],
-              //   ),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    fullscreenDialog: true,
+                    maintainState: true,
+                    builder: (BuildContext context) {
+                      return FindNewFriend();
+                    }),
+              );
             },
           )
         ],
       ),
       body: StreamBuilder(
-        stream: _friendsBloc.friendsList,
+        stream: _friendsBloc.friendsListStream,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.data == null) {
             return Center(
@@ -90,12 +66,13 @@ class _FriendsState extends State<Friends> {
                   trailing: IconButton(
                     icon: Icon(Icons.add),
                     onPressed: () {
+                      Navigator.pop(context);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           fullscreenDialog: true,
                           builder: (BuildContext context) {
-                            return PartieErstellen(
+                            return CreateGame(
                               opponent: snapshot.data[index],
                             );
                           },

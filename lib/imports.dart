@@ -14,23 +14,30 @@ export "package:firebase_dynamic_links/firebase_dynamic_links.dart";
 export "package:firebase_in_app_messaging/firebase_in_app_messaging.dart";
 // 2
 export "./main.dart";
-// seiten
-export "./seiten/home.dart";
-export "./seiten/partie.dart";
-export "./seiten/registrierung.dart";
-export "./seiten/anmeldung.dart";
-export "./seiten/partieErstellen.dart";
-export "./seiten/friends.dart";
-export "./seiten/findNewFriend.dart";
+// pages
+// homePage:
+export "./pages/home/home.dart";
+export "./pages/home/menu.dart";
+export "./pages/home/createGameButton.dart";
+// gamePage:
+export "./pages/game/game.dart";
+export "./pages/game/labeling.dart";
+export "./pages/game/chessBoardWidget.dart";
+// friendsPage:
+export "./pages/friends/friends.dart";
+export "./pages/friends/findNewFriend.dart";
+
+export "./pages/signUp.dart";
+export "./pages/signIn.dart";
+export "./pages/createGame.dart";
+
 // klassen
-export "./klassen/partieKlasse.dart";
-export "./klassen/partienProvider.dart";
-export "./klassen/validatoren.dart";
-export "./klassen/invitation.dart";
+export "./classes/gameClass.dart";
+export "./classes/partienProvider.dart";
+export "./classes/validators.dart";
+export "./classes/invitation.dart";
 // widgets
-export "./widgets/partieErstellenButton.dart";
-export "./widgets/beschriftung.dart";
-export "./widgets/menu.dart";
+
 // services
 export "./services/authentication.dart";
 export "./services/cloudFirestoreDatabase.dart";
@@ -41,5 +48,6 @@ export "./blocs/loginBloc.dart";
 export "./blocs/friendsBloc.dart";
 // 3
 export "package:provider/provider.dart";
+export "package:uuid/uuid.dart";
 export "package:flutter_chess_board/flutter_chess_board.dart";
 export "package:after_layout/after_layout.dart";

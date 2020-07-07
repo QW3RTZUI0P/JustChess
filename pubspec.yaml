@@ -27,6 +27,7 @@ dependencies:
   provider: ^4.1.2
   shared_preferences: ^0.5.7
   path_provider: ^1.6.9
+  uuid: ^2.2.0
   flutter_chess_board: ^0.9.4
   after_layout: ^1.0.7+2
   # dependency for firebase/google analytics

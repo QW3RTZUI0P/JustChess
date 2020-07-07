@@ -1,16 +1,17 @@
-// partieErstellen.dart
+// createGame.dart
 import "../imports.dart";
 
 // Dialog der angezeigt wird, wenn der PartieErstellenButton gedrückt wird
-class PartieErstellen extends StatefulWidget {
+// TODO: enable auto generated names
+class CreateGame extends StatefulWidget {
   final String opponent;
-  PartieErstellen({this.opponent});
+  CreateGame({this.opponent});
 
   @override
-  _PartieErstellenState createState() => _PartieErstellenState();
+  _CreateGameState createState() => _CreateGameState();
 }
 
-class _PartieErstellenState extends State<PartieErstellen> {
+class _CreateGameState extends State<CreateGame> {
   GameBloc _gameBloc;
 
   TextEditingController _neuePartieNameController = TextEditingController();
@@ -42,7 +43,7 @@ class _PartieErstellenState extends State<PartieErstellen> {
   void createGame() async {
     String opponentID = await _gameBloc.cloudFirestoreDatabase
         .getUserIDForUsername(username: widget.opponent);
-    PartieKlasse neuePartie = PartieKlasse(
+    GameClass neuePartie = GameClass(
       name: _neuePartieNameController.text,
       pgn: "",
       player01: _gameBloc.currentUserID,

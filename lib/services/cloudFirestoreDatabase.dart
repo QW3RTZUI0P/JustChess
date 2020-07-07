@@ -6,6 +6,7 @@ abstract class CloudFirestoreDatabaseApi {
   // fetches the gameIDs of the current user
   Future<List<dynamic>> getGameIDsFromFirestore({@required String userID});
   Future<List<String>> getUsernamesList();
+  Future<String> getUsernameForUserID({@required String userID});
   Future<dynamic> getUserIDForUsername({@required String username});
   // adds a gameID to the gameIDs value of the current user's object in the user collection
   void addGameIDToFirestore({@required String userID, @required String gameID});
@@ -17,11 +18,11 @@ abstract class CloudFirestoreDatabaseApi {
   Future<List<dynamic>> getInvitations({@required String userID});
   Future<List<dynamic>> getFriendsList({@required String userID});
   // fetches the game with the given gameID
-  Future<PartieKlasse> getGameFromFirestore({@required String gameID});
+  Future<GameClass> getGameFromFirestore({@required String gameID});
   // adds a game in the games collection
-  void addGameToFirestore({@required PartieKlasse game});
+  void addGameToFirestore({@required GameClass game});
   // updatet ein game in der games collection
-  void updateGameFromFirestore({@required PartieKlasse game});
+  void updateGameFromFirestore({@required GameClass game});
   // löscht ein game in der games collection
   void deleteGameFromFirestore({@required String gameID});
   void addFriendToFirestore(
@@ -60,6 +61,12 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
       (index) => snapshot["usernames"][index].toString(),
     );
     return usernamesList;
+  }
+
+  Future<String> getUsernameForUserID({@required String userID}) async {
+    DocumentSnapshot snapshot =
+        await _firestore.collection(_userCollection).document(userID).get();
+    return snapshot["username"];
   }
 
   // gets the uid for the given username
@@ -119,7 +126,6 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
     @required String username,
   }) async {
     await _firestore.collection(_userCollection).document(userID).setData({
-      "username": username,
       "gameIDs": [],
       "invitations": [],
       "friends": [],
@@ -156,23 +162,23 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   //
   // functions in the games collection:
   // functions for getting values:
-  Future<PartieKlasse> getGameFromFirestore({@required String gameID}) async {
+  Future<GameClass> getGameFromFirestore({@required String gameID}) async {
     DocumentSnapshot snapshot =
         await _firestore.collection(_gamesCollection).document(gameID).get();
-    PartieKlasse game = PartieKlasse.fromDocumentSnapshot(snapshot);
+    GameClass game = GameClass.fromDocumentSnapshot(snapshot);
     return game;
   }
 
   //
   // functions for manipulating values:
-  void addGameToFirestore({@required PartieKlasse game}) async {
+  void addGameToFirestore({@required GameClass game}) async {
     // adds a game to the games collection
     await _firestore.collection(_gamesCollection).document(game.id).setData(
           game.toJson(),
         );
   }
 
-  void updateGameFromFirestore({@required PartieKlasse game}) async {
+  void updateGameFromFirestore({@required GameClass game}) async {
     await _firestore.collection(_gamesCollection).document(game.id).updateData(
           game.toJson(),
         );

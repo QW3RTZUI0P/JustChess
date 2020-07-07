@@ -18,7 +18,7 @@ class PartienProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void neuePartieErstellt({PartieKlasse partie}) {
+  void neuePartieErstellt({GameClass partie}) {
     this.datenbank.partien.add(partie);
     DatenbankFileRoutinen().schreibeDokument(
       datenbankZuJson(this.datenbank),
@@ -26,7 +26,7 @@ class PartienProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> partieGeloescht({PartieKlasse partie}) {
+  Future<void> partieGeloescht({GameClass partie}) {
     this.datenbank.partien.remove(partie);
     DatenbankFileRoutinen().schreibeDokument(
       datenbankZuJson(this.datenbank),
@@ -35,7 +35,7 @@ class PartienProvider with ChangeNotifier {
   }
 
   Future<void> partieUpgedatet(
-      {PartieKlasse altePartie, PartieKlasse neuePartie}) {
+      {GameClass altePartie, GameClass neuePartie}) {
     int index = this.datenbank.partien.indexOf(altePartie);
     this.datenbank.partien[index].pgn = neuePartie.pgn;
     DatenbankFileRoutinen().schreibeDokument(
@@ -95,16 +95,16 @@ String datenbankZuJson(Datenbank datenbank) {
 }
 
 class Datenbank {
-  List<PartieKlasse> partien = [];
+  List<GameClass> partien = [];
 
   Datenbank({
     this.partien,
   });
   factory Datenbank.vonJson(Map<String, dynamic> json) {
     return Datenbank(
-      partien: List<PartieKlasse>.from(
+      partien: List<GameClass>.from(
             json["partien"].map(
-              (x) => PartieKlasse.fromJson(x),
+              (x) => GameClass.fromJson(x),
             ),
           ) ??
           [],

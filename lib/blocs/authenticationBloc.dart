@@ -16,12 +16,14 @@ class AuthenticationBloc {
   Sink<bool> get logoutUser => _logoutController.sink;
   Stream<bool> get listLogoutUser => _logoutController.stream;
 
+
+
   AuthenticationBloc({this.authenticationService}) {
-    onAuthChanged();
+    _startListeners();
   }
 
   // überwacht die ganze Zeit, ob der User ein- oder ausgeloggt ist
-  void onAuthChanged() {
+  void _startListeners() {
     // wenn der User sich einloggt/ausloggt wird das hier ausgeführt
     authenticationService.getFirebaseAuth().onAuthStateChanged.listen((user) {
       final String uid = user != null ? user.uid : null;
@@ -34,6 +36,7 @@ class AuthenticationBloc {
       }
     });
   }
+
 
   // schließt die beiden StreamController (aus Performance-Gründen)
   void dispose() {

@@ -1,17 +1,17 @@
-// anmeldung.dart
+// signIn.dart
 import 'package:JustChess/services/cloudFirestoreDatabase.dart';
 
 import "../imports.dart";
 
-class Anmeldung extends StatefulWidget {
+class SignIn extends StatefulWidget {
   // loginBloc aus registrierung.dart
   final LoginBloc loginBloc;
-  Anmeldung({this.loginBloc});
+  SignIn({this.loginBloc});
   @override
-  _AnmeldungState createState() => _AnmeldungState();
+  _SignInState createState() => _SignInState();
 }
 
-class _AnmeldungState extends State<Anmeldung> with Validatoren {
+class _SignInState extends State<SignIn> with Validators {
   // key für das Form Widget
   final _formKey = GlobalKey<FormState>();
 
@@ -49,13 +49,14 @@ class _AnmeldungState extends State<Anmeldung> with Validatoren {
             autovalidate: false,
             child: Column(
               children: <Widget>[
-                // TODO: bessere validatoren einfügen
+                // TODO: create better validators
                 TextFormField(
                   decoration: InputDecoration(labelText: "E-Mail Adresse"),
                   controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
                   maxLines: 1,
                   validator: (String email) {
-                    return checkeEmailAdresse(email: email);
+                    return checkEmail(email: email);
                   },
                 ),
                 TextFormField(
@@ -82,7 +83,7 @@ class _AnmeldungState extends State<Anmeldung> with Validatoren {
                   obscureText: _passwortIstVerdeckt,
                   maxLines: 1,
                   validator: (String passwort) {
-                    return checkePasswort(passwort: passwort);
+                    return checkPassword(passwort: passwort);
                   },
                 ),
                 // TODO: dem User eine Benachrichtigung / ein Feedback anzeigen, z.B. "Passwort ist falsch"

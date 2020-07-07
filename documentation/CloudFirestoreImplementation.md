@@ -3,4 +3,4 @@ In this file I'll explain how the Cloud Firestore Database from the Firebase Inf
 
 ## Data structure
 ### Collections
-Currently, this project's data is split into two collections, namely the users and the games collection. 
+Currently, this project's data is split into two collections, namely the "users" and the "games" collection. 

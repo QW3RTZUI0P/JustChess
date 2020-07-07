@@ -1,5 +1,5 @@
 // menu.dart
-import "../imports.dart";
+import "../../imports.dart";
 
 class Menu extends StatefulWidget {
   @override
@@ -7,15 +7,29 @@ class Menu extends StatefulWidget {
 }
 
 class _MenuState extends State<Menu> {
-
-  AuthenticationBloc authenticationBloc;
+  AuthenticationBloc _authenticationBloc;
   GameBloc _gameBloc;
+
+  String username;
+  String emailAdress;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this.authenticationBloc = AuthenticationBlocProvider.of(context).authenticationBloc;
+    this._authenticationBloc =
+        AuthenticationBlocProvider.of(context).authenticationBloc;
     this._gameBloc = GameBlocProvider.of(context).gameBloc;
+    getUserCredentials();
+  }
+
+  void getUserCredentials() async {
+    Map<String, dynamic> credentials = await _authenticationBloc
+        .authenticationService
+        .currentUserCredentials();
+    setState(() {
+      this.username = credentials["username"];
+      this.emailAdress = credentials["email"];
+    });
   }
 
   @override
@@ -24,7 +38,12 @@ class _MenuState extends State<Menu> {
       child: ListView(
         children: <Widget>[
           DrawerHeader(
-            child: Text("Header"),
+            child: Column(
+              children: <Widget>[
+                Text("Benutzername: $username"),
+                Text("Email: $emailAdress"),
+              ],
+            ),
           ),
           ListTile(
             title: Text("Partien"),
@@ -35,6 +54,7 @@ class _MenuState extends State<Menu> {
           ListTile(
             title: Text("Freunde"),
             onTap: () {
+              Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -46,12 +66,15 @@ class _MenuState extends State<Menu> {
             },
           ),
           ListTile(
+            title: Text("Über"),
+          ),
+          ListTile(
             title: Text("Ausloggen"),
             onTap: () async {
               _gameBloc.games.clear();
               _gameBloc.currentUserID = "";
-              
-              authenticationBloc.authenticationService.signOut();
+
+              _authenticationBloc.authenticationService.signOut();
             },
           ),
         ],

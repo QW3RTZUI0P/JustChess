@@ -8,7 +8,7 @@ class GameBloc {
   // userUID of the current logged in user
   String currentUserID = "";
   // list of the current user's games
-  List<PartieKlasse> games = [];
+  List<GameClass> games = [];
   // gameIDs of the logged in user (from the current user's document)
   List<String> gameIDs = [];
 
@@ -18,33 +18,33 @@ class GameBloc {
   Stream<String> get gameIDStream => gameIDController.stream;
 
   // StreamController that controls all the games being fetched from Firebase
-  final StreamController<PartieKlasse> localGameController =
-      StreamController<PartieKlasse>();
-  Sink<PartieKlasse> get localGameSink => localGameController.sink;
-  Stream<PartieKlasse> get localGameStream => localGameController.stream;
+  final StreamController<GameClass> localGameController =
+      StreamController<GameClass>();
+  Sink<GameClass> get localGameSink => localGameController.sink;
+  Stream<GameClass> get localGameStream => localGameController.stream;
 
   // StreamController that controls all the games the user added (not the invitations the user accepted)
-  final StreamController<PartieKlasse> addGameController =
-      StreamController<PartieKlasse>();
-  Sink<PartieKlasse> get addGameSink => addGameController.sink;
-  Stream<PartieKlasse> get addGameStream => addGameController.stream;
+  final StreamController<GameClass> addGameController =
+      StreamController<GameClass>();
+  Sink<GameClass> get addGameSink => addGameController.sink;
+  Stream<GameClass> get addGameStream => addGameController.stream;
 
   // controls the updated games
-  final StreamController<PartieKlasse> updateGameController =
-      StreamController<PartieKlasse>();
-  Sink<PartieKlasse> get updateGameSink => updateGameController.sink;
-  Stream<PartieKlasse> get updateGameStream => updateGameController.stream;
+  final StreamController<GameClass> updateGameController =
+      StreamController<GameClass>();
+  Sink<GameClass> get updateGameSink => updateGameController.sink;
+  Stream<GameClass> get updateGameStream => updateGameController.stream;
 
   // controls the deleting of the games
-  final StreamController<PartieKlasse> deleteGameController =
-      StreamController<PartieKlasse>();
-  Sink<PartieKlasse> get deleteGameSink => deleteGameController.sink;
-  Stream<PartieKlasse> get deleteGameStream => deleteGameController.stream;
+  final StreamController<GameClass> deleteGameController =
+      StreamController<GameClass>();
+  Sink<GameClass> get deleteGameSink => deleteGameController.sink;
+  Stream<GameClass> get deleteGameStream => deleteGameController.stream;
 
-  final StreamController<List<PartieKlasse>> gamesListController =
-      StreamController<List<PartieKlasse>>.broadcast();
-  Sink<List<PartieKlasse>> get gamesListSink => gamesListController.sink;
-  Stream<List<PartieKlasse>> get gamesListStream => gamesListController.stream;
+  final StreamController<List<GameClass>> gamesListController =
+      StreamController<List<GameClass>>.broadcast();
+  Sink<List<GameClass>> get gamesListSink => gamesListController.sink;
+  Stream<List<GameClass>> get gamesListStream => gamesListController.stream;
 
   GameBloc({
     this.cloudFirestoreDatabase,
@@ -62,12 +62,18 @@ class GameBloc {
     List<dynamic> gameIDs = await cloudFirestoreDatabase
             .getGameIDsFromFirestore(userID: this.currentUserID) ??
         [];
+    // if the user hasn't any gameIDs the for loop wouldn't execute and gamesListSink wouldn't get anything
+    if (gameIDs.length == 0) {
+      this.gamesListSink.add(this.games);
+    }
+    // adds each gameID to the gameIDSink, which passes it down the Stream Tree
     for (String currentGameID in gameIDs) {
       gameIDSink.add(currentGameID);
     }
   }
 
-  void refresh() async {
+  // refreshes, reloads and refetches the list of games from Firebase
+  Future<void> refresh() async {
     games.clear();
     this.currentUserID = await authenticationService.currentUserUid();
     List<dynamic> gameIDs = await cloudFirestoreDatabase
@@ -77,6 +83,7 @@ class GameBloc {
     for (String currentGameID in gameIDs) {
       gameIDSink.add(currentGameID);
     }
+    return;
   }
 
   // starts the listeners for the three streams
@@ -84,7 +91,7 @@ class GameBloc {
     this.gameIDStream.listen((gameID) async {
       // adds gameID locally
       this.gameIDs.add(gameID);
-      PartieKlasse currentGame =
+      GameClass currentGame =
           await cloudFirestoreDatabase.getGameFromFirestore(gameID: gameID);
       this.localGameSink.add(currentGame);
     });
@@ -109,7 +116,7 @@ class GameBloc {
       this.cloudFirestoreDatabase.addGameToFirestore(game: addedGame);
     });
     this.updateGameStream.listen((updatedGame) {
-      PartieKlasse outdatedGame =
+      GameClass outdatedGame =
           this.games.where((game) => game.id == updatedGame.id).elementAt(0);
       int index = this.games.indexOf(outdatedGame);
       this.games.replaceRange(index, index + 1, [updatedGame]);
@@ -128,7 +135,7 @@ class GameBloc {
         cloudFirestoreDatabase.deleteGameIDFromFirestore(
             userID: currentUserID, gameID: deletedGame.id);
       } else {
-        PartieKlasse changedGame = PartieKlasse.from(deletedGame);
+        GameClass changedGame = GameClass.from(deletedGame);
         changedGame.canBeDeleted = true;
         cloudFirestoreDatabase.updateGameFromFirestore(game: changedGame);
         // deletes gameID in the users object

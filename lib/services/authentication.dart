@@ -5,12 +5,16 @@ import "package:firebase_auth/firebase_auth.dart";
 abstract class AuthenticationApi {
   getFirebaseAuth();
   Future<String> currentUserUid();
+  Future<Map<String, dynamic>> currentUserCredentials();
   Future<void> signOut();
   Future<String> signInWithEmailAndPassword({String email, String password});
   // erstellt einen User, der mit seiner Email Adresse und seinem Passwort authentifiziert wird
   // erstellt außerdem in CloudFirestore in der users collection einen Eintrag
-  Future<String> createUserWithEmailAndPassword(
-      {String email, String password});
+  Future<String> createUserWithEmailAndPassword({
+    String email,
+    String password,
+    String username,
+  });
   Future<void> sendEmailVerification();
   Future<bool> isEmailVerified();
 }
@@ -27,6 +31,11 @@ class AuthenticationService implements AuthenticationApi {
     return user.uid;
   }
 
+  Future<Map<String, dynamic>> currentUserCredentials() async {
+    FirebaseUser user = await _firebaseAuth.currentUser();
+    return {"username": user.displayName, "email": user.email};
+  }
+
   Future<void> signOut() async {
     return _firebaseAuth.signOut();
   }
@@ -38,10 +47,16 @@ class AuthenticationService implements AuthenticationApi {
     return result.user.uid;
   }
 
-  Future<String> createUserWithEmailAndPassword(
-      {String email, String password}) async {
+  Future<String> createUserWithEmailAndPassword({
+    String email,
+    String password,
+    String username,
+  }) async {
     AuthResult result = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email, password: password);
+    UserUpdateInfo updateInfo = UserUpdateInfo();
+    updateInfo.displayName = username;
+    result.user.updateProfile(updateInfo);
     return result.user.uid;
   }
 

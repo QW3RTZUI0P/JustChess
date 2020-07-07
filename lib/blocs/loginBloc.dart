@@ -17,7 +17,7 @@ class LoginBloc {
   Future<String> createAccount({@required String email, @required String password, @required String username}) async {
     // creates a new user account in Firebase Auth
     String userID = await authenticationService
-        .createUserWithEmailAndPassword(email: email, password: password);
+        .createUserWithEmailAndPassword(email: email, password: password, username: username,);
     //     .then((_) async {
     //   await authenticationService.sendEmailVerification();
     // });
@@ -47,3 +47,4 @@ class LoginBloc {
   }
 
 }
+

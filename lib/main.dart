@@ -1,39 +1,27 @@
 // main.dart
-import 'package:JustChess/seiten/registrierung.dart';
-import 'package:JustChess/services/cloudFirestoreDatabase.dart';
-
 import "imports.dart";
 
 void main() => runApp(JustChess());
-
-// class JustChess extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return ChangeNotifierProvider(
-//       create: (_) => PartienProvider(),
-//       child: MaterialApp(
-//         title: "JustChess",
-//         debugShowCheckedModeBanner: false,
-//         theme: ThemeData(),
-//         home: MeinBuilder(),
-//       ),
-//     );
-//   }
-// }
 
 class JustChess extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AuthenticationService _authenticationService =
         AuthenticationService();
+    final CloudFirestoreDatabaseApi _cloudFirestoreDatabase =
+        CloudFirestoreDatabase();
+
     final AuthenticationBloc _authenticationBloc =
         AuthenticationBloc(authenticationService: _authenticationService);
+
+    // controls the sign in status of the current user
     return AuthenticationBlocProvider(
       authenticationBloc: _authenticationBloc,
+      // controls the loading and saving of the user's games
       child: GameBlocProvider(
         gameBloc: GameBloc(
-          cloudFirestoreDatabase: CloudFirestoreDatabase(),
-          authenticationService: AuthenticationService(),
+          cloudFirestoreDatabase: _cloudFirestoreDatabase,
+          authenticationService: _authenticationService,
         ),
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -56,7 +44,7 @@ class JustChess extends StatelessWidget {
                 }
                 // wird ausgeführt, wenn FirebaseAuth nichts zurückgibt, also wenn noch kein User angemeldet ist
                 else {
-                  return Registrierung();
+                  return SignUp();
                 }
               }),
         ),

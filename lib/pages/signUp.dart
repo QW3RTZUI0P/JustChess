@@ -1,14 +1,13 @@
-// registrierung.dart
+// signUp.dart
+import "../imports.dart";
 import 'package:JustChess/services/cloudFirestoreDatabase.dart';
 
-import "../imports.dart";
-
-class Registrierung extends StatefulWidget {
+class SignUp extends StatefulWidget {
   @override
-  _RegistrierungState createState() => _RegistrierungState();
+  _SignUpState createState() => _SignUpState();
 }
 
-class _RegistrierungState extends State<Registrierung> with Validatoren {
+class _SignUpState extends State<SignUp> with Validators {
   // key für das Form Widget
   final _formKey = GlobalKey<FormState>();
   // loginBloc für die gesamte Registrierungslogik
@@ -60,13 +59,14 @@ class _RegistrierungState extends State<Registrierung> with Validatoren {
                   decoration: InputDecoration(labelText: "Benutzername"),
                   controller: _benutzernameController,
                   maxLines: 1,
+                  maxLength: 40,
                   keyboardType: TextInputType.text,
                   autocorrect: false,
                   onFieldSubmitted: (_) {
                     _formKey.currentState.validate();
                   },
                   validator: (benutzername) {
-                    return checkeBenutzername(benutzername: benutzername);
+                    return checkUsername(benutzername: benutzername);
                   },
                 ),
                 // Textfled für die Email Addresse
@@ -80,7 +80,7 @@ class _RegistrierungState extends State<Registrierung> with Validatoren {
                     _formKey.currentState.validate();
                   },
                   validator: (email) {
-                    return checkeEmailAdresse(email: email);
+                    return checkEmail(email: email);
                   },
                 ),
                 // Textfeld für das Passwort
@@ -111,43 +111,10 @@ class _RegistrierungState extends State<Registrierung> with Validatoren {
                     _formKey.currentState.validate();
                   },
                   validator: (passwort) {
-                    return checkePasswort(passwort: passwort);
+                    return checkPassword(passwort: passwort);
                   },
                 ),
-                // Textfeld für die Wiederholung des Passwortes
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: "Passwort wiederholen",
-                    suffix: IconButton(
-                      icon: _passwortWiederholungIcon,
-                      onPressed: () {
-                        setState(() {
-                          if (this._passwortWiederholungIstVerdeckt) {
-                            _passwortWiederholungIstVerdeckt = false;
-                            _passwortWiederholungIcon =
-                                Icon(Icons.visibility_off);
-                          } else {
-                            _passwortWiederholungIstVerdeckt = true;
-                            _passwortWiederholungIcon = Icon(Icons.visibility);
-                          }
-                        });
-                      },
-                    ),
-                  ),
-                  controller: _passwortWiederholungController,
-                  maxLines: 1,
-                  obscureText: _passwortWiederholungIstVerdeckt,
-                  keyboardType: TextInputType.text,
-                  autocorrect: false,
-                  onFieldSubmitted: (_) {
-                    _formKey.currentState.validate();
-                  },
-                  validator: (passwortWiederholung) {
-                    return checkePasswortWiederholung(
-                        passwort: _passwortController.text,
-                        passwortWiederholung: passwortWiederholung);
-                  },
-                ),
+
                 // TODO: implement Sign In With Apple
                 RaisedButton(
                   child: Text("Registrieren"),
@@ -192,7 +159,7 @@ class _RegistrierungState extends State<Registrierung> with Validatoren {
                       MaterialPageRoute(
                           fullscreenDialog: true,
                           builder: (BuildContext context) {
-                            return Anmeldung();
+                            return SignIn();
                           }),
                     );
                   },

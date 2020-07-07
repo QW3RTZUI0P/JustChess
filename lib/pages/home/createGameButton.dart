@@ -1,15 +1,15 @@
-// partieErstellenButton.dart
-import "../imports.dart";
+// createGameButton.dart
+import "../../imports.dart";
 
-class PartieErstellenButton extends StatefulWidget {
+class CreateGameButton extends StatefulWidget {
   final GameBloc gameBloc;
-  PartieErstellenButton({this.gameBloc});
+  CreateGameButton({this.gameBloc});
 
   @override
-  _PartieErstellenButtonState createState() => _PartieErstellenButtonState();
+  _CreateGameButtonState createState() => _CreateGameButtonState();
 }
 
-class _PartieErstellenButtonState extends State<PartieErstellenButton> {
+class _CreateGameButtonState extends State<CreateGameButton> {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
