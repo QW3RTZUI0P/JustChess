@@ -1,15 +1,15 @@
 // game.dart
 import "../../imports.dart";
 
-// TODO: clean this file up and split it in separate widgets
-// TODO: think of a solution to solve the problem with variables just being references
 // TODO: implement chessBoard to try out ones move
 class Game extends StatefulWidget {
   final GameClass currentGame;
-  final GameBloc oldGameBloc;
+  bool isUserWhite;
+  bool isUsersTurn;
   Game({
-    this.currentGame,
-    this.oldGameBloc,
+    @required this.currentGame,
+    @required this.isUserWhite,
+    @required this.isUsersTurn,
   });
 
   @override
@@ -19,19 +19,11 @@ class Game extends StatefulWidget {
 class _GameState extends State<Game> {
   GameBloc gameBloc;
   GameClass currentGame;
-  bool isUserWhite;
 
   @override
   void initState() {
     super.initState();
     this.currentGame = GameClass.from(widget.currentGame);
-    // TODO: think of a better solution so this variable can use the gameBloc in this State
-    this.isUserWhite = (currentGame.player01IsWhite &&
-                widget.oldGameBloc.currentUserID == currentGame.player01) ||
-            (!currentGame.player01IsWhite &&
-                widget.oldGameBloc.currentUserID == currentGame.player02)
-        ? true
-        : false;
   }
 
   @override
@@ -48,7 +40,7 @@ class _GameState extends State<Game> {
         size.width < size.height ? size.width * 0.9 : size.height * 0.9;
 
     var appBar = AppBar(
-      title: Text(currentGame.name ?? ""),
+      title: Text(currentGame.subtitle ?? ""),
     );
 
     return Scaffold(
@@ -66,7 +58,7 @@ class _GameState extends State<Game> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    this.isUserWhite
+                    widget.isUserWhite
                         ? VerticalNumbersWhite(
                             height: boardSize,
                           )
@@ -78,14 +70,15 @@ class _GameState extends State<Game> {
                     ),
                     ChessBoardWidget(
                       currentGame: this.currentGame,
-                      isUserWhite: this.isUserWhite,
+                      isUserWhite: widget.isUserWhite,
+                      isUsersTurn: widget.isUsersTurn,
                     ),
                   ],
                 ),
                 const SizedBox(
                   height: 5,
                 ),
-                this.isUserWhite
+                widget.isUserWhite
                     ? Center(
                         child: HorizontalLettersWhite(
                           width: boardSize,
@@ -96,6 +89,21 @@ class _GameState extends State<Game> {
                           width: boardSize,
                         ),
                       ),
+                RaisedButton(
+                  child: Text("Zug ausprobieren"),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          fullscreenDialog: true,
+                          builder: (BuildContext context) {
+                            return TryOutChessBoardWidget(
+                              pgn: widget.currentGame.pgn,
+                            );
+                          }),
+                    );
+                  },
+                ),
               ],
             ),
           ),

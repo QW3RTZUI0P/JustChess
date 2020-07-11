@@ -23,6 +23,7 @@ export "./pages/home/createGameButton.dart";
 export "./pages/game/game.dart";
 export "./pages/game/labeling.dart";
 export "./pages/game/chessBoardWidget.dart";
+export "./pages/game/tryOutChessBoardWidget.dart";
 // friendsPage:
 export "./pages/friends/friends.dart";
 export "./pages/friends/findNewFriend.dart";

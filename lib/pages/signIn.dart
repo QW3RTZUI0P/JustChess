@@ -16,6 +16,7 @@ class _SignInState extends State<SignIn> with Validators {
   final _formKey = GlobalKey<FormState>();
 
   LoginBloc _loginBloc;
+  GameBloc _gameBloc;
 
   // authenticationService, um den User anzumelden
   AuthenticationService authenticationService = AuthenticationService();
@@ -33,6 +34,12 @@ class _SignInState extends State<SignIn> with Validators {
       authenticationService: AuthenticationService(),
       cloudFirestoreDatabase: CloudFirestoreDatabase(),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    this._gameBloc = GameBlocProvider.of(context).gameBloc;
   }
 
   @override
@@ -91,9 +98,11 @@ class _SignInState extends State<SignIn> with Validators {
                   child: Text("Anmelden"),
                   onPressed: () {
                     if (_formKey.currentState.validate()) {
-                      _loginBloc.signIn(
-                          email: _emailController.text,
-                          password: _passwortController.text);
+                      _loginBloc
+                          .signIn(
+                              email: _emailController.text,
+                              password: _passwortController.text)
+                          .then((value) => _gameBloc.refresh());
                       Navigator.pop(context);
                     }
                   },

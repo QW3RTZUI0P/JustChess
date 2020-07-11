@@ -10,7 +10,8 @@ import "../../imports.dart";
 // bigger projects:
 // TODO: add offline support
 // TODO: add in app purchases
-
+// TODO: add in app messaging
+// TODO: add starter tutorial
 class Home extends StatefulWidget {
   List<GameClass> partien = [];
   var partieGeloescht;
@@ -56,6 +57,7 @@ class _HomeState extends State<Home> {
       ),
       drawer: Menu(),
       body: SafeArea(
+        // TODO: enable pull to reload also for CircularProgressIndicator and for "Noch keine Partien"
         child: RefreshIndicator(
           onRefresh: () => refresh(),
           child: StreamBuilder(
@@ -66,43 +68,77 @@ class _HomeState extends State<Home> {
                   return Center(
                     child: CircularProgressIndicator(),
                   );
-                } else if (snapshot.data == null ||
-                    snapshot.data == [] ||
-                    snapshot.data.isEmpty) {
-                  return Column(
+                } else if (snapshot.data == [] || snapshot.data.isEmpty) {
+                  return ListView(
                     children: <Widget>[
-                      Expanded(
-                        child: Center(
-                          child: Text("Noch keine Partien hinzugefügt"),
-                        ),
-                      ),
+                      Container(
+                          height: MediaQuery.of(context).size.height,
+                          child: Center(
+                              child: Text("Noch keine Partien hinzugefügt"))),
                     ],
                   );
                 } else {
                   return Scrollbar(
                     child: ListView.separated(
                         itemBuilder: (BuildContext context, int index) {
+                          bool userWhite() {
+                            if (snapshot.data[index].player01IsWhite &&
+                                _gameBloc.currentUserID ==
+                                    snapshot.data[index].player01) {
+                              return true;
+                            } else if (!snapshot.data[index].player01IsWhite &&
+                                _gameBloc.currentUserID ==
+                                    snapshot.data[index].player02) {
+                              return true;
+                            } else {
+                              return false;
+                            }
+                          }
+
+                          bool isUserWhite = userWhite();
+                          bool usersTurn() {
+                            if (snapshot.data[index].whitesTurn &&
+                                isUserWhite) {
+                              return true;
+                            } else if (!snapshot.data[index].whitesTurn &&
+                                !isUserWhite) {
+                              return true;
+                            } else {
+                              return false;
+                            }
+                          }
+
+                          bool isUsersTurn = usersTurn();
+
                           return Dismissible(
                             key: Key(
                               snapshot.data[index].id,
                             ),
-                            child: ListTile(
-                              title: Text(snapshot.data[index].name ?? ""),
-                              subtitle: Text(
-                                  "Anzahl der Züge: ${snapshot.data[index].moveCount.toString()}"),
-                              trailing: Icon(Icons.arrow_forward_ios),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    fullscreenDialog: false,
-                                    builder: (context) => Game(
-                                      currentGame: snapshot.data[index],
-                                      oldGameBloc: this._gameBloc,
+                            child: Container(
+                              color: isUsersTurn
+                                  ? Colors.lightGreen
+                                  : Colors.white,
+                              child: ListTile(
+                                title: Text("Partie gegen " +
+                                        _gameBloc.opponentsNamesList[index] ??
+                                    ""),
+                                subtitle:
+                                    Text(snapshot.data[index].subtitle ?? ""),
+                                trailing: Icon(Icons.arrow_forward_ios),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      fullscreenDialog: false,
+                                      builder: (context) => Game(
+                                        currentGame: snapshot.data[index],
+                                        isUserWhite: isUserWhite,
+                                        isUsersTurn: isUsersTurn,
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
+                                  );
+                                },
+                              ),
                             ),
                             background: Icon(Icons.delete),
                             secondaryBackground: Icon(Icons.delete),

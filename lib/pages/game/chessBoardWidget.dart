@@ -6,10 +6,11 @@ import "../../imports.dart";
 class ChessBoardWidget extends StatefulWidget {
   GameClass currentGame;
   bool isUserWhite;
-
+  bool isUsersTurn;
   ChessBoardWidget({
     @required this.currentGame,
     @required this.isUserWhite,
+    @required this.isUsersTurn,
   });
 
   @override
@@ -21,13 +22,11 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget>
   GameBloc _gameBloc;
   GameClass _currentGame;
   ChessBoardController _chessBoardController = ChessBoardController();
-  bool _isUsersTurn;
 
   @override
   void initState() {
     super.initState();
     this._currentGame = widget.currentGame;
-    this._isUsersTurn = usersTurn();
   }
 
   @override
@@ -42,14 +41,14 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget>
     _chessBoardController.loadPGN(_currentGame.pgn ?? "");
   }
 
-  bool usersTurn() {
-    if ((_currentGame.whitesTurn && widget.isUserWhite) ||
-        (!_currentGame.whitesTurn && !widget.isUserWhite)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  // bool usersTurn() {
+  //   if ((_currentGame.whitesTurn && widget.isUserWhite) ||
+  //       (!_currentGame.whitesTurn && !widget.isUserWhite)) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // }
 
   void confirmMove() {
     showModalBottomSheet(
@@ -91,8 +90,8 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget>
                       icon: Icon(Icons.done),
                       tooltip: "Bestätigen",
                       onPressed: () {
+                        widget.isUsersTurn = false;
                         setState(() {
-                          this._isUsersTurn = false;
                           this._currentGame.pgn =
                               this._chessBoardController.game.pgn();
                         });
@@ -134,7 +133,7 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget>
     return ChessBoard(
       size: boardSize,
       whiteSideTowardsUser: widget.isUserWhite,
-      enableUserMoves: this._isUsersTurn,
+      enableUserMoves: widget.isUsersTurn,
       onMove: (move) {
         confirmMove();
         // partie.anzahlDerZuege += 0.5;

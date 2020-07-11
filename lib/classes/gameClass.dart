@@ -8,9 +8,10 @@ import "../imports.dart";
 class GameClass {
   // die einzigartigeID jeder Partie (ist eine)
   String id;
-  // der Name der Partie
-  // wenn kein Name vorhanden ist wird in der UI einfach "Partie gegen NAME DES GEGNERS" angezeigt
-  final String name;
+  // der Untertitel der Partie
+  // for the name of the game, JustChess will use the name of the opponent
+  // if someone plays more than one game against the same opponent, this value can be uses to distinguish these games
+  final String subtitle;
   // aktuelle Stellung des Schachspiels in dem Standard "Portable Game Notation"
   String pgn;
 
@@ -31,7 +32,7 @@ class GameClass {
 
   GameClass({
     this.id,
-    this.name = "",
+    this.subtitle = "",
     this.pgn = "",
     this.player01 = "",
     this.player02 = "",
@@ -39,14 +40,13 @@ class GameClass {
     this.whitesTurn = true,
     this.moveCount = 0,
     this.canBeDeleted = false,
-    
   });
 
   // creates a copy of the given object
   factory GameClass.from(GameClass otherGame) {
     return GameClass(
       id: otherGame.id,
-      name: otherGame.name,
+      subtitle: otherGame.subtitle,
       pgn: otherGame.pgn,
       player01: otherGame.player01,
       player02: otherGame.player02,
@@ -62,7 +62,7 @@ class GameClass {
     Map<String, dynamic> data = snapshot.data ?? {};
     return GameClass(
       id: data["id"],
-      name: data["name"],
+      subtitle: data["subtitle"],
       pgn: data["pgn"],
       player01: data["player01"],
       player02: data["player02"],
@@ -76,7 +76,7 @@ class GameClass {
   // Funktionen um die Partien aus dem lokalen Json-File zu extrahieren oder sie in das Json-File zu schreiben
   factory GameClass.fromJson(Map<String, dynamic> json) => GameClass(
         id: json["id"],
-        name: json["name"],
+        subtitle: json["subtitle"],
         pgn: json["pgn"],
         player01: json["player01"],
         player02: json["player02"],
@@ -88,7 +88,7 @@ class GameClass {
 
   Map<String, dynamic> toJson() => {
         "id": this.id,
-        "name": this.name,
+        "subtitle": this.subtitle,
         "pgn": this.pgn,
         "player01": this.player01,
         "player02": this.player02,

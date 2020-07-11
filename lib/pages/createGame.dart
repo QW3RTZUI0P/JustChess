@@ -44,7 +44,7 @@ class _CreateGameState extends State<CreateGame> {
     String opponentID = await _gameBloc.cloudFirestoreDatabase
         .getUserIDForUsername(username: widget.opponent);
     GameClass neuePartie = GameClass(
-      name: _neuePartieNameController.text,
+      subtitle: _neuePartieNameController.text,
       pgn: "",
       player01: _gameBloc.currentUserID,
       player01IsWhite: this.benutzerIstWeiss,
@@ -54,13 +54,7 @@ class _CreateGameState extends State<CreateGame> {
     );
     neuePartie.erstelleID();
     _gameBloc.addGameSink.add(neuePartie);
-    // if (widget.opponent.isEmpty == false) {
-    //   String opponentsUserID = await _gameBloc.cloudFirestoreDatabase
-    //       .getUserIDForUsername(username: widget.opponent);
-    //   neuePartie.player02 = opponentsUserID;
-    //   _gameBloc.cloudFirestoreDatabase
-    //       .addGameIDToFirestore(userID: opponentsUserID, gameID: neuePartie.id);
-    // }r
+
     _neuePartieNameController.text = "";
     Navigator.pop(context);
   }
@@ -79,7 +73,8 @@ class _CreateGameState extends State<CreateGame> {
             children: <Widget>[
               TextField(
                 controller: _neuePartieNameController,
-                decoration: InputDecoration(hintText: "der Name der Partie"),
+                decoration:
+                    InputDecoration(hintText: "der Untertitel der Partie"),
               ),
               // TextField(
               //   controller: _opponentController,

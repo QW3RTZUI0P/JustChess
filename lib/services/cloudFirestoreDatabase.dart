@@ -63,10 +63,11 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
     return usernamesList;
   }
 
+  // gets the username for the given userID
   Future<String> getUsernameForUserID({@required String userID}) async {
     DocumentSnapshot snapshot =
         await _firestore.collection(_userCollection).document(userID).get();
-    return snapshot["username"];
+    return snapshot.data["username"];
   }
 
   // gets the uid for the given username
@@ -129,6 +130,7 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
       "gameIDs": [],
       "invitations": [],
       "friends": [],
+      "username": username,
     });
     DocumentSnapshot snapshot = await _firestore
         .collection(_userCollection)

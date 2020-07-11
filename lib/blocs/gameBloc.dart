@@ -9,8 +9,10 @@ class GameBloc {
   String currentUserID = "";
   // list of the current user's games
   List<GameClass> games = [];
-  // gameIDs of the logged in user (from the current user's document)
+  // gameIDs of the logged in user (from the current user's user document)
   List<String> gameIDs = [];
+  // list with the names of the user's opponents
+  List<String> opponentsNamesList = [];
 
   // StreamController that controls all the gameIDs of the current user
   final StreamController<String> gameIDController = StreamController<String>();
@@ -18,10 +20,10 @@ class GameBloc {
   Stream<String> get gameIDStream => gameIDController.stream;
 
   // StreamController that controls all the games being fetched from Firebase
-  final StreamController<GameClass> localGameController =
+  final StreamController<GameClass> fetchedGameController =
       StreamController<GameClass>();
-  Sink<GameClass> get localGameSink => localGameController.sink;
-  Stream<GameClass> get localGameStream => localGameController.stream;
+  Sink<GameClass> get fetchedGameSink => fetchedGameController.sink;
+  Stream<GameClass> get fetchedGameStream => fetchedGameController.stream;
 
   // StreamController that controls all the games the user added (not the invitations the user accepted)
   final StreamController<GameClass> addGameController =
@@ -58,7 +60,6 @@ class GameBloc {
   // gets all the important values to function this class
   void getImportantValues() async {
     this.currentUserID = await authenticationService.currentUserUid();
-    print("currentUserID " + this.currentUserID);
     List<dynamic> gameIDs = await cloudFirestoreDatabase
             .getGameIDsFromFirestore(userID: this.currentUserID) ??
         [];
@@ -73,17 +74,17 @@ class GameBloc {
   }
 
   // refreshes, reloads and refetches the list of games from Firebase
-  Future<void> refresh() async {
+  void refresh() async {
     games.clear();
-    this.currentUserID = await authenticationService.currentUserUid();
-    List<dynamic> gameIDs = await cloudFirestoreDatabase
-            .getGameIDsFromFirestore(userID: this.currentUserID) ??
-        [];
-    print("gameIDs: " + gameIDs.toString());
-    for (String currentGameID in gameIDs) {
-      gameIDSink.add(currentGameID);
-    }
-    return;
+    opponentsNamesList.clear();
+    getImportantValues();
+  }
+
+  void signOut() {
+    this.gameIDs.clear();
+    this.games.clear();
+    this.opponentsNamesList.clear();
+    this.currentUserID = "";
   }
 
   // starts the listeners for the three streams
@@ -93,9 +94,15 @@ class GameBloc {
       this.gameIDs.add(gameID);
       GameClass currentGame =
           await cloudFirestoreDatabase.getGameFromFirestore(gameID: gameID);
-      this.localGameSink.add(currentGame);
+      this.fetchedGameSink.add(currentGame);
     });
-    this.localGameStream.listen((game) {
+    this.fetchedGameStream.listen((game) async {
+      // updates the opponents name list (has to be before this.games is added to gamesListSink)
+      String opponentsUserID =
+          (game.player01 == currentUserID) ? game.player02 : game.player01;
+      String opponentsName = await cloudFirestoreDatabase.getUsernameForUserID(
+          userID: opponentsUserID);
+      this.opponentsNamesList.add(opponentsName);
       // adds game locally
       this.games.add(game);
       // adds updated gamesList to the gamesListStream
@@ -106,27 +113,31 @@ class GameBloc {
     this.addGameStream.listen((addedGame) {
       // adds values locally
       this.gameIDs.add(addedGame.id);
-      this.localGameSink.add(addedGame);
+      this.fetchedGameSink.add(addedGame);
       // adds values to Firebase
-
+      // adds the gameID to the first player
       this.cloudFirestoreDatabase.addGameIDToFirestore(
           userID: addedGame.player01, gameID: addedGame.id);
+      // adds the gameID to the second player
       this.cloudFirestoreDatabase.addGameIDToFirestore(
           userID: addedGame.player02, gameID: addedGame.id);
       this.cloudFirestoreDatabase.addGameToFirestore(game: addedGame);
     });
-    this.updateGameStream.listen((updatedGame) {
+    this.updateGameStream.listen((updatedGame) async {
       GameClass outdatedGame =
           this.games.where((game) => game.id == updatedGame.id).elementAt(0);
       int index = this.games.indexOf(outdatedGame);
+      // updates this.games with updatedGame
       this.games.replaceRange(index, index + 1, [updatedGame]);
+      // adds the updated list to gamesListSink
       this.gamesListSink.add(this.games);
       cloudFirestoreDatabase.updateGameFromFirestore(game: updatedGame);
     });
     // only .listen function that is smart
     this.deleteGameStream.listen((deletedGame) {
-      print("id " + deletedGame.id);
       if (deletedGame.canBeDeleted) {
+        // deletes the entry in the opponentsNamesList
+        this.opponentsNamesList.removeAt(this.games.indexOf(deletedGame));
         // deletes the game locally
         this.games.remove(deletedGame);
         this.gamesListSink.add(this.games);
@@ -141,6 +152,10 @@ class GameBloc {
         // deletes gameID in the users object
         cloudFirestoreDatabase.deleteGameIDFromFirestore(
             userID: currentUserID, gameID: deletedGame.id);
+
+        // deletes the entry in the opponentsNamesList
+        this.opponentsNamesList.removeAt(this.games.indexOf(deletedGame));
+
         this.games.remove(deletedGame);
         this.gamesListSink.add(this.games);
       }
@@ -190,7 +205,7 @@ class GameBloc {
   // closes all of the StreamControllers to preserve performance
   void dispose() {
     gameIDController.close();
-    localGameController.close();
+    fetchedGameController.close();
     addGameController.close();
     updateGameController.close();
     deleteGameController.close();

@@ -71,9 +71,7 @@ class _MenuState extends State<Menu> {
           ListTile(
             title: Text("Ausloggen"),
             onTap: () async {
-              _gameBloc.games.clear();
-              _gameBloc.currentUserID = "";
-
+              _gameBloc.signOut();
               _authenticationBloc.authenticationService.signOut();
             },
           ),
