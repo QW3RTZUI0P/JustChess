@@ -98,22 +98,18 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
                         setState(() {
                           this._currentGame.pgn =
                               widget.chessBoardController.game.pgn();
+                          this.isUsersTurn = false;
+
+                          // TODO: maybe invent a better and more secure way
+                          _currentGame.whitesTurn =
+                              widget.isUserWhite ? false : true;
                         });
-                        _currentGame.pgn =
-                            widget.chessBoardController.game.pgn();
-                        // TODO: maybe invent a better and more secure way
-                        _currentGame.whitesTurn =
-                            widget.isUserWhite ? false : true;
-                        print(_currentGame.pgn);
+
                         saveGame(game: _currentGame);
                         Navigator.pop(context);
-                        WidgetsBinding.instance.addPostFrameCallback((_) =>
-                            widget.chessBoardController
-                                .loadPGN(_currentGame.pgn ?? ""));
+
                         widget.chessBoardController
-                            .loadPGN(this._currentGame.pgn);
-                        // refreshes the games list, so that the right pgn is loaded in TryOutChessBoardWidget
-                        // _gameBloc.refresh();
+                            .loadPGN(this._currentGame.pgn ?? "");
                       },
                     ),
                   ),
