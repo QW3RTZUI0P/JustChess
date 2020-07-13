@@ -7,23 +7,18 @@ class Friends extends StatefulWidget {
   _FriendsState createState() => _FriendsState();
 }
 
-class _FriendsState extends State<Friends> {
+class _FriendsState extends State<Friends> with AfterLayoutMixin<Friends> {
   FriendsBloc _friendsBloc;
-  GameBloc _gameBloc;
-
-  @override
-  void initState() {
-    super.initState();
-    this._friendsBloc = FriendsBloc(
-      authenticationService: AuthenticationService(),
-      cloudFirestoreDatabase: CloudFirestoreDatabase(),
-    );
-  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this._gameBloc = GameBlocProvider.of(context).gameBloc;
+    this._friendsBloc = FriendsBlocProvider.of(context).friendsBloc;
+  }
+
+  @override
+  void afterFirstLayout(BuildContext context) {
+    _friendsBloc.loadFriends();
   }
 
   @override
@@ -58,27 +53,34 @@ class _FriendsState extends State<Friends> {
           } else if (snapshot.hasData) {
             return ListView.separated(
               itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  title: Text(
-                    snapshot.data[index],
-                  ),
-                  // TODO: besseres Icon finden
-                  trailing: IconButton(
-                    icon: Icon(Icons.add),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          fullscreenDialog: true,
-                          builder: (BuildContext context) {
-                            return CreateGame(
-                              opponent: snapshot.data[index],
-                            );
-                          },
-                        ),
-                      );
-                    },
+                return Dismissible(
+                  key: Key(snapshot.data[index]),
+                  background: Icon(Icons.delete),
+                  onDismissed: (_) {
+                    _friendsBloc.deletedFriendSink.add(snapshot.data[index]);
+                  },
+                  child: ListTile(
+                    title: Text(
+                      snapshot.data[index],
+                    ),
+                    // TODO: besseres Icon finden
+                    trailing: IconButton(
+                      icon: Icon(Icons.add),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (BuildContext context) {
+                              return CreateGame(
+                                opponent: snapshot.data[index],
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 );
               },

@@ -31,8 +31,9 @@ export "./pages/friends/findNewFriend.dart";
 export "./pages/signUp.dart";
 export "./pages/signIn.dart";
 export "./pages/createGame.dart";
+export "./pages/about.dart";
 
-// klassen
+// classes
 export "./classes/gameClass.dart";
 export "./classes/partienProvider.dart";
 export "./classes/validators.dart";
@@ -47,8 +48,11 @@ export "./blocs/authenticationBloc.dart";
 export "./blocs/gameBloc.dart";
 export "./blocs/loginBloc.dart";
 export "./blocs/friendsBloc.dart";
+
+// flutter_chess_board:
+export "./flutter_chess_board/flutter_chess_board.dart";
+
 // 3
 export "package:provider/provider.dart";
 export "package:uuid/uuid.dart";
-export "package:flutter_chess_board/flutter_chess_board.dart";
 export "package:after_layout/after_layout.dart";

@@ -74,7 +74,7 @@ class GameBloc {
   }
 
   // refreshes, reloads and refetches the list of games from Firebase
-  void refresh() async {
+  void refresh() {
     games.clear();
     opponentsNamesList.clear();
     getImportantValues();

@@ -1,15 +1,16 @@
 // game.dart
 import "../../imports.dart";
+import "package:chess/chess.dart" as chess;
 
 // TODO: implement chessBoard to try out ones move
 class Game extends StatefulWidget {
   final GameClass currentGame;
+  final String opponentsName;
   bool isUserWhite;
-  bool isUsersTurn;
   Game({
     @required this.currentGame,
+    @required this.opponentsName,
     @required this.isUserWhite,
-    @required this.isUsersTurn,
   });
 
   @override
@@ -17,19 +18,44 @@ class Game extends StatefulWidget {
 }
 
 class _GameState extends State<Game> {
-  GameBloc gameBloc;
+  // bloc that controls the loading, updating and saving of the games
+  GameBloc _gameBloc;
+  // the current game (given from Home())
   GameClass currentGame;
+  // ChessBoardController for the ChessBoardWidget
+  ChessBoardController chessBoardController = ChessBoardController();
+  // tells whether the user is allowed to make turns
+  bool isUsersTurn;
 
   @override
   void initState() {
     super.initState();
     this.currentGame = GameClass.from(widget.currentGame);
+    this.isUsersTurn = usersTurn();
+    this.chessBoardController.loadPGN(widget.currentGame.pgn);
+
+    print("isWhite " + widget.isUserWhite.toString());
+    print("isTurn " + this.isUsersTurn.toString());
+    print("whitesTurn " + currentGame.whitesTurn.toString());
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this.gameBloc = GameBlocProvider.of(context).gameBloc;
+    this._gameBloc = GameBlocProvider.of(context).gameBloc;
+  }
+
+  bool usersTurn() {
+    if (currentGame.whitesTurn && widget.isUserWhite) {
+      print("1");
+      return true;
+    } else if (!currentGame.whitesTurn && !widget.isUserWhite) {
+      print("2");
+      return true;
+    } else {
+      print("3");
+      return false;
+    }
   }
 
   @override
@@ -40,14 +66,30 @@ class _GameState extends State<Game> {
         size.width < size.height ? size.width * 0.9 : size.height * 0.9;
 
     var appBar = AppBar(
-      title: Text(currentGame.subtitle ?? ""),
+      title: Text(widget.opponentsName ?? ""),
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.refresh),
+          onPressed: () async {
+            GameClass updatedGame = await this
+                ._gameBloc
+                .cloudFirestoreDatabase
+                .getGameFromFirestore(gameID: currentGame.id);
+            this._gameBloc.updateGameSink.add(updatedGame);
+            setState(() {
+              this.currentGame = GameClass.from(updatedGame);
+            });
+            chessBoardController.loadPGN(currentGame.pgn);
+          },
+        )
+      ],
     );
-
+    print("building game");
     return Scaffold(
       appBar: appBar,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(8),
+          padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: Container(
             height: size.height - appBar.preferredSize.height - 16,
             child: Column(
@@ -55,6 +97,10 @@ class _GameState extends State<Game> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
+                Text(currentGame.canBeDeleted
+                    ? "Dein Gegner hat dieses Spiel gelöscht"
+                    : ""),
+                const SizedBox(height: 5),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -70,8 +116,9 @@ class _GameState extends State<Game> {
                     ),
                     ChessBoardWidget(
                       currentGame: this.currentGame,
+                      chessBoardController: this.chessBoardController,
                       isUserWhite: widget.isUserWhite,
-                      isUsersTurn: widget.isUsersTurn,
+                      isUsersTurn: this.isUsersTurn,
                     ),
                   ],
                 ),
@@ -99,6 +146,7 @@ class _GameState extends State<Game> {
                           builder: (BuildContext context) {
                             return TryOutChessBoardWidget(
                               pgn: widget.currentGame.pgn,
+                              isUserWhite: widget.isUserWhite,
                             );
                           }),
                     );

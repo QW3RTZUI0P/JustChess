@@ -5,37 +5,35 @@ import "../../imports.dart";
 // TODO: show list of all available friends in the beginning
 
 class FindNewFriend extends StatefulWidget {
-
   @override
   _FindNewFriendState createState() => _FindNewFriendState();
 }
 
-class _FindNewFriendState extends State<FindNewFriend> {
+class _FindNewFriendState extends State<FindNewFriend>
+    with AfterLayoutMixin<FindNewFriend> {
   FriendsBloc _friendsBloc;
-  GameBloc _gameBloc;
   // the search results shown in the list
   List<String> searchResults = [];
   // TextEditingController for the search bar at the top
   TextEditingController _searchBarController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    this._friendsBloc = FriendsBloc(
-      authenticationService: AuthenticationService(),
-      cloudFirestoreDatabase: CloudFirestoreDatabase(),
-    );
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    this._friendsBloc = FriendsBlocProvider.of(context).friendsBloc;
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    this._gameBloc = GameBlocProvider.of(context).gameBloc;
+  void afterFirstLayout(BuildContext context) {
+    this._friendsBloc.loadAvailableFriends();
+    setState(() {
+      // has to be this way, otherwise when searchResults changes, the availableFriendsHelperList would also change
+      this.searchResults = List.from(_friendsBloc.availableFriendsHelperList);
+    });
   }
 
   void addNewFriend({@required String name}) {
-    _friendsBloc.cloudFirestoreDatabase.addFriendToFirestore(
-        userID: _gameBloc.currentUserID, nameOfTheFriend: name);
+    _friendsBloc.addedFriendSink.add(name);
   }
 
   @override
@@ -103,12 +101,20 @@ class _FindNewFriendState extends State<FindNewFriend> {
                             title: Text(
                               searchResults[index],
                             ),
+                            onTap: () {
+                              addNewFriend(name: searchResults[index]);
+                              Navigator.pop(context);
+                            },
                             trailing: IconButton(
                               icon: Icon(Icons.add),
                               onPressed: () {
                                 addNewFriend(
                                   name: searchResults[index],
                                 );
+                                // think about this
+                                // is it good that the page dissappears when the user added a friend or is it confusing
+                                // TODO: maybe add a nice animation so that it's clear
+                                Navigator.pop(context);
                               },
                             ),
                           );

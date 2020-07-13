@@ -102,6 +102,7 @@ class _SignInState extends State<SignIn> with Validators {
                           .signIn(
                               email: _emailController.text,
                               password: _passwortController.text)
+                          // refreshes the list of games (otherwise snapshot wouldn't connect)
                           .then((value) => _gameBloc.refresh());
                       Navigator.pop(context);
                     }

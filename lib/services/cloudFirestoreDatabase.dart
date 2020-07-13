@@ -15,6 +15,11 @@ abstract class CloudFirestoreDatabaseApi {
       {@required String userID, @required String gameID});
   // adds a user object with all the important values to the users collection
   void addUserToFirestore({@required String userID, @required String username});
+  void deleteUserFromFirestore(
+      {@required String userID, @required String username});
+  //
+  //
+  //
   Future<List<dynamic>> getInvitations({@required String userID});
   Future<List<dynamic>> getFriendsList({@required String userID});
   // fetches the game with the given gameID
@@ -27,9 +32,13 @@ abstract class CloudFirestoreDatabaseApi {
   void deleteGameFromFirestore({@required String gameID});
   void addFriendToFirestore(
       {@required String userID, @required String nameOfTheFriend});
+  void deleteFriendFromFirestore(
+      {@required String userID, @required String nameOfTheFriend});
   // void inviteOpponentToGame(
   //     {@required String gameID, @required String opponentUserID});
 }
+
+// TODO: minimize CloudFirestore database accesses
 
 // implements CloudFirestoreDatabaseApi
 // manages the communication with the CloudFirestore database in Firebase
@@ -47,7 +56,7 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
       {@required String userID}) async {
     DocumentSnapshot snapshot =
         await _firestore.collection(_userCollection).document(userID).get();
-    return snapshot.data["gameIDs"];
+    return snapshot.data["gameIDs"] ?? [];
   }
 
   // gets a list with all the usernames in use
@@ -146,6 +155,24 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
         .updateData({"usernames": usernames, "userIDs": userIDs});
   }
 
+  void deleteUserFromFirestore(
+      {@required String userID, @required String username}) async {
+    await _firestore.collection(_userCollection).document(userID).delete();
+    DocumentSnapshot snapshot = await _firestore
+        .collection(_userCollection)
+        .document("usernames")
+        .get();
+    List<dynamic> usernames = snapshot["usernames"];
+    Map<String, dynamic> userIDs = snapshot["userIDs"];
+    usernames.remove(username);
+    userIDs.remove({username: userID});
+    await _firestore
+        .collection(_userCollection)
+        .document("usernames")
+        .updateData({"usernames": usernames, "userIDs": userIDs});
+  }
+
+  // adds a friend to firestore
   void addFriendToFirestore(
       {@required String userID, @required String nameOfTheFriend}) async {
     DocumentSnapshot snapshot =
@@ -153,7 +180,19 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
 
     Map<String, dynamic> newMap = snapshot.data;
     newMap["friends"].add(nameOfTheFriend);
-    print("s " + newMap["friends"].toString());
+    await _firestore
+        .collection(_userCollection)
+        .document(userID)
+        .updateData(newMap);
+  }
+
+  void deleteFriendFromFirestore(
+      {@required String userID, @required String nameOfTheFriend}) async {
+    DocumentSnapshot snapshot =
+        await _firestore.collection(_userCollection).document(userID).get();
+
+    Map<String, dynamic> newMap = snapshot.data;
+    newMap["friends"].remove(nameOfTheFriend);
     await _firestore
         .collection(_userCollection)
         .document(userID)

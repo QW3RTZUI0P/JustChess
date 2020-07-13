@@ -32,6 +32,81 @@ class _MenuState extends State<Menu> {
     });
   }
 
+  void showUserOptionsDialog() {
+    showDialog(
+      context: context,
+      child: AlertDialog(
+        title: Text("Account Optionen"),
+        content: Container(
+          child: Column(
+            children: <Widget>[
+              FlatButton(
+                child: Text("Account löschen"),
+                
+                // onPressed: () {
+                //   showDialog(
+                //     context: context,
+                //     child: AlertDialog(
+                //       title: Text("Bestätigung"),
+                //       content: Container(
+                //         child: Row(
+                //           children: <Widget>[
+                //             FlatButton(
+                //               child: Text("Abbrechen"),
+                //               onPressed: () => Navigator.pop(context),
+                //             ),
+                //             FlatButton(
+                //               child: Text("Ok"),
+                //               onPressed: () async {
+                //                 // deletes Account from FirebaseAuth
+                //                 _authenticationBloc.authenticationService
+                //                     .deleteAccount();
+                //                 String usernameInFunction = await _gameBloc
+                //                     .cloudFirestoreDatabase
+                //                     .getUsernameForUserID(
+                //                         userID: _gameBloc.currentUserID);
+                //                 // deletes Account Info from CloudFirestore
+                //                 _gameBloc.cloudFirestoreDatabase
+                //                     .deleteUserFromFirestore(
+                //                         userID: _gameBloc.currentUserID,
+                //                         username: usernameInFunction);
+                //                 Navigator.pop(context);
+                //                 Navigator.pop(context);
+                //               },
+                //             ),
+                //           ],
+                //         ),
+                //       ),
+                //     ),
+                //   );
+                // },
+              ),
+              FlatButton(
+                child: Text("Passwort zurücksetzen"),
+                onPressed: () {
+                  _authenticationBloc.authenticationService
+                      .sendResetPasswortEmail();
+                },
+              ),
+              FlatButton(
+                child: Text("Datenschutzerklärung"),
+                onPressed: () {},
+              ),
+              Row(
+                children: <Widget>[
+                  FlatButton(
+                    child: Text("Abbrechen"),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -40,7 +115,15 @@ class _MenuState extends State<Menu> {
           DrawerHeader(
             child: Column(
               children: <Widget>[
-                Text("Benutzername: $username"),
+                Row(
+                  children: <Widget>[
+                    GestureDetector(
+                      child: CircleAvatar(),
+                      onTap: () => showUserOptionsDialog(),
+                    ),
+                    Text("Benutzername: $username"),
+                  ],
+                ),
                 Text("Email: $emailAdress"),
               ],
             ),

@@ -5,40 +5,42 @@ import "../../imports.dart";
 // TODO: add text widget which says who's turn it is
 class ChessBoardWidget extends StatefulWidget {
   GameClass currentGame;
+  ChessBoardController chessBoardController;
   bool isUserWhite;
   bool isUsersTurn;
   ChessBoardWidget({
     @required this.currentGame,
+    @required this.chessBoardController,
     @required this.isUserWhite,
     @required this.isUsersTurn,
-  });
+  }) {
+    print("white " + isUserWhite.toString());
+    print("turn " + isUsersTurn.toString());
+  }
 
   @override
   _ChessBoardWidgetState createState() => _ChessBoardWidgetState();
 }
 
-class _ChessBoardWidgetState extends State<ChessBoardWidget>
-    with AfterLayoutMixin<ChessBoardWidget> {
+class _ChessBoardWidgetState extends State<ChessBoardWidget> {
   GameBloc _gameBloc;
   GameClass _currentGame;
-  ChessBoardController _chessBoardController = ChessBoardController();
+  bool isUsersTurn;
 
   @override
   void initState() {
     super.initState();
     this._currentGame = widget.currentGame;
+    this.isUsersTurn = widget.isUsersTurn;
+    print(this.isUsersTurn);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     this._gameBloc = GameBlocProvider.of(context).gameBloc;
-  }
-
-  @override
-  // Funktion aus dem Package after_layout
-  void afterFirstLayout(BuildContext context) {
-    _chessBoardController.loadPGN(_currentGame.pgn ?? "");
+    this._currentGame = widget.currentGame;
+    widget.chessBoardController.loadPGN(_currentGame.pgn);
   }
 
   // bool usersTurn() {
@@ -68,10 +70,12 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget>
                       icon: Icon(Icons.clear),
                       tooltip: "Abbrechen",
                       onPressed: () {
-                        this
-                            ._chessBoardController
-                            .loadPGN(_currentGame.pgn ?? "");
-                        print("partieINKlasse: " + this._currentGame.pgn);
+                        setState(() {
+                          widget.chessBoardController
+                              .loadPGN(widget.currentGame.pgn ?? "");
+                          this.isUsersTurn = true;
+                        });
+
                         Navigator.pop(context);
                       },
                     ),
@@ -93,9 +97,10 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget>
                         widget.isUsersTurn = false;
                         setState(() {
                           this._currentGame.pgn =
-                              this._chessBoardController.game.pgn();
+                              widget.chessBoardController.game.pgn();
                         });
-                        _currentGame.pgn = _chessBoardController.game.pgn();
+                        _currentGame.pgn =
+                            widget.chessBoardController.game.pgn();
                         // TODO: maybe invent a better and more secure way
                         _currentGame.whitesTurn =
                             widget.isUserWhite ? false : true;
@@ -103,11 +108,12 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget>
                         saveGame(game: _currentGame);
                         Navigator.pop(context);
                         WidgetsBinding.instance.addPostFrameCallback((_) =>
-                            _chessBoardController
+                            widget.chessBoardController
                                 .loadPGN(_currentGame.pgn ?? ""));
-                        this
-                            ._chessBoardController
+                        widget.chessBoardController
                             .loadPGN(this._currentGame.pgn);
+                        // refreshes the games list, so that the right pgn is loaded in TryOutChessBoardWidget
+                        // _gameBloc.refresh();
                       },
                     ),
                   ),
@@ -133,7 +139,7 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget>
     return ChessBoard(
       size: boardSize,
       whiteSideTowardsUser: widget.isUserWhite,
-      enableUserMoves: widget.isUsersTurn,
+      enableUserMoves: this.isUsersTurn,
       onMove: (move) {
         confirmMove();
         // partie.anzahlDerZuege += 0.5;
@@ -167,7 +173,8 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget>
           ),
         );
       },
-      chessBoardController: this._chessBoardController,
+      onCheck: (_) {},
+      chessBoardController: widget.chessBoardController,
     );
   }
 }

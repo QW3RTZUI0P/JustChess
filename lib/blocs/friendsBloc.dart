@@ -12,11 +12,17 @@ class FriendsBloc {
 
   // the username of the current user
   String username = "";
+  // the userID of the current user
+  String userID = "";
   // List with all usernames, also with the one of the current user and the ones of himself
   List<String> usernamesList = [];
   // List which gets added every friends when all friends are added at the start
   // during runtime this has all the user's friends
   List<String> friendsHelperList = [];
+
+  // helper list for available friends
+  // during runtime it has all the available friends for the user
+  List<String> availableFriendsHelperList = [];
 
   FriendsBloc({
     this.cloudFirestoreDatabase,
@@ -37,13 +43,25 @@ class FriendsBloc {
   Sink<List<dynamic>> get friendsListSink => friendsListController.sink;
   Stream<List<dynamic>> get friendsListStream => friendsListController.stream;
 
+  // TODO: make this StreamController lazy so that it only fetches the friends the user searched for
   // controls all the available friends
   StreamController<List<dynamic>> availableFriendsListController =
-      StreamController<List<dynamic>>();
+      StreamController<List<dynamic>>.broadcast();
   Sink<List<dynamic>> get availableFriendsListSink =>
       availableFriendsListController.sink;
   Stream<List<dynamic>> get availableFriendsListStream =>
       availableFriendsListController.stream;
+
+  // controls all the added friends
+  StreamController<dynamic> addedFriendController = StreamController<dynamic>();
+  Sink<dynamic> get addedFriendSink => addedFriendController.sink;
+  Stream<dynamic> get addedFriendStream => addedFriendController.stream;
+
+  // controls all the deleted friends
+  StreamController<dynamic> deletedFriendController =
+      StreamController<dynamic>();
+  Sink<dynamic> get deletedFriendSink => deletedFriendController.sink;
+  Stream<dynamic> get deletedFriendStream => deletedFriendController.stream;
 
   // is being executed in the constructor
   // sets up the listeners necessary for the StreamControllers to work
@@ -53,15 +71,38 @@ class FriendsBloc {
       this.friendsListSink.add(this.friendsHelperList);
     });
     this.friendsListStream.listen((newFriendsList) {
-      List<String> availableFriendsInFunction = List.from(this.usernamesList);
+      availableFriendsHelperList = List.from(this.usernamesList);
       print("newFriendsList: " + newFriendsList.toString());
       // removes the added friends from the availableFriends list
       for (String currentFriend in newFriendsList) {
-        availableFriendsInFunction.remove(currentFriend);
+        availableFriendsHelperList.remove(currentFriend);
       }
       // removes the own username from the availableFriends list
-      availableFriendsInFunction.remove(this.username);
-      this.availableFriendsListSink.add(availableFriendsInFunction);
+      availableFriendsHelperList.remove(this.username);
+      this.availableFriendsListSink.add(availableFriendsHelperList);
+    });
+
+    addedFriendStream.listen((addedFriend) {
+      // removes friend from available friends list
+      this.availableFriendsHelperList.remove(addedFriend);
+      this.availableFriendsListSink.add(this.availableFriendsHelperList);
+      // adds friend to friends list
+      this.friendSink.add(addedFriend);
+      // adds a new friend to cloud firestore
+      this.cloudFirestoreDatabase.addFriendToFirestore(
+          userID: this.userID, nameOfTheFriend: addedFriend);
+    });
+
+    deletedFriendStream.listen((deletedFriend) {
+      // adds friend to available friends list
+      this.availableFriendsHelperList.add(deletedFriend);
+      this.availableFriendsListSink.add(this.availableFriendsHelperList);
+      // deletes friend from friends list
+      this.friendsHelperList.remove(deletedFriend);
+      this.friendsListSink.add(this.friendsHelperList);
+      // deletes friend from cloud firestore
+      this.cloudFirestoreDatabase.deleteFriendFromFirestore(
+          userID: this.userID, nameOfTheFriend: deletedFriend);
     });
   }
 
@@ -70,6 +111,8 @@ class FriendsBloc {
     friendsController.close();
     friendsListController.close();
     availableFriendsListController.close();
+    addedFriendController.close();
+    deletedFriendController.close();
   }
 
   void getImportantValues() async {
@@ -77,8 +120,15 @@ class FriendsBloc {
     Map<String, dynamic> credentials =
         await authenticationService.currentUserCredentials();
     this.username = credentials["username"];
+    this.userID = await authenticationService.currentUserUid();
     // gets the usernames list from the users collection
     this.usernamesList = await cloudFirestoreDatabase.getUsernamesList();
+  }
+
+  // is called when Friends() loads
+  void loadFriends() async {
+    // clears the list with the loaded friends (otherwise you'd have multiple times the same friend)
+    this.friendsHelperList.clear();
     // checks if the user has already added any friends
     String currentUserID = await authenticationService.currentUserUid();
     List<dynamic> friendsList =
@@ -97,8 +147,14 @@ class FriendsBloc {
       friendSink.add(friend);
     }
   }
+
+  // is called when FindNewFriend() loads
+  void loadAvailableFriends() async {
+    this.availableFriendsListSink.add(this.availableFriendsHelperList);
+  }
 }
 
+// Provider for the friendsBloc
 class FriendsBlocProvider extends InheritedWidget {
   final FriendsBloc friendsBloc;
   const FriendsBlocProvider({Key key, Widget child, this.friendsBloc})
@@ -109,6 +165,7 @@ class FriendsBlocProvider extends InheritedWidget {
 
   @override
   bool updateShouldNotify(FriendsBlocProvider oldWidget) {
+    // returns true if the friendsBloc objects are different from each other
     return this.friendsBloc != oldWidget.friendsBloc;
   }
 }

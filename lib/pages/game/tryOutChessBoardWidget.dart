@@ -3,18 +3,22 @@ import "../../imports.dart";
 
 class TryOutChessBoardWidget extends StatefulWidget {
   final String pgn;
-  TryOutChessBoardWidget({@required this.pgn});
+  final bool isUserWhite;
+  TryOutChessBoardWidget({
+    @required this.pgn,
+    @required this.isUserWhite,
+  });
 
   @override
   _TryOutChessBoardWidgetState createState() => _TryOutChessBoardWidgetState();
 }
 
-class _TryOutChessBoardWidgetState extends State<TryOutChessBoardWidget>
-    with AfterLayoutMixin<TryOutChessBoardWidget> {
+class _TryOutChessBoardWidgetState extends State<TryOutChessBoardWidget> {
   ChessBoardController _chessBoardController = ChessBoardController();
 
   @override
-  void afterFirstLayout(BuildContext context) {
+  void initState() {
+    super.initState();
     _chessBoardController.loadPGN(widget.pgn);
   }
 
@@ -23,38 +27,65 @@ class _TryOutChessBoardWidgetState extends State<TryOutChessBoardWidget>
     Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: Icon(
-            Icons.clear,
-            color: Colors.black,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              ChessBoard(
-                chessBoardController: _chessBoardController,
-                size: size.width > size.height
-                    ? size.height * 0.9
-                    : size.width * 0.9,
-                onMove: (move) {},
-                onDraw: () {},
-                onCheckMate: (color) {},
-              ),
-              Row(
-                children: <Widget>[
-                  RaisedButton(
-                    child: Text("Zurücksetzen"),
-                    onPressed: () => _chessBoardController.loadPGN(widget.pgn),
+          padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+          child: Container(
+            height: size.height,
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    icon: Icon(Icons.clear),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                   ),
-                ],
-              ),
-            ],
+                ),
+                Expanded(
+                  child: Column(
+                    children: <Widget>[
+                      ChessBoard(
+                        chessBoardController: _chessBoardController,
+                        whiteSideTowardsUser: widget.isUserWhite,
+                        size: size.width > size.height
+                            ? size.height * 0.9
+                            : size.width * 0.9,
+                        onMove: (move) {},
+                        onDraw: () {},
+                        onCheckMate: (color) {},
+                        onCheck: (_) {},
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          RaisedButton(
+                            child: Text("Zurücksetzen"),
+                            onPressed: () => setState(() {_chessBoardController.loadPGN(widget.pgn);})
+                                
+                          ),
+                          RaisedButton(
+                            child: Text("Einen Zug zurück"),
+                            onPressed: () {
+                              setState(() {
+                                _chessBoardController.game.undo_move();
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

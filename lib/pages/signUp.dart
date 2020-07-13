@@ -12,6 +12,7 @@ class _SignUpState extends State<SignUp> with Validators {
   final _formKey = GlobalKey<FormState>();
   // loginBloc für die gesamte Registrierungslogik
   LoginBloc _loginBloc;
+  GameBloc _gameBloc;
   // TextEditingController für die Textfelder
   final TextEditingController _benutzernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -33,6 +34,12 @@ class _SignUpState extends State<SignUp> with Validators {
       authenticationService: AuthenticationService(),
       cloudFirestoreDatabase: CloudFirestoreDatabase(),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    this._gameBloc = GameBlocProvider.of(context).gameBloc;
   }
 
   @override
@@ -125,11 +132,14 @@ class _SignUpState extends State<SignUp> with Validators {
                     if (_formKey.currentState.validate()) {
                       if (await _loginBloc.isUsernameAvailable(
                           username: _benutzernameController.text)) {
-                        _loginBloc.createAccount(
-                          email: _emailController.text,
-                          password: _passwortController.text,
-                          username: _benutzernameController.text,
-                        );
+                        _loginBloc
+                            .createAccount(
+                              email: _emailController.text,
+                              password: _passwortController.text,
+                              username: _benutzernameController.text,
+                            )
+                            // refreshes the list of games (otherwise snapshot wouldn't connect)
+                            .then((value) => _gameBloc.refresh());
                       } else {
                         showDialog(
                             context: context,
