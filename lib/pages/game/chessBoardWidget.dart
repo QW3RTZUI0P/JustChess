@@ -43,6 +43,12 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
     widget.chessBoardController.loadPGN(_currentGame.pgn);
   }
 
+  @override
+  void didUpdateWidget(ChessBoardWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    this.isUsersTurn = widget.isUsersTurn;
+  }
+
   // bool usersTurn() {
   //   if ((_currentGame.whitesTurn && widget.isUserWhite) ||
   //       (!_currentGame.whitesTurn && !widget.isUserWhite)) {

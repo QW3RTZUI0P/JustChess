@@ -78,6 +78,7 @@ class _GameState extends State<Game> {
             this._gameBloc.updateGameSink.add(updatedGame);
             setState(() {
               this.currentGame = GameClass.from(updatedGame);
+              this.isUsersTurn = usersTurn();
             });
             chessBoardController.loadPGN(currentGame.pgn);
           },
@@ -145,7 +146,7 @@ class _GameState extends State<Game> {
                           fullscreenDialog: true,
                           builder: (BuildContext context) {
                             return TryOutChessBoardWidget(
-                              pgn: widget.currentGame.pgn,
+                              pgn: this.currentGame.pgn,
                               isUserWhite: widget.isUserWhite,
                             );
                           }),

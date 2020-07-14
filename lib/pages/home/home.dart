@@ -51,9 +51,14 @@ class _HomeState extends State<Home> {
   // TODO: create invitations
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("JustChess"),
+        title: Text(
+          "JustChess",
+          style: theme.textTheme.headline6,
+        ),
       ),
       floatingActionButton: CreateGameButton(
         gameBloc: this._gameBloc,

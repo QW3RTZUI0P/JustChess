@@ -48,6 +48,8 @@ export "./blocs/authenticationBloc.dart";
 export "./blocs/gameBloc.dart";
 export "./blocs/loginBloc.dart";
 export "./blocs/friendsBloc.dart";
+// other
+export "./other/theme.dart";
 
 // flutter_chess_board:
 export "./flutter_chess_board/flutter_chess_board.dart";

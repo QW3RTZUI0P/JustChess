@@ -44,6 +44,9 @@ class _SignInState extends State<SignIn> with Validators {
 
   @override
   Widget build(BuildContext context) {
+
+    ThemeData theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Anmeldung"),
@@ -84,6 +87,15 @@ class _SignInState extends State<SignIn> with Validators {
                           });
                         }
                       },
+                    ),
+                    counter: Expanded(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: FlatButton(
+                          child: Text("Passwort zurücksetzen", ),
+
+                        ),
+                      ),
                     ),
                   ),
                   controller: _passwortController,

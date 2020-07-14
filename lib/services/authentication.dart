@@ -30,7 +30,7 @@ class AuthenticationService implements AuthenticationApi {
 
   Future<String> currentUserUid() async {
     FirebaseUser user = await _firebaseAuth.currentUser();
-    return user.uid;
+    return user.uid ?? "";
   }
 
   Future<Map<String, dynamic>> currentUserCredentials() async {

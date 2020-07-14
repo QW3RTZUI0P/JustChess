@@ -42,7 +42,7 @@ class _MenuState extends State<Menu> {
             children: <Widget>[
               FlatButton(
                 child: Text("Account löschen"),
-                
+
                 // onPressed: () {
                 //   showDialog(
                 //     context: context,
@@ -150,6 +150,17 @@ class _MenuState extends State<Menu> {
           ),
           ListTile(
             title: Text("Über"),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    fullscreenDialog: false,
+                    builder: (BuildContext context) {
+                      return About();
+                    }),
+              );
+            },
           ),
           ListTile(
             title: Text("Ausloggen"),
