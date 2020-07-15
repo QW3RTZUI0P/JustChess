@@ -20,17 +20,19 @@ export "./pages/home/home.dart";
 export "./pages/home/menu.dart";
 export "./pages/home/createGameButton.dart";
 // gamePage:
-export "./pages/game/game.dart";
+export "./pages/game/premium/game.dart";
 export "./pages/game/labeling.dart";
 export "./pages/game/chessBoardWidget.dart";
-export "./pages/game/tryOutChessBoardWidget.dart";
+export "./pages/game/premium/tryOutChessBoardWidget.dart";
 // friendsPage:
 export "./pages/friends/friends.dart";
 export "./pages/friends/findNewFriend.dart";
+// createGamePage:
+export "./pages/createGame/createGame.dart";
+export "./pages/createGame/createOfflineGame.dart";
 
 export "./pages/signUp.dart";
 export "./pages/signIn.dart";
-export "./pages/createGame.dart";
 export "./pages/about.dart";
 
 // classes
@@ -43,11 +45,13 @@ export "./classes/invitation.dart";
 // services
 export "./services/authentication.dart";
 export "./services/cloudFirestoreDatabase.dart";
+export "./services/localDatabase.dart";
 // blocs
 export "./blocs/authenticationBloc.dart";
 export "./blocs/gameBloc.dart";
 export "./blocs/loginBloc.dart";
 export "./blocs/friendsBloc.dart";
+export "./blocs/localGamesBloc.dart";
 // other
 export "./other/theme.dart";
 

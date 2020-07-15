@@ -1,5 +1,5 @@
 // tryOutChessBoardWidget.dart
-import "../../imports.dart";
+import "../../../imports.dart";
 
 class TryOutChessBoardWidget extends StatefulWidget {
   final String pgn;

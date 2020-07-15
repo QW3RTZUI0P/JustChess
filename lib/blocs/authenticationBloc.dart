@@ -1,9 +1,14 @@
 // authenticationBloc.dart
 import "../imports.dart";
 
-// bloc Klasse, die sich um die Authentisierung kümmert
+// class that handles authentication and checks whether the user is premium or not
 class AuthenticationBloc {
   final AuthenticationApi authenticationService;
+
+  // StreamController that tracks whether the user is a premium user
+  StreamController<bool> _isUserPremiumController = StreamController<bool>();
+  Sink<bool> get isUserPremiumSink => _isUserPremiumController.sink;
+  Stream<bool> get isUserPremiumStream => _isUserPremiumController.stream;
 
   // Stream, der den Status der Authentisierung überwacht
   StreamController<String> _authenticationController =
@@ -16,10 +21,15 @@ class AuthenticationBloc {
   Sink<bool> get logoutUser => _logoutController.sink;
   Stream<bool> get listLogoutUser => _logoutController.stream;
 
-
-
   AuthenticationBloc({this.authenticationService}) {
     _startListeners();
+    getUserStatus();
+  }
+
+  void getUserStatus() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool isUserPremium = sharedPreferences.getBool("isUserPremium") ?? false;
+    isUserPremiumSink.add(isUserPremium);
   }
 
   // überwacht die ganze Zeit, ob der User ein- oder ausgeloggt ist
@@ -37,16 +47,12 @@ class AuthenticationBloc {
     });
   }
 
-
   // schließt die beiden StreamController (aus Performance-Gründen)
   void dispose() {
+    _isUserPremiumController.close();
     _authenticationController.close();
     _logoutController.close();
   }
-
-
-  // ab hier Funktionen, die für die Registrierung und Anmeldung erforderlich sind
-
 }
 
 // InheritedWidget, das den AuthenticationBloc dem Widget Tree zur Verfügung stellt

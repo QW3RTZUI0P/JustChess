@@ -1,5 +1,5 @@
 // createGame.dart
-import "../imports.dart";
+import "../../imports.dart";
 
 // Dialog der angezeigt wird, wenn der PartieErstellenButton gedrückt wird
 // TODO: enable auto generated names

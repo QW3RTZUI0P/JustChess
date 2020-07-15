@@ -1,5 +1,5 @@
 // game.dart
-import "../../imports.dart";
+import "../../../imports.dart";
 import "package:chess/chess.dart" as chess;
 
 // TODO: implement chessBoard to try out ones move

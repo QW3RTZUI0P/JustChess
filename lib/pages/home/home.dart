@@ -15,11 +15,9 @@ import "../../imports.dart";
 // TODO: add in app messaging
 // TODO: add starter tutorial
 class Home extends StatefulWidget {
-  List<GameClass> partien = [];
-  var partieGeloescht;
+  final bool isUserPremium;
   Home({
-    this.partien = const [],
-    this.partieGeloescht,
+    this.isUserPremium,
   });
 
   @override
@@ -29,13 +27,18 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   AuthenticationBloc _authenticationBloc;
   GameBloc _gameBloc;
+  LocalGamesBloc _localGamesBloc;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _authenticationBloc =
-        AuthenticationBlocProvider.of(context).authenticationBloc;
-    _gameBloc = GameBlocProvider.of(context).gameBloc;
+    if (widget.isUserPremium) {
+      _authenticationBloc =
+          AuthenticationBlocProvider.of(context).authenticationBloc;
+      _gameBloc = GameBlocProvider.of(context).gameBloc;
+    } else {
+      _localGamesBloc = LocalGamesBlocProvider.of(context).localGamesBloc;
+    }
   }
 
   @override
@@ -53,6 +56,18 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
 
+    return widget.isUserPremium
+        ? buildPremiumHome(theme)
+        : buildNormalHome(theme);
+  }
+
+  Scaffold buildNormalHome(ThemeData theme) {
+    return Scaffold(
+      body: ListView.builder(itemBuilder: (BuildContext context, int index) {}),
+    );
+  }
+
+  Scaffold buildPremiumHome(ThemeData theme) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -97,29 +112,6 @@ class _HomeState extends State<Home> {
                 } else {
                   List games = List.from(snapshot.data);
 
-                  // games.sort((firstGame, secondGame) {
-                  //   bool isWhite = (firstGame.player01IsWhite &&
-                  //               firstGame.player01 ==
-                  //                   _gameBloc.currentUserID) ||
-                  //           (!firstGame.player01IsWhite ||
-                  //               firstGame.player02 == _gameBloc.currentUserID)
-                  //       ? true
-                  //       : false;
-                  //   bool isTurn = (firstGame.whitesTurn && isWhite) ||
-                  //           (!firstGame.whitesTurn && !isWhite)
-                  //       ? true
-                  //       : false;
-                  //   if (isTurn) {
-                  //     return 1;
-                  //   } else {
-                  //     return -1;
-                  //   }
-                  // });
-                  // for (GameClass game in games) {
-                  //   print(game.subtitle);
-                  //   print(game.whitesTurn.toString());
-                  //   print("for");
-                  // }
                   return Scrollbar(
                     child: ListView.builder(
                         itemBuilder: (BuildContext context, int index) {
