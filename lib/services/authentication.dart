@@ -5,7 +5,7 @@ import "package:firebase_auth/firebase_auth.dart";
 abstract class AuthenticationApi {
   getFirebaseAuth();
   Future<String> currentUserUid();
-  Future<Map<String, dynamic>> currentUserCredentials();
+  Future<String> currentUserEmail();
   Future<void> signOut();
   Future<String> signInWithEmailAndPassword({String email, String password});
   // erstellt einen User, der mit seiner Email Adresse und seinem Passwort authentifiziert wird
@@ -30,12 +30,12 @@ class AuthenticationService implements AuthenticationApi {
 
   Future<String> currentUserUid() async {
     FirebaseUser user = await _firebaseAuth.currentUser();
-    return user.uid ?? "";
+    return user?.uid ?? "";
   }
 
-  Future<Map<String, dynamic>> currentUserCredentials() async {
+  Future<String> currentUserEmail() async {
     FirebaseUser user = await _firebaseAuth.currentUser();
-    return {"username": user.displayName, "email": user.email};
+    return user.email;
   }
 
   Future<void> signOut() async {

@@ -1,14 +1,14 @@
-// chessBoardWidget.dart
+// chessBoardWidgetPremium.dart
 
-import "../../imports.dart";
+import "../../../imports.dart";
 
 // TODO: add text widget which says who's turn it is
-class ChessBoardWidget extends StatefulWidget {
+class ChessBoardWidgetPremium extends StatefulWidget {
   GameClass currentGame;
   ChessBoardController chessBoardController;
   bool isUserWhite;
   bool isUsersTurn;
-  ChessBoardWidget({
+  ChessBoardWidgetPremium({
     @required this.currentGame,
     @required this.chessBoardController,
     @required this.isUserWhite,
@@ -19,35 +19,53 @@ class ChessBoardWidget extends StatefulWidget {
   }
 
   @override
-  _ChessBoardWidgetState createState() => _ChessBoardWidgetState();
+  _ChessBoardWidgetPremiumState createState() =>
+      _ChessBoardWidgetPremiumState();
 }
 
-class _ChessBoardWidgetState extends State<ChessBoardWidget> {
-  GameBloc _gameBloc;
+class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium>
+    with
+        AfterLayoutMixin<ChessBoardWidgetPremium>,
+        SingleTickerProviderStateMixin {
+  GamesBloc _gameBloc;
   GameClass _currentGame;
   bool isUsersTurn;
+  AnimationController animationController;
 
   @override
   void initState() {
     super.initState();
     this._currentGame = widget.currentGame;
     this.isUsersTurn = widget.isUsersTurn;
+    this.animationController = AnimationController(
+      duration: Duration(seconds: 3),
+      vsync: this,
+    );
     print(this.isUsersTurn);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this._gameBloc = GameBlocProvider.of(context).gameBloc;
+    this._gameBloc = GamesBlocProvider.of(context).gameBloc;
     this._currentGame = widget.currentGame;
     widget.chessBoardController.loadPGN(_currentGame.pgn);
   }
 
   @override
-  void didUpdateWidget(ChessBoardWidget oldWidget) {
+  void didUpdateWidget(ChessBoardWidgetPremium oldWidget) {
     super.didUpdateWidget(oldWidget);
     this.isUsersTurn = widget.isUsersTurn;
   }
+
+  @override
+  void dispose() {
+    this.animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void afterFirstLayout(BuildContext context) {}
 
   // bool usersTurn() {
   //   if ((_currentGame.whitesTurn && widget.isUserWhite) ||
@@ -137,6 +155,7 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget> {
 
     double boardSize =
         size.width < size.height ? size.width * 0.9 : size.height * 0.9;
+
 
     return ChessBoard(
       size: boardSize,

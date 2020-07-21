@@ -1,27 +1,30 @@
-// createGame.dart
+// createGamePremium.dart
 import "../../imports.dart";
 
 // Dialog der angezeigt wird, wenn der PartieErstellenButton gedrückt wird
 // TODO: enable auto generated names
-class CreateGame extends StatefulWidget {
-  final String opponent;
-  CreateGame({this.opponent});
-
+class CreateGamePremium extends StatefulWidget {
   @override
-  _CreateGameState createState() => _CreateGameState();
+  _CreateGamePremiumState createState() => _CreateGamePremiumState();
 }
 
-class _CreateGameState extends State<CreateGame> {
-  GameBloc _gameBloc;
+class _CreateGamePremiumState extends State<CreateGamePremium> {
+  GamesBloc _gameBloc;
+  FriendsBloc _friendsBloc;
 
   TextEditingController _neuePartieNameController = TextEditingController();
   int radioButtonGroupValue = 0;
   bool benutzerIstWeiss = true;
 
+  // the friend the user wants to play against
+  String selectedFriend = "";
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this._gameBloc = GameBlocProvider.of(context).gameBloc;
+    this._gameBloc = GamesBlocProvider.of(context).gameBloc;
+    this._friendsBloc = FriendsBlocProvider.of(context).friendsBloc;
+    this._friendsBloc.loadFriends();
   }
 
   void radioButtonChanged(int value) {
@@ -42,7 +45,7 @@ class _CreateGameState extends State<CreateGame> {
 
   void createGame() async {
     String opponentID = await _gameBloc.cloudFirestoreDatabase
-        .getUserIDForUsername(username: widget.opponent);
+        .getUserIDForUsername(username: this.selectedFriend);
     GameClass neuePartie = GameClass(
       subtitle: _neuePartieNameController.text,
       pgn: "",
@@ -65,6 +68,13 @@ class _CreateGameState extends State<CreateGame> {
       appBar: AppBar(
         title: Text("Partie erstellen"),
       ),
+      floatingActionButton: FloatingActionButton(
+        child: Text("Partie erstellen"),
+        shape: CircleBorder(side: BorderSide()),
+        tooltip: "Partie erstellen",
+        onPressed: () => createGame(),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
@@ -85,7 +95,7 @@ class _CreateGameState extends State<CreateGame> {
               ),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text("Ich bin"),
+                child: Text("Ich spiele als"),
               ),
               Row(
                 children: <Widget>[
@@ -107,14 +117,36 @@ class _CreateGameState extends State<CreateGame> {
                   Text("Schwarz"),
                 ],
               ),
-              FlatButton(
-                child: Text("Erstellen"),
-                onPressed: () => createGame(),
-              ),
-              FlatButton(
-                child: Text("Abbrechen"),
-                onPressed: () => Navigator.pop(context),
-              ),
+              StreamBuilder<Object>(
+                  stream: _friendsBloc.friendsListStream,
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.data == null ||
+                        !snapshot.hasData ||
+                        snapshot.data == []) {
+                      return Center(
+                        child: Text(
+                          "Noch keine Freunde hinzugefügt",
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    }
+                    return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: snapshot.data.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return ListTile(
+                            title: Text(snapshot.data[index]),
+                            selected: this.selectedFriend == snapshot.data[index],
+                            onTap: () {
+                              setState(() {
+                                this.selectedFriend = snapshot.data[index];
+                              });
+                            },
+                          );
+                        });
+                  }),
             ],
           ),
         ),

@@ -1,6 +1,6 @@
 // findNewFriend.dart
 
-import "../../imports.dart";
+import "../../../imports.dart";
 
 // TODO: show list of all available friends in the beginning
 
@@ -28,7 +28,7 @@ class _FindNewFriendState extends State<FindNewFriend>
     this._friendsBloc.loadAvailableFriends();
     setState(() {
       // has to be this way, otherwise when searchResults changes, the availableFriendsHelperList would also change
-      this.searchResults = List.from(_friendsBloc.availableFriendsHelperList);
+      this.searchResults = List.from(_friendsBloc.availableFriendsList);
     });
   }
 

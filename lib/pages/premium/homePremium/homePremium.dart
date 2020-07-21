@@ -1,5 +1,5 @@
-// home.dart
-import "../../imports.dart";
+// homePremium.dart
+import "../../../imports.dart";
 
 // TODO: clean everything up, split some widgets up and improve performance
 
@@ -14,31 +14,31 @@ import "../../imports.dart";
 // TODO: add in app purchases
 // TODO: add in app messaging
 // TODO: add starter tutorial
-class Home extends StatefulWidget {
-  final bool isUserPremium;
-  Home({
-    this.isUserPremium,
-  });
-
+class HomePremium extends StatefulWidget {
   @override
-  _HomeState createState() => _HomeState();
+  _HomePremiumState createState() => _HomePremiumState();
 }
 
-class _HomeState extends State<Home> {
+class _HomePremiumState extends State<HomePremium> {
   AuthenticationBloc _authenticationBloc;
-  GameBloc _gameBloc;
+  GamesBloc _gameBloc;
   LocalGamesBloc _localGamesBloc;
+
+  _HomePremiumState() {
+    print("Home State");
+  }
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (widget.isUserPremium) {
-      _authenticationBloc =
-          AuthenticationBlocProvider.of(context).authenticationBloc;
-      _gameBloc = GameBlocProvider.of(context).gameBloc;
-    } else {
-      _localGamesBloc = LocalGamesBlocProvider.of(context).localGamesBloc;
-    }
+    _authenticationBloc =
+        AuthenticationBlocProvider.of(context).authenticationBloc;
+
+    _gameBloc = GamesBlocProvider.of(context).gameBloc;
   }
 
   @override
@@ -56,18 +56,6 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
 
-    return widget.isUserPremium
-        ? buildPremiumHome(theme)
-        : buildNormalHome(theme);
-  }
-
-  Scaffold buildNormalHome(ThemeData theme) {
-    return Scaffold(
-      body: ListView.builder(itemBuilder: (BuildContext context, int index) {}),
-    );
-  }
-
-  Scaffold buildPremiumHome(ThemeData theme) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -76,9 +64,10 @@ class _HomeState extends State<Home> {
         ),
       ),
       floatingActionButton: CreateGameButton(
-        gameBloc: this._gameBloc,
+        isUserPremium: true,
       ),
-      drawer: Menu(),
+      drawer: MenuPremium(),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         // TODO: enable pull to reload also for CircularProgressIndicator and for "Noch keine Partien"
         child: RefreshIndicator(
@@ -169,19 +158,24 @@ class _HomeState extends State<Home> {
                                     snapshot.data[index].id,
                                   ),
                                   child: ListTile(
-                                    title: Text("Partie gegen " +
-                                            _gameBloc
-                                                .opponentsNamesList[index] ??
-                                        ""),
+                                    title: Text(
+                                      "Partie gegen " +
+                                              _gameBloc
+                                                  .opponentsNamesList[index] ??
+                                          "",
+                                      style: theme.textTheme.bodyText1,
+                                    ),
                                     subtitle: Text(
-                                        snapshot.data[index].subtitle ?? ""),
+                                      snapshot.data[index].subtitle ?? "",
+                                      style: theme.textTheme.bodyText1,
+                                    ),
                                     trailing: Icon(Icons.arrow_forward_ios),
                                     onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           fullscreenDialog: false,
-                                          builder: (context) => Game(
+                                          builder: (context) => GamePremium(
                                             currentGame: snapshot.data[index],
                                             opponentsName: _gameBloc
                                                 .opponentsNamesList[index],

@@ -1,25 +1,25 @@
-// game.dart
+// gamePremium.dart
 import "../../../imports.dart";
 import "package:chess/chess.dart" as chess;
 
 // TODO: implement chessBoard to try out ones move
-class Game extends StatefulWidget {
+class GamePremium extends StatefulWidget {
   final GameClass currentGame;
   final String opponentsName;
   bool isUserWhite;
-  Game({
+  GamePremium({
     @required this.currentGame,
     @required this.opponentsName,
     @required this.isUserWhite,
   });
 
   @override
-  _GameState createState() => _GameState();
+  _GamePremiumState createState() => _GamePremiumState();
 }
 
-class _GameState extends State<Game> {
+class _GamePremiumState extends State<GamePremium>     {
   // bloc that controls the loading, updating and saving of the games
-  GameBloc _gameBloc;
+  GamesBloc _gameBloc;
   // the current game (given from Home())
   GameClass currentGame;
   // ChessBoardController for the ChessBoardWidget
@@ -33,16 +33,12 @@ class _GameState extends State<Game> {
     this.currentGame = GameClass.from(widget.currentGame);
     this.isUsersTurn = usersTurn();
     this.chessBoardController.loadPGN(widget.currentGame.pgn);
-
-    print("isWhite " + widget.isUserWhite.toString());
-    print("isTurn " + this.isUsersTurn.toString());
-    print("whitesTurn " + currentGame.whitesTurn.toString());
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this._gameBloc = GameBlocProvider.of(context).gameBloc;
+    this._gameBloc = GamesBlocProvider.of(context).gameBloc;
   }
 
   bool usersTurn() {
@@ -60,13 +56,15 @@ class _GameState extends State<Game> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    MediaQueryData mediaQueryData = MediaQuery.of(context);
+    Size size = mediaQueryData.size;
 
     double boardSize =
         size.width < size.height ? size.width * 0.9 : size.height * 0.9;
 
     var appBar = AppBar(
       title: Text(widget.opponentsName ?? ""),
+      centerTitle: true,
       actions: <Widget>[
         IconButton(
           icon: Icon(Icons.refresh),
@@ -82,7 +80,14 @@ class _GameState extends State<Game> {
             });
             chessBoardController.loadPGN(currentGame.pgn);
           },
-        )
+        ),
+        // button that provides more options for the user (e.g. edit name of game, export pgn, ...)
+        DropdownButton(
+          icon: Icon(Icons.more_vert),
+          value: null,
+          items: [],
+          onChanged: (_) {},
+        ),
       ],
     );
     print("building game");
@@ -92,7 +97,10 @@ class _GameState extends State<Game> {
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: Container(
-            height: size.height - appBar.preferredSize.height - 16,
+            height: size.height -
+                appBar.preferredSize.height -
+                mediaQueryData.padding.top -
+                mediaQueryData.padding.bottom,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -115,7 +123,7 @@ class _GameState extends State<Game> {
                     const SizedBox(
                       width: 5,
                     ),
-                    ChessBoardWidget(
+                    ChessBoardWidgetPremium(
                       currentGame: this.currentGame,
                       chessBoardController: this.chessBoardController,
                       isUserWhite: widget.isUserWhite,

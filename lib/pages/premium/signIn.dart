@@ -1,7 +1,5 @@
 // signIn.dart
-import 'package:JustChess/services/cloudFirestoreDatabase.dart';
-
-import "../imports.dart";
+import "../../imports.dart";
 
 class SignIn extends StatefulWidget {
   // loginBloc aus registrierung.dart
@@ -16,7 +14,7 @@ class _SignInState extends State<SignIn> with Validators {
   final _formKey = GlobalKey<FormState>();
 
   LoginBloc _loginBloc;
-  GameBloc _gameBloc;
+  GamesBloc _gameBloc;
 
   // authenticationService, um den User anzumelden
   AuthenticationService authenticationService = AuthenticationService();
@@ -39,12 +37,11 @@ class _SignInState extends State<SignIn> with Validators {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this._gameBloc = GameBlocProvider.of(context).gameBloc;
+    this._gameBloc = GamesBlocProvider.of(context).gameBloc;
   }
 
   @override
   Widget build(BuildContext context) {
-
     ThemeData theme = Theme.of(context);
 
     return Scaffold(
@@ -92,8 +89,10 @@ class _SignInState extends State<SignIn> with Validators {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: FlatButton(
-                          child: Text("Passwort zurücksetzen", ),
-
+                          child: Text(
+                            "Passwort zurücksetzen",
+                          ),
+                          onPressed: () {},
                         ),
                       ),
                     ),

@@ -1,5 +1,5 @@
 // friends.dart
-import "../../imports.dart";
+import "../../../imports.dart";
 
 // TODO: enable auto reload after adding a friend
 class Friends extends StatefulWidget {
@@ -73,9 +73,7 @@ class _FriendsState extends State<Friends> with AfterLayoutMixin<Friends> {
                           MaterialPageRoute(
                             fullscreenDialog: true,
                             builder: (BuildContext context) {
-                              return CreateGame(
-                                opponent: snapshot.data[index],
-                              );
+                              return CreateGamePremium();
                             },
                           ),
                         );

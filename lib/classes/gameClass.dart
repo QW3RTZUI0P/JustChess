@@ -8,10 +8,11 @@ import "../imports.dart";
 class GameClass {
   // die einzigartigeID jeder Partie (ist eine)
   String id;
-  // der Untertitel der Partie
+  // normal: name of the game
+  // premium: subtitle of the game
   // for the name of the game, JustChess will use the name of the opponent
   // if someone plays more than one game against the same opponent, this value can be uses to distinguish these games
-  final String subtitle;
+  String subtitle;
   // aktuelle Stellung des Schachspiels in dem Standard "Portable Game Notation"
   String pgn;
 
@@ -74,20 +75,25 @@ class GameClass {
   }
 
   // Funktionen um die Partien aus dem lokalen Json-File zu extrahieren oder sie in das Json-File zu schreiben
-  factory GameClass.fromJson(Map<String, dynamic> json) => GameClass(
-        id: json["id"],
-        subtitle: json["subtitle"],
-        pgn: json["pgn"],
-        player01: json["player01"],
-        player02: json["player02"],
-        player01IsWhite: json["player01IsWhite"],
-        whitesTurn: json["whitesTurn"],
-        moveCount: json["moveCount"],
-        canBeDeleted: json["canBeDeleted"],
-      );
+  factory GameClass.fromJson(Map<String, dynamic> json) {
+    print("game class from json");
+    GameClass game = GameClass(
+      id: json["id"] ?? "",
+      subtitle: json["subtitle"],
+      pgn: json["pgn"],
+      player01: json["player01"],
+      player02: json["player02"],
+      player01IsWhite: json["player01IsWhite"],
+      whitesTurn: json["whitesTurn"],
+      moveCount: json["moveCount"],
+      canBeDeleted: json["canBeDeleted"],
+    );
+    print("subtitle " + game.subtitle);
+    return game;
+  }
 
   Map<String, dynamic> toJson() => {
-        "id": this.id,
+        "id": this.id ?? "",
         "subtitle": this.subtitle,
         "pgn": this.pgn,
         "player01": this.player01,

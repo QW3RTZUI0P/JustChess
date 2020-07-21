@@ -1,14 +1,14 @@
-// menu.dart
-import "../../imports.dart";
+// menuPremium.dart
+import "../../../imports.dart";
 
-class Menu extends StatefulWidget {
+class MenuPremium extends StatefulWidget {
   @override
-  _MenuState createState() => _MenuState();
+  _MenuPremiumState createState() => _MenuPremiumState();
 }
 
-class _MenuState extends State<Menu> {
+class _MenuPremiumState extends State<MenuPremium> {
   AuthenticationBloc _authenticationBloc;
-  GameBloc _gameBloc;
+  GamesBloc _gameBloc;
 
   String username;
   String emailAdress;
@@ -18,17 +18,18 @@ class _MenuState extends State<Menu> {
     super.didChangeDependencies();
     this._authenticationBloc =
         AuthenticationBlocProvider.of(context).authenticationBloc;
-    this._gameBloc = GameBlocProvider.of(context).gameBloc;
+    this._gameBloc = GamesBlocProvider.of(context).gameBloc;
     getUserCredentials();
   }
 
   void getUserCredentials() async {
-    Map<String, dynamic> credentials = await _authenticationBloc
+    String emailAdress = await _authenticationBloc
         .authenticationService
-        .currentUserCredentials();
+        .currentUserEmail();
+        String username = await CloudFirestoreDatabase().getUsernameForUserID(userID: _gameBloc.currentUserID);
     setState(() {
-      this.username = credentials["username"];
-      this.emailAdress = credentials["email"];
+      this.username = username;
+      this.emailAdress = emailAdress;
     });
   }
 
@@ -110,7 +111,7 @@ class _MenuState extends State<Menu> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: ListView(
+      child: Column(
         children: <Widget>[
           DrawerHeader(
             child: Column(
@@ -125,6 +126,15 @@ class _MenuState extends State<Menu> {
                   ],
                 ),
                 Text("Email: $emailAdress"),
+                FlatButton(
+                  child: Text("werde Normal"),
+                  onPressed: () async {
+                    SharedPreferences sharedPreferences =
+                        await SharedPreferences.getInstance();
+                    sharedPreferences.setBool("isUserPremium", false);
+                    this._authenticationBloc.isUserPremiumSink.add(false);
+                  },
+                )
               ],
             ),
           ),
@@ -134,11 +144,18 @@ class _MenuState extends State<Menu> {
               Navigator.pop(context);
             },
           ),
+          // ListTile(
+          //   title: Text("Freunde"),
+          //   onTap: () {
+          //     Navigator.pop(context);
+          //     Navigator.pushNamed(context, "/friends");
+          //   },
+          // ),
           ListTile(
             title: Text("Freunde"),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                     fullscreenDialog: false,
@@ -160,6 +177,19 @@ class _MenuState extends State<Menu> {
                       return About();
                     }),
               );
+            },
+          ),
+          ListTile(
+            title: Text("Einstellungen"),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      fullscreenDialog: false,
+                      builder: (BuildContext context) {
+                        return SettingsPremium();
+                      }));
             },
           ),
           ListTile(

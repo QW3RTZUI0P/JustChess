@@ -7,9 +7,16 @@ import "package:path_provider/path_provider.dart";
 // class that contains the list with all the users games
 class LocalDatabase {
   List<dynamic> games = [];
-  LocalDatabase({this.games});
+  LocalDatabase({@required this.games});
   factory LocalDatabase.fromJson(Map<String, dynamic> json) {
-    return LocalDatabase(games: json["games"]);
+    return LocalDatabase(
+      games: List.generate(
+        json["games"].length,
+        (index) => GameClass.fromJson(
+          json["games"][index],
+        ),
+      ),
+    );
   }
 
   Map<String, dynamic> toJson() {

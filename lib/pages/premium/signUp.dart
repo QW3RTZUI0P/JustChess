@@ -1,5 +1,5 @@
 // signUp.dart
-import "../imports.dart";
+import "../../imports.dart";
 import 'package:JustChess/services/cloudFirestoreDatabase.dart';
 
 class SignUp extends StatefulWidget {
@@ -12,7 +12,7 @@ class _SignUpState extends State<SignUp> with Validators {
   final _formKey = GlobalKey<FormState>();
   // loginBloc für die gesamte Registrierungslogik
   LoginBloc _loginBloc;
-  GameBloc _gameBloc;
+  GamesBloc _gameBloc;
   // TextEditingController für die Textfelder
   final TextEditingController _benutzernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -39,7 +39,7 @@ class _SignUpState extends State<SignUp> with Validators {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this._gameBloc = GameBlocProvider.of(context).gameBloc;
+    this._gameBloc = GamesBlocProvider.of(context).gameBloc;
   }
 
   @override

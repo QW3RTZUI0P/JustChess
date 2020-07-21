@@ -1,10 +1,10 @@
 // labeling.dart
-import "../../imports.dart";
+import "../imports.dart";
 
 class VerticalNumbersWhite extends StatelessWidget {
   final double height;
 
-  const VerticalNumbersWhite({this.height});
+  const VerticalNumbersWhite({@required this.height});
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +71,7 @@ class VerticalNumbersWhite extends StatelessWidget {
 class VerticalNumbersBlack extends StatelessWidget {
   final double height;
 
-  const VerticalNumbersBlack({this.height});
+  const VerticalNumbersBlack({@required this.height});
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +138,7 @@ class VerticalNumbersBlack extends StatelessWidget {
 class HorizontalLettersWhite extends StatelessWidget {
   final double width;
 
-  const HorizontalLettersWhite({this.width});
+  const HorizontalLettersWhite({@required this.width});
 
   @override
   Widget build(BuildContext context) {
@@ -218,7 +218,7 @@ class HorizontalLettersWhite extends StatelessWidget {
 class HorizontalLettersBlack extends StatelessWidget {
   final double width;
 
-  const HorizontalLettersBlack({this.width});
+  const HorizontalLettersBlack({@required this.width});
 
   @override
   Widget build(BuildContext context) {

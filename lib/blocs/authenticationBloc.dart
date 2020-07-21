@@ -1,10 +1,13 @@
 // authenticationBloc.dart
 import "../imports.dart";
 
+// TODO: fix bug when changing the isUserPremium Status to often
+
 // class that handles authentication and checks whether the user is premium or not
 class AuthenticationBloc {
   final AuthenticationApi authenticationService;
 
+  // will be replaced with AppStore Subscription value
   // StreamController that tracks whether the user is a premium user
   StreamController<bool> _isUserPremiumController = StreamController<bool>();
   Sink<bool> get isUserPremiumSink => _isUserPremiumController.sink;
@@ -17,12 +20,13 @@ class AuthenticationBloc {
   Sink<String> get addUser => _authenticationController.sink;
   // wenn dem Sink addUser etwas hinzugefügt wird, wird dieser Stream benachrichtigt
   Stream<String> get user => _authenticationController.stream;
+  // checks whether the user has logged out
   final StreamController<bool> _logoutController = StreamController<bool>();
   Sink<bool> get logoutUser => _logoutController.sink;
   Stream<bool> get listLogoutUser => _logoutController.stream;
 
   AuthenticationBloc({this.authenticationService}) {
-    _startListeners();
+    startListeners();
     getUserStatus();
   }
 
@@ -33,7 +37,8 @@ class AuthenticationBloc {
   }
 
   // überwacht die ganze Zeit, ob der User ein- oder ausgeloggt ist
-  void _startListeners() {
+  void startListeners() async {
+    await authenticationService.getFirebaseAuth();
     // wenn der User sich einloggt/ausloggt wird das hier ausgeführt
     authenticationService.getFirebaseAuth().onAuthStateChanged.listen((user) {
       final String uid = user != null ? user.uid : null;
@@ -47,7 +52,7 @@ class AuthenticationBloc {
     });
   }
 
-  // schließt die beiden StreamController (aus Performance-Gründen)
+  // closes the three StreamControllers
   void dispose() {
     _isUserPremiumController.close();
     _authenticationController.close();

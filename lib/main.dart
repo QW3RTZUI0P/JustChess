@@ -3,6 +3,8 @@ import "imports.dart";
 
 void main() => runApp(JustChess());
 
+// TODO: find solution so that GameBloc Provider doesn't call currentUserID when no user is signed in
+
 class JustChess extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -18,70 +20,82 @@ class JustChess extends StatelessWidget {
         AuthenticationBloc(authenticationService: _authenticationService);
 
     // controls the sign in status of the current user
-    return MaterialApp(
-      debugShowCheckedModeBanner: true,
-      theme: theme,
-      darkTheme: darkTheme,
-      home: AuthenticationBlocProvider(
-        authenticationBloc: _authenticationBloc,
-        // checks whether the user is premium or not
-        child: StreamBuilder(
-            stream: _authenticationBloc.isUserPremiumStream,
-            initialData: null,
-            builder: (BuildContext context, AsyncSnapshot firstSnapshot) {
-              if (firstSnapshot.connectionState == ConnectionState.waiting) {
-                return Container(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (firstSnapshot.hasData && firstSnapshot.data == true) {
-                // controls the loading and saving of the user's games
-                return GameBlocProvider(
-                  gameBloc: GameBloc(
-                    cloudFirestoreDatabase: _cloudFirestoreDatabase,
+    return AuthenticationBlocProvider(
+      authenticationBloc: _authenticationBloc,
+      // checks whether the user is premium or not
+      child: StreamBuilder(
+          stream: _authenticationBloc.isUserPremiumStream,
+          initialData: null,
+          builder: (BuildContext context, AsyncSnapshot userStatusSnapshot) {
+            if (userStatusSnapshot.connectionState == ConnectionState.waiting) {
+              return MaterialApp(
+                home: Scaffold(
+                  body: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              );
+            } else if (userStatusSnapshot.hasData &&
+                userStatusSnapshot.data == true) {
+              // controls the loading and saving of the user's games
+              return GamesBlocProvider(
+                gameBloc: GamesBloc(
+                  cloudFirestoreDatabase: _cloudFirestoreDatabase,
+                  authenticationService: _authenticationService,
+                ),
+                // controls the loading, adding and deleting of the user's friends
+                child: FriendsBlocProvider(
+                  friendsBloc: FriendsBloc(
                     authenticationService: _authenticationService,
+                    cloudFirestoreDatabase: _cloudFirestoreDatabase,
                   ),
-                  // controls the loading, adding and deleting of the user's friends
-                  child: FriendsBlocProvider(
-                    friendsBloc: FriendsBloc(
-                      authenticationService: _authenticationService,
-                      cloudFirestoreDatabase: _cloudFirestoreDatabase,
+                  // the app for premium user
+                  child: LocalGamesBlocProvider(
+                    localGamesBloc: LocalGamesBloc(),
+                    child: MaterialApp(
+                      debugShowCheckedModeBanner: true,
+                      theme: theme,
+                      darkTheme: darkTheme,
+                      home: StreamBuilder(
+                          initialData: null,
+                          // based on the user's authentication status either Home() or SignUp() is being built
+                          stream: _authenticationBloc.user,
+                          builder: (BuildContext context,
+                              AsyncSnapshot userAuthenticationSnapshot) {
+                            // _authenticationBloc.startListeners();
+                            // loading icon while checking the user's authentication status
+                            if (userAuthenticationSnapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Container(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            // is executed if the user is authenticated
+                            else if (userAuthenticationSnapshot.hasData) {
+                              return HomePremium();
+                            }
+                            // is executed if the user isn't authenticated
+                            else {
+                              return SignUp();
+                            }
+                          }),
                     ),
-                    child: StreamBuilder(
-                        initialData: null,
-                        // based on the user's authentication status either Home() or SignUp() is being built
-                        stream: _authenticationBloc.user,
-                        builder: (BuildContext context,
-                            AsyncSnapshot secondSnapshot) {
-                          // loading icon while checking the user's authentication status
-                          if (secondSnapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Container(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                          // is executed if the user is authenticated
-                          else if (secondSnapshot.hasData) {
-                            return Home(
-                              isUserPremium: firstSnapshot.data,
-                            );
-                          }
-                          // is executed if the user isn't authenticated
-                          else {
-                            return SignUp();
-                          }
-                        }),
                   ),
-                );
-              } else {
-                return LocalGamesBlocProvider(
-                  localGamesBloc: LocalGamesBloc(),
-                  child: Home(
-                    isUserPremium: firstSnapshot.data,
-                  ),
-                );
-              }
-            }),
-      ),
+                ),
+              );
+            } else {
+              // the app for non premium user
+              return LocalGamesBlocProvider(
+                localGamesBloc: LocalGamesBloc(),
+                child: MaterialApp(
+                  debugShowCheckedModeBanner: true,
+                  theme: theme,
+                  darkTheme: darkTheme,
+                  home: Home(),
+                ),
+              );
+            }
+          }),
     );
   }
 }

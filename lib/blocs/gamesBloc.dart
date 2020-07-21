@@ -1,7 +1,8 @@
-// gameBloc.dart
+// gamesBloc.dart
 import "../imports.dart";
+import "dart:convert";
 
-class GameBloc {
+class GamesBloc {
   final CloudFirestoreDatabaseApi cloudFirestoreDatabase;
   final AuthenticationApi authenticationService;
 
@@ -13,6 +14,8 @@ class GameBloc {
   List<String> gameIDs = [];
   // list with the names of the user's opponents
   List<String> opponentsNamesList = [];
+  // local database for the games the user stored offline
+  LocalDatabase database = LocalDatabase(games: []);
 
   // StreamController that controls all the gameIDs of the current user
   final StreamController<String> gameIDController = StreamController<String>();
@@ -48,21 +51,28 @@ class GameBloc {
   Sink<List<GameClass>> get gamesListSink => gamesListController.sink;
   Stream<List<GameClass>> get gamesListStream => gamesListController.stream;
 
-  GameBloc({
+  GamesBloc({
     this.cloudFirestoreDatabase,
     this.authenticationService,
   }) {
     _startListeners();
-    getImportantValues();
+    getGamesAndImportantValues();
+    print("gameBloc");
   }
 
   // is executed in the constructor
   // gets all the important values to function this class
-  void getImportantValues() async {
+  void getGamesAndImportantValues() async {
+    // userID of the current user
     this.currentUserID = await authenticationService.currentUserUid();
+    // fetches the gameIDs from CloudFirestore
     List<dynamic> gameIDs = await cloudFirestoreDatabase
             .getGameIDsFromFirestore(userID: this.currentUserID) ??
         [];
+    // fetches the games from the local file system
+    String jsonString = await LocalDatabaseFileRoutines().readFileAsString();
+    LocalDatabase databaseInFunction =
+        LocalDatabase.fromJson(jsonDecode(jsonString));
     // if the user hasn't any gameIDs the for loop wouldn't execute and gamesListSink wouldn't get anything
     if (gameIDs.length == 0) {
       this.gamesListSink.add(this.games);
@@ -71,13 +81,19 @@ class GameBloc {
     for (String currentGameID in gameIDs) {
       gameIDSink.add(currentGameID);
     }
+    // adds each game to gamesListSink
+    for (GameClass currentGame in databaseInFunction.games) {
+      this.games.add(currentGame);
+      this.opponentsNamesList.add(currentGame.subtitle);
+      gamesListSink.add(this.games);
+    }
   }
 
   // refreshes, reloads and refetches the list of games from Firebase
   void refresh() {
     games.clear();
     opponentsNamesList.clear();
-    getImportantValues();
+    getGamesAndImportantValues();
   }
 
   void signOut() {
@@ -213,16 +229,16 @@ class GameBloc {
   }
 }
 
-class GameBlocProvider extends InheritedWidget {
-  final GameBloc gameBloc;
-  const GameBlocProvider({Key key, Widget child, this.gameBloc})
+class GamesBlocProvider extends InheritedWidget {
+  final GamesBloc gameBloc;
+  const GamesBlocProvider({Key key, Widget child, this.gameBloc})
       : super(key: key, child: child);
-  static GameBlocProvider of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<GameBlocProvider>();
+  static GamesBlocProvider of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<GamesBlocProvider>();
   }
 
   @override
-  bool updateShouldNotify(GameBlocProvider oldWidget) {
+  bool updateShouldNotify(GamesBlocProvider oldWidget) {
     // gibt nur true aus, wenn sich die beiden blocs unterscheiden
     return this.gameBloc != oldWidget.gameBloc;
   }

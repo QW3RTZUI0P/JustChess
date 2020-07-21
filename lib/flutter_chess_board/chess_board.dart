@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import '../imports.dart';
 import './board_model.dart';
 import './board_rank.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -95,6 +95,13 @@ enum BoardType {
   green,
 }
 
+/// Enum which stores labeling types
+enum LabelingType {
+  zeroSides,
+  twoSides,
+  fourSides,
+}
+
 /// The Chessboard Widget
 class ChessBoard extends StatefulWidget {
   /// Size of chessboard
@@ -121,12 +128,16 @@ class ChessBoard extends StatefulWidget {
   /// A boolean which checks if the user should be allowed to make moves
   final bool enableUserMoves;
 
+  /// the labeling of the board
+  final LabelingType labelingType;
+
   /// The color type of the board
   final BoardType boardType;
 
   ChessBoard({
     this.size = 200.0,
     this.whiteSideTowardsUser = true,
+    this.labelingType = LabelingType.zeroSides,
     @required this.onMove,
     @required this.onCheckMate,
     @required this.onCheck,
@@ -194,6 +205,75 @@ class _ChessBoardState extends State<ChessBoard> {
             }).toList(),
     );
   }
+
+  // /// Builds the board
+  // Widget buildChessBoard() {
+  //   if (widget.whiteSideTowardsUser) {
+  //     switch (widget.labelingType) {
+  //       // returns ChessBoard with labeling on two Sides
+  //       case LabelingType.twoSides:
+  //         return Column(
+  //           children: [
+  //             Row(
+  //               children: [
+  //                 VerticalNumbersWhite(height: widget.size),
+  //                 Row(
+  //                   children: whiteSquareList.map((row) {
+  //                     return ChessBoardRank(
+  //                       children: row,
+  //                     );
+  //                   }).toList(),
+  //                 ),
+  //               ],
+  //             ),
+  //             const SizedBox(height: 5),
+  //             HorizontalLettersWhite(width: widget.size)
+  //           ],
+  //         );
+
+  //       // returns ChessBoard with labeling on four Sides
+  //       case LabelingType.fourSides:
+  //         return Column(
+  //           children: [
+  //             HorizontalLettersWhite(width: widget.size),
+  //             const SizedBox(height: 5),
+  //             Row(
+  //               children: [
+  //                 VerticalNumbersWhite(height: widget.size),
+  //                 Row(
+  //                   children: whiteSquareList.map((row) {
+  //                     return ChessBoardRank(
+  //                       children: row,
+  //                     );
+  //                   }).toList(),
+  //                 ),
+  //                 VerticalNumbersWhite(height: widget.size),
+  //               ],
+  //             ),
+  //             const SizedBox(height: 5),
+  //             HorizontalLettersWhite(width: widget.size)
+  //           ],
+  //         );
+
+  //       default:
+  //         return Column(
+  //           children: whiteSquareList.map((row) {
+  //             return ChessBoardRank(
+  //               children: row,
+  //             );
+  //           }).toList(),
+  //         );
+  //     }
+  //   } else {
+  //     return Column(
+  //       children: whiteSquareList.reversed.map((row) {
+  //         return ChessBoardRank(
+  //           children: row.reversed.toList(),
+  //         );
+  //       }).toList(),
+  //     );
+  //   }
+  // }
 
   /// Returns the board image
   Image _getBoardImage() {
