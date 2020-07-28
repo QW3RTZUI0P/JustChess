@@ -1,7 +1,7 @@
 // gameClass.dart
 import "../imports.dart";
 
-// TODO: change id to uuid from uuid package
+// TODO: remove all the data["subtitle"] references
 
 // Sammelobjekt aller Daten zu einer bestimmten Partie
 // wird in CloudFirestore "game" genannt
@@ -12,7 +12,7 @@ class GameClass {
   // premium: subtitle of the game
   // for the name of the game, JustChess will use the name of the opponent
   // if someone plays more than one game against the same opponent, this value can be uses to distinguish these games
-  String subtitle;
+  String title;
   // aktuelle Stellung des Schachspiels in dem Standard "Portable Game Notation"
   String pgn;
 
@@ -20,8 +20,8 @@ class GameClass {
   // Herausforderer (userID des Herausforderers)
   // wenn die Partie ohne Gegner gespielt wird ist dies einfach der aktuelle User
   String player01;
-  // Gegner (userID des Gegners)
-  // wenn die Partie ohne Gegner gespielt wird, bleibt dieses Feld leer
+  // opponent (userID of the opponent)
+  // if the game is offline, this value is empty
   String player02;
   bool player01IsWhite;
   bool whitesTurn;
@@ -33,7 +33,7 @@ class GameClass {
 
   GameClass({
     this.id,
-    this.subtitle = "",
+    this.title = "",
     this.pgn = "",
     this.player01 = "",
     this.player02 = "",
@@ -47,7 +47,7 @@ class GameClass {
   factory GameClass.from(GameClass otherGame) {
     return GameClass(
       id: otherGame.id,
-      subtitle: otherGame.subtitle,
+      title: otherGame.title,
       pgn: otherGame.pgn,
       player01: otherGame.player01,
       player02: otherGame.player02,
@@ -58,12 +58,12 @@ class GameClass {
     );
   }
 
-  // transforms a DocumentSnapshot from Cloud Firestore to a PartieKlasse object
+  // transforms a DocumentSnapshot from Cloud Firestore to a GameClass object
   factory GameClass.fromDocumentSnapshot(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = snapshot.data ?? {};
     return GameClass(
       id: data["id"],
-      subtitle: data["subtitle"],
+      title: data["subtitle"] ?? data["title"],
       pgn: data["pgn"],
       player01: data["player01"],
       player02: data["player02"],
@@ -74,27 +74,28 @@ class GameClass {
     );
   }
 
-  // Funktionen um die Partien aus dem lokalen Json-File zu extrahieren oder sie in das Json-File zu schreiben
-  factory GameClass.fromJson(Map<String, dynamic> json) {
+  /// takes the given jsonObject and converts it to a GameClass object
+  factory GameClass.fromJson(Map<String, dynamic> jsonObject) {
     print("game class from json");
     GameClass game = GameClass(
-      id: json["id"] ?? "",
-      subtitle: json["subtitle"],
-      pgn: json["pgn"],
-      player01: json["player01"],
-      player02: json["player02"],
-      player01IsWhite: json["player01IsWhite"],
-      whitesTurn: json["whitesTurn"],
-      moveCount: json["moveCount"],
-      canBeDeleted: json["canBeDeleted"],
+      id: jsonObject["id"] ?? "",
+      title: jsonObject["subtitle"] ?? jsonObject["title"] ?? "",
+      pgn: jsonObject["pgn"] ?? "",
+      player01: jsonObject["player01"] ?? "",
+      player02: jsonObject["player02"] ?? "",
+      player01IsWhite: jsonObject["player01IsWhite"] ?? "",
+      whitesTurn: jsonObject["whitesTurn"],
+      moveCount: jsonObject["moveCount"],
+      canBeDeleted: jsonObject["canBeDeleted"],
     );
-    print("subtitle " + game.subtitle);
+    print("subtitle " + game.title);
     return game;
   }
 
+  /// returns a map with the values of this GameClass object
   Map<String, dynamic> toJson() => {
         "id": this.id ?? "",
-        "subtitle": this.subtitle,
+        "title": this.title,
         "pgn": this.pgn,
         "player01": this.player01,
         "player02": this.player02,
@@ -104,8 +105,8 @@ class GameClass {
         "canBeDeleted": this.canBeDeleted,
       };
 
-  // erstellt eine einzigartige ID für die Partie
-  void erstelleID() {
+  /// creates a unique ID for this GameClass
+  void createUniqueID() {
     this.id = Uuid().v4();
   }
 }

@@ -1,7 +1,10 @@
 // createOfflineGame.dart
-import "../imports.dart";
+import "../../imports.dart";
 
 class CreateGame extends StatefulWidget {
+  // whether _gameBloc should be instantiated
+  bool isUserPremium;
+  CreateGame({@required this.isUserPremium});
   @override
   _CreateGameState createState() => _CreateGameState();
 }
@@ -9,6 +12,8 @@ class CreateGame extends StatefulWidget {
 class _CreateGameState extends State<CreateGame> {
   // bloc that manages the local saving of the games
   LocalGamesBloc _localGamesBloc;
+  // bloc for refreshing the gamesList
+  GamesBloc _gamesBloc;
   // TextEditingcontroller for the name of the created game
   TextEditingController _nameController = TextEditingController();
   // holds the value of the RadioButtons
@@ -17,7 +22,11 @@ class _CreateGameState extends State<CreateGame> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this._localGamesBloc = LocalGamesBlocProvider.of(context).localGamesBloc;
+    if (widget.isUserPremium) {
+      this._gamesBloc = GamesBlocProvider.of(context).gamesBloc;
+    } else {
+      this._localGamesBloc = LocalGamesBlocProvider.of(context).localGamesBloc;
+    }
   }
 
   void radioButtonChanged({bool toValue}) {
@@ -69,15 +78,17 @@ class _CreateGameState extends State<CreateGame> {
                 child: Text("Partie erstellen"),
                 onPressed: () async {
                   GameClass newGame = GameClass(
-                    subtitle: _nameController.text,
+                    title: _nameController.text,
                     player01IsWhite: _radioGroupValue,
                   );
-                  print("newGame " + newGame.subtitle);
-                  newGame.erstelleID();
-                  _localGamesBloc.localGameCreated(
-                    newGame: newGame,
-                  );
-                  print(await LocalDatabaseFileRoutines().readFileAsString());
+                  newGame.createUniqueID();
+
+                  if (widget.isUserPremium) {
+                    _gamesBloc.addGameSink.add(newGame);
+                  } else {
+                    _localGamesBloc.localGameCreated(newGame: newGame);
+                  }
+                  this._nameController.text = "";
                   Navigator.pop(context);
                 },
               ),

@@ -1,6 +1,5 @@
 // gamePremium.dart
 import "../../../imports.dart";
-import "package:chess/chess.dart" as chess;
 
 // TODO: implement chessBoard to try out ones move
 class GamePremium extends StatefulWidget {
@@ -17,7 +16,7 @@ class GamePremium extends StatefulWidget {
   _GamePremiumState createState() => _GamePremiumState();
 }
 
-class _GamePremiumState extends State<GamePremium>     {
+class _GamePremiumState extends State<GamePremium> {
   // bloc that controls the loading, updating and saving of the games
   GamesBloc _gameBloc;
   // the current game (given from Home())
@@ -38,18 +37,15 @@ class _GamePremiumState extends State<GamePremium>     {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this._gameBloc = GamesBlocProvider.of(context).gameBloc;
+    this._gameBloc = GamesBlocProvider.of(context).gamesBloc;
   }
 
   bool usersTurn() {
     if (currentGame.whitesTurn && widget.isUserWhite) {
-      print("1");
       return true;
     } else if (!currentGame.whitesTurn && !widget.isUserWhite) {
-      print("2");
       return true;
     } else {
-      print("3");
       return false;
     }
   }
@@ -63,7 +59,10 @@ class _GamePremiumState extends State<GamePremium>     {
         size.width < size.height ? size.width * 0.9 : size.height * 0.9;
 
     var appBar = AppBar(
-      title: Text(widget.opponentsName ?? ""),
+      title: Text(
+        // cuts away "Partie gegen: "
+        widget.opponentsName.replaceRange(0, 13, ""),
+      ),
       centerTitle: true,
       actions: <Widget>[
         IconButton(
@@ -90,7 +89,6 @@ class _GamePremiumState extends State<GamePremium>     {
         ),
       ],
     );
-    print("building game");
     return Scaffold(
       appBar: appBar,
       body: SafeArea(
@@ -128,6 +126,7 @@ class _GamePremiumState extends State<GamePremium>     {
                       chessBoardController: this.chessBoardController,
                       isUserWhite: widget.isUserWhite,
                       isUsersTurn: this.isUsersTurn,
+                      boardSize: boardSize,
                     ),
                   ],
                 ),

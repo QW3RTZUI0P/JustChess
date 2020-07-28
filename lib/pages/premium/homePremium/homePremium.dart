@@ -3,16 +3,13 @@ import "../../../imports.dart";
 
 // TODO: clean everything up, split some widgets up and improve performance
 
-// TODO: machen, dass die Partien auch gesichert werden, wenn man die App schließt
 // TODO: add ability to delete account
 // TODO: add routes to MaterialApp and make everything Navigator.pushNamed
 // TODO: add the sources for the app icon to the "about" page
-// TODO: add a coloured background to every ListTile with a game in which it's my turn
 
 // bigger projects:
 // TODO: add offline support
 // TODO: add in app purchases
-// TODO: add in app messaging
 // TODO: add starter tutorial
 class HomePremium extends StatefulWidget {
   @override
@@ -20,35 +17,21 @@ class HomePremium extends StatefulWidget {
 }
 
 class _HomePremiumState extends State<HomePremium> {
-  AuthenticationBloc _authenticationBloc;
-  GamesBloc _gameBloc;
-  LocalGamesBloc _localGamesBloc;
+  GamesBloc _gamesBloc;
 
   _HomePremiumState() {
     print("Home State");
-  }
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _authenticationBloc =
-        AuthenticationBlocProvider.of(context).authenticationBloc;
-
-    _gameBloc = GamesBlocProvider.of(context).gameBloc;
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
+    _gamesBloc = GamesBlocProvider.of(context).gamesBloc;
   }
 
   // this has to be like this; onRefresh has to get a value
   Future<void> refresh() async {
-    _gameBloc.refresh();
+    _gamesBloc.refresh();
   }
 
   // TODO: create invitations
@@ -60,8 +43,8 @@ class _HomePremiumState extends State<HomePremium> {
       appBar: AppBar(
         title: Text(
           "JustChess",
-          style: theme.textTheme.headline6,
         ),
+        textTheme: theme.appBarTheme.textTheme,
       ),
       floatingActionButton: CreateGameButton(
         isUserPremium: true,
@@ -69,14 +52,14 @@ class _HomePremiumState extends State<HomePremium> {
       drawer: MenuPremium(),
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        // TODO: enable pull to reload also for CircularProgressIndicator and for "Noch keine Partien"
         child: RefreshIndicator(
           onRefresh: () => refresh(),
           child: StreamBuilder(
-              initialData: [],
-              stream: _gameBloc.gamesListStream,
+              initialData: _gamesBloc.gamesList,
+              stream: _gamesBloc.gamesListStream,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
+                  // has to be scrollable (to enable pull to refresh)
                   return ListView(
                     children: [
                       Container(
@@ -88,6 +71,7 @@ class _HomePremiumState extends State<HomePremium> {
                     ],
                   );
                 } else if (snapshot.data == [] || snapshot.data.isEmpty) {
+                  // has to be scrollable (to enable pull to refresh)
                   return ListView(
                     children: <Widget>[
                       Container(
@@ -99,19 +83,20 @@ class _HomePremiumState extends State<HomePremium> {
                     ],
                   );
                 } else {
-                  List games = List.from(snapshot.data);
-
                   return Scrollbar(
                     child: ListView.builder(
                         itemBuilder: (BuildContext context, int index) {
+                          // current Game
+                          GameClass currentGame = snapshot.data[index];
+
                           bool userWhite() {
-                            if (snapshot.data[index].player01IsWhite &&
-                                _gameBloc.currentUserID ==
-                                    snapshot.data[index].player01) {
+                            if (currentGame.player01IsWhite &&
+                                _gamesBloc.currentUserID ==
+                                    currentGame.player01) {
                               return true;
-                            } else if (!snapshot.data[index].player01IsWhite &&
-                                _gameBloc.currentUserID ==
-                                    snapshot.data[index].player02) {
+                            } else if (!currentGame.player01IsWhite &&
+                                _gamesBloc.currentUserID ==
+                                    currentGame.player02) {
                               return true;
                             } else {
                               return false;
@@ -120,10 +105,9 @@ class _HomePremiumState extends State<HomePremium> {
 
                           bool isUserWhite = userWhite();
                           bool usersTurn() {
-                            if (snapshot.data[index].whitesTurn &&
-                                isUserWhite) {
+                            if (currentGame.whitesTurn && isUserWhite) {
                               return true;
-                            } else if (!snapshot.data[index].whitesTurn &&
+                            } else if (!currentGame.whitesTurn &&
                                 !isUserWhite) {
                               return true;
                             } else {
@@ -132,64 +116,73 @@ class _HomePremiumState extends State<HomePremium> {
                           }
 
                           bool isUsersTurn = usersTurn();
-                          // print("home " +
-                          //     isUsersTurn.toString() +
-                          //     isUserWhite.toString() +
-                          //     "whitesTurn" +
-                          //     snapshot.data[index].whitesTurn.toString());
+
                           return Column(
                             children: <Widget>[
                               Container(
-                                decoration: isUsersTurn
-                                    ? BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            Colors.lightGreen.shade100,
-                                            Colors.lightGreen.shade200,
-                                            Colors.lightGreen.shade100,
-                                          ],
-                                        ),
-                                      )
-                                    : null,
+                                color:
+                                    isUsersTurn ? theme.indicatorColor : null,
                                 child: Dismissible(
                                   key: Key(
-                                    snapshot.data[index].id,
+                                    currentGame.id,
                                   ),
                                   child: ListTile(
                                     title: Text(
-                                      "Partie gegen " +
-                                              _gameBloc
-                                                  .opponentsNamesList[index] ??
-                                          "",
-                                      style: theme.textTheme.bodyText1,
+                                      _gamesBloc.gameTitlesList[index] ?? "",
+                                      style: theme.textTheme.headline6,
                                     ),
                                     subtitle: Text(
-                                      snapshot.data[index].subtitle ?? "",
-                                      style: theme.textTheme.bodyText1,
+                                      currentGame.player02.isEmpty
+                                          ? "Anzahl der Züge: " +
+                                              currentGame.moveCount.toString()
+                                          : "Anzahl der Züge: " +
+                                                  currentGame.moveCount
+                                                      .toString() +
+                                                  ", " +
+                                                  currentGame.title ??
+                                              "",
+                                      style: theme.textTheme.subtitle1,
                                     ),
-                                    trailing: Icon(Icons.arrow_forward_ios),
+                                    trailing: Icon(
+                                      Icons.arrow_forward_ios,
+                                      color: theme.iconTheme.color,
+                                    ),
                                     onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          fullscreenDialog: false,
-                                          builder: (context) => GamePremium(
-                                            currentGame: snapshot.data[index],
-                                            opponentsName: _gameBloc
-                                                .opponentsNamesList[index],
-                                            isUserWhite: isUserWhite,
-                                          ),
-                                        ),
+                                            fullscreenDialog: false,
+                                            builder: (context) {
+                                              if (currentGame
+                                                      .player02.isEmpty ||
+                                                  currentGame.player02 ==
+                                                      null) {
+                                                return Game(
+                                                  game: currentGame,
+                                                  isUserPremium: true,
+                                                );
+                                              } else {
+                                                return GamePremium(
+                                                  currentGame: currentGame,
+                                                  opponentsName: _gamesBloc
+                                                      .gameTitlesList[index],
+                                                  isUserWhite: isUserWhite,
+                                                );
+                                              }
+                                            }),
                                       );
                                     },
                                   ),
-                                  background: Icon(Icons.delete),
-                                  secondaryBackground: Icon(Icons.delete),
+                                  background: Icon(
+                                    Icons.delete,
+                                    color: theme.iconTheme.color,
+                                  ),
+                                  secondaryBackground: Icon(
+                                    Icons.delete,
+                                    color: theme.iconTheme.color,
+                                  ),
                                   onDismissed: (direction) => setState(() {
-                                    _gameBloc.deleteGameSink
-                                        .add(snapshot.data[index]);
+                                    _gamesBloc.deleteGameSink.add(currentGame);
                                   }),
                                 ),
                               ),

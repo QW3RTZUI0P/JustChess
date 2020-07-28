@@ -8,46 +8,38 @@ class ChessBoardWidgetPremium extends StatefulWidget {
   ChessBoardController chessBoardController;
   bool isUserWhite;
   bool isUsersTurn;
+  double boardSize;
   ChessBoardWidgetPremium({
     @required this.currentGame,
     @required this.chessBoardController,
     @required this.isUserWhite,
     @required this.isUsersTurn,
-  }) {
-    print("white " + isUserWhite.toString());
-    print("turn " + isUsersTurn.toString());
-  }
+    @required this.boardSize,
+  });
 
   @override
   _ChessBoardWidgetPremiumState createState() =>
       _ChessBoardWidgetPremiumState();
 }
 
-class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium>
-    with
-        AfterLayoutMixin<ChessBoardWidgetPremium>,
-        SingleTickerProviderStateMixin {
+class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium> {
   GamesBloc _gameBloc;
   GameClass _currentGame;
   bool isUsersTurn;
-  AnimationController animationController;
 
   @override
   void initState() {
     super.initState();
     this._currentGame = widget.currentGame;
     this.isUsersTurn = widget.isUsersTurn;
-    this.animationController = AnimationController(
-      duration: Duration(seconds: 3),
-      vsync: this,
-    );
+
     print(this.isUsersTurn);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this._gameBloc = GamesBlocProvider.of(context).gameBloc;
+    this._gameBloc = GamesBlocProvider.of(context).gamesBloc;
     this._currentGame = widget.currentGame;
     widget.chessBoardController.loadPGN(_currentGame.pgn);
   }
@@ -57,24 +49,6 @@ class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium>
     super.didUpdateWidget(oldWidget);
     this.isUsersTurn = widget.isUsersTurn;
   }
-
-  @override
-  void dispose() {
-    this.animationController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void afterFirstLayout(BuildContext context) {}
-
-  // bool usersTurn() {
-  //   if ((_currentGame.whitesTurn && widget.isUserWhite) ||
-  //       (!_currentGame.whitesTurn && !widget.isUserWhite)) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // }
 
   void confirmMove() {
     showModalBottomSheet(
@@ -122,6 +96,8 @@ class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium>
                         setState(() {
                           this._currentGame.pgn =
                               widget.chessBoardController.game.pgn();
+                          this._currentGame.moveCount =
+                              widget.chessBoardController.game.move_number;
                           this.isUsersTurn = false;
 
                           // TODO: maybe invent a better and more secure way
@@ -151,14 +127,9 @@ class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium>
   @override
   Widget build(BuildContext context) {
     print("building");
-    Size size = MediaQuery.of(context).size;
-
-    double boardSize =
-        size.width < size.height ? size.width * 0.9 : size.height * 0.9;
-
 
     return ChessBoard(
-      size: boardSize,
+      size: widget.boardSize,
       whiteSideTowardsUser: widget.isUserWhite,
       enableUserMoves: this.isUsersTurn,
       onMove: (move) {

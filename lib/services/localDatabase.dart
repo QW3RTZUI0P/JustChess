@@ -1,34 +1,7 @@
 // localDatabase.dart
 import 'dart:convert';
-
 import "../imports.dart";
 import "package:path_provider/path_provider.dart";
-
-// class that contains the list with all the users games
-class LocalDatabase {
-  List<dynamic> games = [];
-  LocalDatabase({@required this.games});
-  factory LocalDatabase.fromJson(Map<String, dynamic> json) {
-    return LocalDatabase(
-      games: List.generate(
-        json["games"].length,
-        (index) => GameClass.fromJson(
-          json["games"][index],
-        ),
-      ),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      "games": List<dynamic>.from(
-        games.map(
-          (currentGame) => currentGame.toJson(),
-        ),
-      ),
-    };
-  }
-}
 
 // class that handles the reading and writing from and to the user's file system
 class LocalDatabaseFileRoutines {
@@ -74,14 +47,20 @@ class LocalDatabaseFileRoutines {
 //
 // for better readability
 //
-// takes a json String and converts it to a LocalDatabase object
-LocalDatabase databaseFromJson(String jsonString) {
-  final Map<String, dynamic> dataToJson = jsonDecode(jsonString);
-  return LocalDatabase.fromJson(dataToJson);
+List<GameClass> gamesListFromJsonString(String jsonString) {
+  final Map<String, dynamic> jsonObject = jsonDecode(jsonString);
+  List<GameClass> gamesListInFunction = List.generate(
+    jsonObject["games"].length,
+    (int index) => GameClass.fromJson(jsonObject["games"][index]),
+  );
+  return gamesListInFunction ?? [];
 }
 
-// takes a LocalDatabase Object and converts it to a json String
-String databaseToJson(LocalDatabase database) {
-  final Map<String, dynamic> json = database.toJson();
-  return jsonEncode(json);
+/// takes the given List<GameClass> and converts it to a json String
+String gamesListToJsonString(List<GameClass> gamesList) {
+  final Map<String, dynamic> jsonObject = {"games": []};
+  gamesList.forEach((GameClass currentGame) {
+    jsonObject["games"].add(currentGame.toJson());
+  });
+  return jsonEncode(jsonObject) ?? "";
 }

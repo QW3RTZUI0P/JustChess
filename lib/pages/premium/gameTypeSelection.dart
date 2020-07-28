@@ -9,8 +9,6 @@ class GameTypeSelection extends StatefulWidget {
 class _GameTypeSelectionState extends State<GameTypeSelection> {
   Widget currentPage;
 
-  
-
   @override
   void initState() {
     super.initState();
@@ -56,7 +54,9 @@ class _GameTypeSelectionState extends State<GameTypeSelection> {
 
   void createOfflineGame() {
     setState(() {
-      this.currentPage = CreateGame();
+      this.currentPage = CreateGame(
+        isUserPremium: true,
+      );
     });
   }
 

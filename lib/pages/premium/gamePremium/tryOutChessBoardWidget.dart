@@ -27,14 +27,19 @@ class _TryOutChessBoardWidgetState extends State<TryOutChessBoardWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    MediaQueryData mediaQueryData = MediaQuery.of(context);
+    Size size = mediaQueryData.size;
 
+    double boardSize =
+        size.width < size.height ? size.width * 0.9 : size.height * 0.9;
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: Container(
-            height: size.height,
+            height: size.height -
+                mediaQueryData.padding.top -
+                mediaQueryData.padding.bottom,
             child: Column(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -53,17 +58,43 @@ class _TryOutChessBoardWidgetState extends State<TryOutChessBoardWidget> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      ChessBoard(
-                        chessBoardController: _chessBoardController,
-                        whiteSideTowardsUser: widget.isUserWhite,
-                        size: size.width > size.height
-                            ? size.height * 0.9
-                            : size.width * 0.9,
-                        onMove: (move) {},
-                        onDraw: () {},
-                        onCheckMate: (color) {},
-                        onCheck: (_) {},
+                      Row(
+                        children: <Widget>[
+                          widget.isUserWhite
+                              ? VerticalNumbersWhite(
+                                  height: boardSize,
+                                )
+                              : VerticalNumbersBlack(
+                                  height: boardSize,
+                                ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          ChessBoard(
+                            chessBoardController: _chessBoardController,
+                            whiteSideTowardsUser: widget.isUserWhite,
+                            size: boardSize,
+                            onMove: (move) {},
+                            onDraw: () {},
+                            onCheckMate: (color) {},
+                            onCheck: (_) {},
+                          ),
+                        ],
                       ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      widget.isUserWhite
+                          ? Center(
+                              child: HorizontalLettersWhite(
+                                width: boardSize,
+                              ),
+                            )
+                          : Center(
+                              child: HorizontalLettersBlack(
+                                width: boardSize,
+                              ),
+                            ),
                       const SizedBox(
                         height: 5,
                       ),

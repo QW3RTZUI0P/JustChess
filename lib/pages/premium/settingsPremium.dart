@@ -12,6 +12,7 @@ class SettingsPremium extends StatefulWidget {
 
 class _SettingsPremiumState extends State<SettingsPremium> {
   AuthenticationBloc _authenticationBloc;
+  GamesBloc _gamesBloc;
   // only necessary during development
   // the value of the premium switch
   bool switchValue = true;
@@ -21,6 +22,7 @@ class _SettingsPremiumState extends State<SettingsPremium> {
     super.didChangeDependencies();
     this._authenticationBloc =
         AuthenticationBlocProvider.of(context).authenticationBloc;
+    this._gamesBloc = GamesBlocProvider.of(context).gamesBloc;
   }
 
   void switchValueChanged(bool updatedSwitchValue) async {
@@ -47,12 +49,18 @@ class _SettingsPremiumState extends State<SettingsPremium> {
           padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
           children: <Widget>[
             Container(
-              height: size.height * 0.25,
+              height: size.height * 0.35,
               child: Column(
                 children: <Widget>[
                   Icon(Icons.account_circle, size: size.height * 0.2),
-                  Text(widget.username),
-                  Text(widget.emailAdress),
+                  Text(
+                    widget.username ?? "",
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    widget.emailAdress ?? "",
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
               ),
             ),
@@ -64,6 +72,17 @@ class _SettingsPremiumState extends State<SettingsPremium> {
               trailing: Switch(
                 value: true,
                 onChanged: (switchValue) => switchValueChanged(switchValue),
+              ),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: ListTile(
+                title: Text("Ausloggen"),
+                trailing: Icon(Icons.exit_to_app),
+                onTap: () async {
+                  Navigator.pop(context);
+                  _gamesBloc.signOut();
+                },
               ),
             ),
           ],

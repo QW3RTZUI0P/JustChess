@@ -37,7 +37,7 @@ class _SignInState extends State<SignIn> with Validators {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this._gameBloc = GamesBlocProvider.of(context).gameBloc;
+    this._gameBloc = GamesBlocProvider.of(context).gamesBloc;
   }
 
   @override
@@ -85,15 +85,13 @@ class _SignInState extends State<SignIn> with Validators {
                         }
                       },
                     ),
-                    counter: Expanded(
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: FlatButton(
-                          child: Text(
-                            "Passwort zurücksetzen",
-                          ),
-                          onPressed: () {},
+                    counter: Align(
+                      alignment: Alignment.centerLeft,
+                      child: FlatButton(
+                        child: Text(
+                          "Passwort zurücksetzen",
                         ),
+                        // onPressed: () {},
                       ),
                     ),
                   ),
@@ -114,8 +112,10 @@ class _SignInState extends State<SignIn> with Validators {
                               email: _emailController.text,
                               password: _passwortController.text)
                           // refreshes the list of games (otherwise snapshot wouldn't connect)
-                          .then((value) => _gameBloc.refresh());
-                      Navigator.pop(context);
+                          .then((value) {
+                        _gameBloc.refresh();
+                        Navigator.pop(context);
+                      });
                     }
                   },
                 ),

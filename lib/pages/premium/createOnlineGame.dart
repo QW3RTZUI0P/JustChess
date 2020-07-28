@@ -1,8 +1,7 @@
-// createGamePremium.dart
-import "../../imports.dart";
+// createOnlineGame.dart
+import '../../imports.dart';
 
-// Dialog der angezeigt wird, wenn der PartieErstellenButton gedrückt wird
-// TODO: enable auto generated names
+// page that is shown when CreateGameButton has been pressed
 class CreateGamePremium extends StatefulWidget {
   @override
   _CreateGamePremiumState createState() => _CreateGamePremiumState();
@@ -43,6 +42,7 @@ class _CreateGamePremiumState extends State<CreateGamePremium> {
     }
   }
 
+  // TODO: store a Map<FriendName, FriensUserID> locallly ont the device
   void createGame() async {
     String opponentID = await _gameBloc.cloudFirestoreDatabase
         .getUserIDForUsername(username: this.selectedFriend);

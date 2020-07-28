@@ -11,24 +11,29 @@ export "package:firebase_analytics/firebase_analytics.dart";
 export "package:cloud_firestore/cloud_firestore.dart";
 export "package:firebase_auth/firebase_auth.dart";
 export "package:firebase_dynamic_links/firebase_dynamic_links.dart";
-export "package:firebase_in_app_messaging/firebase_in_app_messaging.dart";
 //
 //
 //
 // 2
 export "./main.dart";
 // pages
-export "./pages/about.dart";
-export "./pages/createGame.dart";
+
 // normal:
+export "./pages/normal/game.dart";
+export "./pages/normal/settings.dart";
+export "./pages/normal/createGame.dart";
+export "./pages/normal/about.dart";
 // home:
 export "./pages/normal/home/home.dart";
 export "./pages/normal/home/menu.dart";
-// other pages:
-export "./pages/normal/game.dart";
-export "./pages/normal/settings.dart";
+
 //
 // premium:
+export "./pages/premium/signUp.dart";
+export "./pages/premium/signIn.dart";
+export "./pages/premium/settingsPremium.dart";
+export 'pages/premium/createOnlineGame.dart';
+export "./pages/premium/gameTypeSelection.dart";
 // homePremium:
 export "./pages/premium/homePremium/homePremium.dart";
 export "./pages/premium/homePremium/menuPremium.dart";
@@ -39,12 +44,7 @@ export "./pages/premium/gamePremium/tryOutChessBoardWidget.dart";
 // friends:
 export "./pages/premium/friends/friends.dart";
 export "./pages/premium/friends/findNewFriend.dart";
-// other pages:
-export "./pages/premium/signUp.dart";
-export "./pages/premium/signIn.dart";
-export "./pages/premium/settingsPremium.dart";
-export "./pages/premium/createGamePremium.dart";
-export "./pages/premium/gameTypeSelection.dart";
+
 //
 //
 // classes

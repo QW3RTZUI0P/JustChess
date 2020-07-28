@@ -28,7 +28,6 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     print("home build");
     ThemeData theme = Theme.of(context);
-    print("games " + _localGamesBloc.database.games.toString());
     return Scaffold(
       appBar: AppBar(
         title: Text("Home"),
@@ -63,10 +62,19 @@ class _HomeState extends State<Home> {
                             snapshot.data[index].id,
                           ),
                           child: ListTile(
-                            title: Text(snapshot.data[index].subtitle),
-                            subtitle: Text("Anzahl der Züge: " +
-                                snapshot.data[index].moveCount.toString()),
-                            trailing: Icon(Icons.arrow_forward_ios),
+                            title: Text(
+                              snapshot.data[index].title,
+                              style: theme.textTheme.headline6,
+                            ),
+                            subtitle: Text(
+                              "Anzahl der Züge: " +
+                                  snapshot.data[index].moveCount.toString(),
+                              style: theme.textTheme.subtitle1,
+                            ),
+                            trailing: Icon(
+                              Icons.arrow_forward_ios,
+                              color: theme.iconTheme.color,
+                            ),
                             onTap: () {
                               Navigator.push(
                                   context,
@@ -75,6 +83,7 @@ class _HomeState extends State<Home> {
                                       builder: (BuildContext context) {
                                         return Game(
                                           game: snapshot.data[index],
+                                          isUserPremium: false,
                                         );
                                       }));
                             },

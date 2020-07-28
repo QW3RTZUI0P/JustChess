@@ -39,7 +39,7 @@ class JustChess extends StatelessWidget {
                 userStatusSnapshot.data == true) {
               // controls the loading and saving of the user's games
               return GamesBlocProvider(
-                gameBloc: GamesBloc(
+                gamesBloc: GamesBloc(
                   cloudFirestoreDatabase: _cloudFirestoreDatabase,
                   authenticationService: _authenticationService,
                 ),
@@ -55,7 +55,8 @@ class JustChess extends StatelessWidget {
                     child: MaterialApp(
                       debugShowCheckedModeBanner: true,
                       theme: theme,
-                      darkTheme: darkTheme,
+                      // TODO: enable darkTheme when darkmode is implemented
+                      // darkTheme: darkTheme,
                       home: StreamBuilder(
                           initialData: null,
                           // based on the user's authentication status either Home() or SignUp() is being built

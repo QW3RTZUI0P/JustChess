@@ -6,15 +6,21 @@ import 'package:chess/chess.dart' as chess;
 // TODO: include labeling into the chessboard widget
 class Game extends StatefulWidget {
   GameClass game;
-  Game({this.game});
+  bool isUserPremium;
+  Game({
+    @required this.game,
+    @required this.isUserPremium,
+  });
 
   @override
   _GameState createState() => _GameState();
 }
 
 class _GameState extends State<Game> {
-  // bloc that controls the loading and saving of all the games
+  // bloc that controls the loading and saving of the local games
   LocalGamesBloc _localGamesBloc;
+  // bloc that controls the loading and saving of all the games
+  GamesBloc _gamesBloc;
   // the current game loaded onto the ChessBoard
   GameClass currentGame;
   // controller for the ChessBoard widget
@@ -25,6 +31,7 @@ class _GameState extends State<Game> {
   @override
   void initState() {
     super.initState();
+    print("pgn " + widget.game.pgn);
     this.currentGame = GameClass.from(widget.game);
     _chessBoardController.loadPGN(this.currentGame.pgn);
   }
@@ -32,7 +39,11 @@ class _GameState extends State<Game> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this._localGamesBloc = LocalGamesBlocProvider.of(context).localGamesBloc;
+    if (widget.isUserPremium) {
+      this._gamesBloc = GamesBlocProvider.of(context).gamesBloc;
+    } else {
+      this._localGamesBloc = LocalGamesBlocProvider.of(context).localGamesBloc;
+    }
   }
 
   // saves the game to the local file system
@@ -49,7 +60,7 @@ class _GameState extends State<Game> {
         size.height < size.width ? size.height * 0.85 : size.width * 0.85;
     var appBar = AppBar(
       title: Text(
-        this.currentGame.subtitle,
+        this.currentGame.title,
       ),
       actions: <Widget>[
         // TODO: add options to this button
@@ -108,8 +119,12 @@ class _GameState extends State<Game> {
                           currentGame.pgn = _chessBoardController.game.pgn();
                           currentGame.moveCount =
                               _chessBoardController.game.move_number;
-                          _localGamesBloc.localGameUpdated(
-                              updatedGame: currentGame);
+                          if (widget.isUserPremium) {
+                            this._gamesBloc.updateGameSink.add(this.currentGame);
+                          } else {
+                            _localGamesBloc.localGameUpdated(
+                                updatedGame: currentGame);
+                          }
                         });
                       },
                     ),
@@ -140,6 +155,15 @@ class _GameState extends State<Game> {
                             this.movesList.clear();
                             // loads the last saved state (pgn) of the game
                             this._chessBoardController.loadPGN(widget.game.pgn);
+                            currentGame.pgn = _chessBoardController.game.pgn();
+                            currentGame.moveCount =
+                                _chessBoardController.game.move_number;
+                            if (widget.isUserPremium) {
+                              this._gamesBloc.updateGameSink.add(this.currentGame);
+                            } else {
+                              _localGamesBloc.localGameUpdated(
+                                  updatedGame: currentGame);
+                            }
                           });
                         },
                       ),
@@ -159,8 +183,15 @@ class _GameState extends State<Game> {
                                     _chessBoardController.game.pgn();
                                 currentGame.moveCount =
                                     _chessBoardController.game.move_number;
-                                _localGamesBloc.localGameUpdated(
-                                    updatedGame: currentGame);
+                                if (widget.isUserPremium) {
+                                  this
+                                      ._gamesBloc
+                                      .updateGameSink
+                                      .add(this.currentGame);
+                                } else {
+                                  _localGamesBloc.localGameUpdated(
+                                      updatedGame: currentGame);
+                                }
                               });
                             },
                     ),
@@ -180,8 +211,15 @@ class _GameState extends State<Game> {
                                     _chessBoardController.game.pgn();
                                 currentGame.moveCount =
                                     _chessBoardController.game.move_number;
-                                _localGamesBloc.localGameUpdated(
-                                    updatedGame: currentGame);
+                                if (widget.isUserPremium) {
+                                  this
+                                      ._gamesBloc
+                                      .updateGameSink
+                                      .add(this.currentGame);
+                                } else {
+                                  _localGamesBloc.localGameUpdated(
+                                      updatedGame: currentGame);
+                                }
                               });
                             },
                     ),

@@ -30,21 +30,23 @@ class AuthenticationBloc {
     getUserStatus();
   }
 
+  // returns whether the user is premium or not
   void getUserStatus() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    bool isUserPremium = sharedPreferences.getBool("isUserPremium") ?? false;
+    // TODO: change this to false after debug phase is over
+    bool isUserPremium = sharedPreferences.getBool("isUserPremium") ?? true;
     isUserPremiumSink.add(isUserPremium);
   }
 
-  // überwacht die ganze Zeit, ob der User ein- oder ausgeloggt ist
+  // checks all the time the user's authentication status
   void startListeners() async {
     await authenticationService.getFirebaseAuth();
-    // wenn der User sich einloggt/ausloggt wird das hier ausgeführt
+    // is executed when the user logs in or logs out
     authenticationService.getFirebaseAuth().onAuthStateChanged.listen((user) {
       final String uid = user != null ? user.uid : null;
       addUser.add(uid);
     });
-    // wenn der User auf den Ausloggen-Button drückt, wird dies hier ausgeführt
+    // is executed when the user presses the logout button
     _logoutController.stream.listen((logoutBool) {
       if (logoutBool == true) {
         authenticationService.signOut();
@@ -60,10 +62,9 @@ class AuthenticationBloc {
   }
 }
 
-// InheritedWidget, das den AuthenticationBloc dem Widget Tree zur Verfügung stellt
+// InheritedWidget that provides the authenticationBloc
 class AuthenticationBlocProvider extends InheritedWidget {
   final AuthenticationBloc authenticationBloc;
-  // key und child sind fields, die das InheritedWidget braucht
   const AuthenticationBlocProvider(
       {Key key, Widget child, this.authenticationBloc})
       : super(key: key, child: child);
@@ -74,7 +75,7 @@ class AuthenticationBlocProvider extends InheritedWidget {
 
   @override
   bool updateShouldNotify(AuthenticationBlocProvider oldWidget) {
-    // gibt nur true aus, wenn sich die beiden blocs unterscheiden
+    // returns true if the two InheritedWidgets differ from each other
 
     return authenticationBloc != oldWidget.authenticationBloc;
   }

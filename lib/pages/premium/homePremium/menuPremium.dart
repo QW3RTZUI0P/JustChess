@@ -18,15 +18,15 @@ class _MenuPremiumState extends State<MenuPremium> {
     super.didChangeDependencies();
     this._authenticationBloc =
         AuthenticationBlocProvider.of(context).authenticationBloc;
-    this._gameBloc = GamesBlocProvider.of(context).gameBloc;
+    this._gameBloc = GamesBlocProvider.of(context).gamesBloc;
     getUserCredentials();
   }
 
   void getUserCredentials() async {
-    String emailAdress = await _authenticationBloc
-        .authenticationService
-        .currentUserEmail();
-        String username = await CloudFirestoreDatabase().getUsernameForUserID(userID: _gameBloc.currentUserID);
+    String emailAdress =
+        await _authenticationBloc.authenticationService.currentUserEmail();
+    String username = await CloudFirestoreDatabase()
+        .getUsernameForUserID(userID: _gameBloc.currentUserID);
     setState(() {
       this.username = username;
       this.emailAdress = emailAdress;
@@ -155,7 +155,7 @@ class _MenuPremiumState extends State<MenuPremium> {
             title: Text("Freunde"),
             onTap: () {
               Navigator.pop(context);
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                     fullscreenDialog: false,
@@ -188,15 +188,11 @@ class _MenuPremiumState extends State<MenuPremium> {
                   MaterialPageRoute(
                       fullscreenDialog: false,
                       builder: (BuildContext context) {
-                        return SettingsPremium();
+                        return SettingsPremium(
+                          username: this.username,
+                          emailAdress: this.emailAdress,
+                        );
                       }));
-            },
-          ),
-          ListTile(
-            title: Text("Ausloggen"),
-            onTap: () async {
-              _gameBloc.signOut();
-              _authenticationBloc.authenticationService.signOut();
             },
           ),
         ],

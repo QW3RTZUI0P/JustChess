@@ -1,5 +1,5 @@
 // about.dart
-import "../imports.dart";
+import "../../imports.dart";
 
 class About extends StatelessWidget {
   @override

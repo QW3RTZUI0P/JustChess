@@ -4,6 +4,7 @@ import "package:firebase_auth/firebase_auth.dart";
 // abstract class to ensure the AuthenticationService class to be platform independent
 abstract class AuthenticationApi {
   getFirebaseAuth();
+  Future<dynamic> currentUser();
   Future<String> currentUserUid();
   Future<String> currentUserEmail();
   Future<void> signOut();
@@ -23,14 +24,20 @@ abstract class AuthenticationApi {
 
 class AuthenticationService implements AuthenticationApi {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-
   FirebaseAuth getFirebaseAuth() {
     return _firebaseAuth;
   }
 
+  Future<dynamic> currentUser() async {
+    print("hello");
+    dynamic user = await _firebaseAuth.currentUser();
+    print("world");
+    return user;
+  }
+
   Future<String> currentUserUid() async {
     FirebaseUser user = await _firebaseAuth.currentUser();
-    return user?.uid ?? "";
+    return user != null ? user.uid : "";
   }
 
   Future<String> currentUserEmail() async {

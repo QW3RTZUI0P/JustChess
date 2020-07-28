@@ -114,13 +114,21 @@ class FriendsBloc {
 
   // gets the important values
   void getImportantValues() async {
-    // gets the userID
-    this.userID = await authenticationService.currentUserUid();
-    // gets the current User's username
-    this.username =
-        await cloudFirestoreDatabase.getUsernameForUserID(userID: this.userID);
-    // gets the usernames list from the users collection
-    this.usernamesList = await cloudFirestoreDatabase.getUsernamesList();
+    print("1");
+    dynamic user = await authenticationService.currentUser();
+    print("u " + user.toString());
+    // only executes when the user is signed in
+    if (user != null) {
+      print(user.toString());
+      // gets the userID
+      this.userID = await authenticationService.currentUserUid();
+      // gets the current User's username
+      this.username = await cloudFirestoreDatabase.getUsernameForUserID(
+          userID: this.userID);
+      // gets the usernames list from the users collection
+      this.usernamesList = await cloudFirestoreDatabase.getUsernamesList();
+      print("2");
+    }
   }
 
   // is called when Friends() loads

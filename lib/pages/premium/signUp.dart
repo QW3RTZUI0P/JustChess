@@ -2,6 +2,7 @@
 import "../../imports.dart";
 import 'package:JustChess/services/cloudFirestoreDatabase.dart';
 
+// TODO: make this english
 class SignUp extends StatefulWidget {
   @override
   _SignUpState createState() => _SignUpState();
@@ -12,20 +13,17 @@ class _SignUpState extends State<SignUp> with Validators {
   final _formKey = GlobalKey<FormState>();
   // loginBloc für die gesamte Registrierungslogik
   LoginBloc _loginBloc;
-  GamesBloc _gameBloc;
+  GamesBloc _gamesBloc;
   // TextEditingController für die Textfelder
   final TextEditingController _benutzernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwortController = TextEditingController();
-  final TextEditingController _passwortWiederholungController =
-      TextEditingController();
+
 
   // fields die speichern, ob der Text in den Passwörter Textfeldern angezeigt werden soll
   bool _passwortIstVerdeckt = true;
-  bool _passwortWiederholungIstVerdeckt = true;
   // fields die die angezeigten icons in den Passwört Textfeldern speichern
   Icon _passwortIcon = Icon(Icons.visibility);
-  Icon _passwortWiederholungIcon = Icon(Icons.visibility);
 
   @override
   void initState() {
@@ -39,7 +37,7 @@ class _SignUpState extends State<SignUp> with Validators {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this._gameBloc = GamesBlocProvider.of(context).gameBloc;
+    this._gamesBloc = GamesBlocProvider.of(context).gamesBloc;
   }
 
   @override
@@ -139,7 +137,7 @@ class _SignUpState extends State<SignUp> with Validators {
                               username: _benutzernameController.text,
                             )
                             // refreshes the list of games (otherwise snapshot wouldn't connect)
-                            .then((value) => _gameBloc.refresh());
+                            .then((value) => _gamesBloc.refresh());
                       } else {
                         showDialog(
                             context: context,
