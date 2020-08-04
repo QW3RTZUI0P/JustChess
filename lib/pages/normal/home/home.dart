@@ -55,20 +55,22 @@ class _HomeState extends State<Home> {
                 return ListView.builder(
                   itemCount: snapshot.data.length,
                   itemBuilder: (BuildContext context, int index) {
+                    GameClass currentGame = snapshot.data[index];
+                    print(currentGame.id);
                     return Column(
                       children: <Widget>[
                         Dismissible(
                           key: Key(
-                            snapshot.data[index].id,
+                            currentGame.id,
                           ),
                           child: ListTile(
                             title: Text(
-                              snapshot.data[index].title,
+                              currentGame.title,
                               style: theme.textTheme.headline6,
                             ),
                             subtitle: Text(
                               "Anzahl der Züge: " +
-                                  snapshot.data[index].moveCount.toString(),
+                                  currentGame.moveCount.toString(),
                               style: theme.textTheme.subtitle1,
                             ),
                             trailing: Icon(
@@ -82,7 +84,7 @@ class _HomeState extends State<Home> {
                                       fullscreenDialog: false,
                                       builder: (BuildContext context) {
                                         return Game(
-                                          game: snapshot.data[index],
+                                          game: currentGame,
                                           isUserPremium: false,
                                         );
                                       }));
@@ -91,15 +93,40 @@ class _HomeState extends State<Home> {
                           background: Container(
                             child: Icon(Icons.delete),
                           ),
+                          confirmDismiss: (_) => showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Löschen bestätigen"),
+                                  content: Text(
+                                      "Willst du diese Partie wirklich löschen? Diese Aktion kann nicht widerrufen werden!"),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: Text(
+                                        "Bestätigen",
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        return true;
+                                      },
+                                    ),
+                                    FlatButton(
+                                        child: Text("Abbrechen"),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          return false;
+                                        }),
+                                  ],
+                                );
+                              }),
                           onDismissed: (_) {
+                            print(currentGame.id);
                             _localGamesBloc.localGameDeleted(
-                                deletedGame: snapshot.data[index]);
+                                deletedGame: currentGame);
                           },
                         ),
-                        Container(
-                          height: 1.0,
-                          color: Colors.grey,
-                        ),
+                        Divider(),
                       ],
                     );
                   },

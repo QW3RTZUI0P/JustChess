@@ -114,7 +114,6 @@ class FriendsBloc {
 
   // gets the important values
   void getImportantValues() async {
-    print("1");
     dynamic user = await authenticationService.currentUser();
     print("u " + user.toString());
     // only executes when the user is signed in
@@ -140,12 +139,12 @@ class FriendsBloc {
     List<dynamic> friendsList =
         await cloudFirestoreDatabase.getFriendsList(userID: currentUserID) ??
             [];
+    print(friendsList.toString());
     // adds all the usernames (except the user's username) to the availableFriendsSink
     if (friendsList.isEmpty) {
       List<String> availableFriendsInIf = List.from(this.usernamesList);
-
-      availableFriendsInIf.remove(this.username);
-      availableFriendsListSink.add(availableFriendsInIf);
+      this.availableFriendsList = List.from(this.usernamesList);
+      this.availableFriendsList.remove(this.username);
     }
     // adds all the friends to the StreamTree
     for (dynamic friend in friendsList) {

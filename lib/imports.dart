@@ -5,6 +5,7 @@ export "dart:async";
 export "package:flutter/material.dart";
 export "package:path_provider/path_provider.dart";
 export "package:shared_preferences/shared_preferences.dart";
+export "package:url_launcher/url_launcher.dart";
 // Firebase
 export "package:firebase_core/firebase_core.dart";
 export "package:firebase_analytics/firebase_analytics.dart";
@@ -34,6 +35,7 @@ export "./pages/premium/signIn.dart";
 export "./pages/premium/settingsPremium.dart";
 export 'pages/premium/createOnlineGame.dart';
 export "./pages/premium/gameTypeSelection.dart";
+export "./pages/premium/invitations.dart";
 // homePremium:
 export "./pages/premium/homePremium/homePremium.dart";
 export "./pages/premium/homePremium/menuPremium.dart";
@@ -51,7 +53,7 @@ export "./pages/premium/friends/findNewFriend.dart";
 export "./classes/gameClass.dart";
 export "./classes/partienProvider.dart";
 export "./classes/validators.dart";
-export "./classes/invitation.dart";
+export "./classes/invitationClass.dart";
 //
 //
 // services
@@ -72,6 +74,7 @@ export "./blocs/localGamesBloc.dart";
 export "./widgets/theme.dart";
 export "./widgets/labeling.dart";
 export "./widgets/createGameButton.dart";
+export "./widgets/failure.dart";
 //
 //
 // flutter_chess_board:
@@ -80,6 +83,5 @@ export "./flutter_chess_board/flutter_chess_board.dart";
 //
 //
 // 3
-export "package:provider/provider.dart";
 export "package:uuid/uuid.dart";
 export "package:after_layout/after_layout.dart";

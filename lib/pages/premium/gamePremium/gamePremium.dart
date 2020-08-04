@@ -1,4 +1,6 @@
 // gamePremium.dart
+import 'package:flutter/services.dart';
+
 import "../../../imports.dart";
 
 // TODO: implement chessBoard to try out ones move
@@ -25,6 +27,10 @@ class _GamePremiumState extends State<GamePremium> {
   ChessBoardController chessBoardController = ChessBoardController();
   // tells whether the user is allowed to make turns
   bool isUsersTurn;
+  // value for the DropdownButton in the AppBar
+  int _dropdownButtonValue;
+  // the items for the DropdownButton
+  List<String> dropdownButtonItems = ["Aufgeben", "Remis", "PGN exportieren"];
 
   @override
   void initState() {
@@ -81,11 +87,62 @@ class _GamePremiumState extends State<GamePremium> {
           },
         ),
         // button that provides more options for the user (e.g. edit name of game, export pgn, ...)
-        DropdownButton(
-          icon: Icon(Icons.more_vert),
-          value: null,
-          items: [],
-          onChanged: (_) {},
+        Builder(
+          builder: (BuildContext context) => DropdownButtonHideUnderline(
+            child: DropdownButton<int>(
+              icon: Icon(
+                Icons.more_vert,
+                color: theme.appBarTheme.actionsIconTheme.color,
+              ),
+              value: _dropdownButtonValue,
+              hint: Text(""),
+              // makes the DropdownButton show nothing except the Menu Icon
+              selectedItemBuilder: (BuildContext context) {
+                return dropdownButtonItems
+                    .map<Widget>((currentItem) => Text(""))
+                    .toList();
+              },
+              underline: null,
+              items: this
+                  .dropdownButtonItems
+                  .map<DropdownMenuItem<int>>(
+                    (currentItem) => DropdownMenuItem(
+                      value: this.dropdownButtonItems.indexOf(currentItem),
+                      child: Column(
+                        children: <Widget>[
+                          Text(currentItem),
+                          Divider(),
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
+              elevation: 0,
+              onChanged: (int newValue) {
+                switch (newValue) {
+                  case 1:
+                  case 2:
+                  case 3:
+                    Clipboard.setData(
+                      ClipboardData(text: currentGame.pgn),
+                    );
+                    // shows a SnackBar that informs the user that the PGN has been pasted to the clipboard
+                    Scaffold.of(context).showSnackBar(
+                      SnackBar(
+                        content:
+                            Text("PGN wurde in die Zwischenablage kopiert"),
+                      ),
+                    );
+                    return;
+                  default:
+                    return;
+                }
+              },
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 20,
         ),
       ],
     );
@@ -105,7 +162,7 @@ class _GamePremiumState extends State<GamePremium> {
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
                 Text(currentGame.canBeDeleted
-                    ? "Dein Gegner hat dieses Spiel gelöscht"
+                    ? "Dein Gegner hat diese Partie gelöscht"
                     : ""),
                 const SizedBox(height: 5),
                 Row(

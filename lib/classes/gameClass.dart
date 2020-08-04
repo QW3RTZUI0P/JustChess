@@ -76,7 +76,6 @@ class GameClass {
 
   /// takes the given jsonObject and converts it to a GameClass object
   factory GameClass.fromJson(Map<String, dynamic> jsonObject) {
-    print("game class from json");
     GameClass game = GameClass(
       id: jsonObject["id"] ?? "",
       title: jsonObject["subtitle"] ?? jsonObject["title"] ?? "",
@@ -88,7 +87,6 @@ class GameClass {
       moveCount: jsonObject["moveCount"],
       canBeDeleted: jsonObject["canBeDeleted"],
     );
-    print("subtitle " + game.title);
     return game;
   }
 

@@ -16,17 +16,34 @@ class HomePremium extends StatefulWidget {
   _HomePremiumState createState() => _HomePremiumState();
 }
 
-class _HomePremiumState extends State<HomePremium> {
+// WidgetsBindingObserver helps observing the AppLifecycleState (to refresh _gamesBloc when app is resumed)
+class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
   GamesBloc _gamesBloc;
+  AppLifecycleState _appLifecycleState;
 
-  _HomePremiumState() {
-    print("Home State");
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _gamesBloc = GamesBlocProvider.of(context).gamesBloc;
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    setState(() {
+      this._appLifecycleState = state;
+    });
   }
 
   // this has to be like this; onRefresh has to get a value
@@ -37,6 +54,10 @@ class _HomePremiumState extends State<HomePremium> {
   // TODO: create invitations
   @override
   Widget build(BuildContext context) {
+    if (_appLifecycleState?.index == 0) {
+      refresh();
+    }
+
     ThemeData theme = Theme.of(context);
 
     return Scaffold(
@@ -45,6 +66,21 @@ class _HomePremiumState extends State<HomePremium> {
           "JustChess",
         ),
         textTheme: theme.appBarTheme.textTheme,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.local_post_office),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    fullscreenDialog: false,
+                    builder: (BuildContext context) {
+                      return Invitations();
+                    }),
+              );
+            },
+          ),
+        ],
       ),
       floatingActionButton: CreateGameButton(
         isUserPremium: true,
@@ -123,73 +159,108 @@ class _HomePremiumState extends State<HomePremium> {
                                 color:
                                     isUsersTurn ? theme.indicatorColor : null,
                                 child: Dismissible(
-                                  key: Key(
-                                    currentGame.id,
-                                  ),
-                                  child: ListTile(
-                                    title: Text(
-                                      _gamesBloc.gameTitlesList[index] ?? "",
-                                      style: theme.textTheme.headline6,
+                                    key: Key(
+                                      currentGame.id,
                                     ),
-                                    subtitle: Text(
-                                      currentGame.player02.isEmpty
-                                          ? "Anzahl der Züge: " +
-                                              currentGame.moveCount.toString()
-                                          : "Anzahl der Züge: " +
-                                                  currentGame.moveCount
-                                                      .toString() +
-                                                  ", " +
-                                                  currentGame.title ??
-                                              "",
-                                      style: theme.textTheme.subtitle1,
+                                    child: ListTile(
+                                      title: Text(
+                                        _gamesBloc.gameTitlesList[index] ?? "",
+                                        style: theme.textTheme.headline6,
+                                      ),
+                                      subtitle: Text(
+                                        currentGame.player02.isEmpty
+                                            ? "Anzahl der Züge: " +
+                                                currentGame.moveCount.toString()
+                                            : "Anzahl der Züge: " +
+                                                    currentGame.moveCount
+                                                        .toString() +
+                                                    ", " +
+                                                    currentGame.title ??
+                                                "",
+                                        style: theme.textTheme.subtitle1,
+                                      ),
+                                      trailing: Icon(
+                                        Icons.arrow_forward_ios,
+                                        color: theme.iconTheme.color,
+                                      ),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              fullscreenDialog: false,
+                                              builder: (context) {
+                                                if (currentGame
+                                                        .player02.isEmpty ||
+                                                    currentGame.player02 ==
+                                                        null) {
+                                                  return Game(
+                                                    game: currentGame,
+                                                    isUserPremium: true,
+                                                  );
+                                                } else {
+                                                  return GamePremium(
+                                                    currentGame: currentGame,
+                                                    opponentsName: _gamesBloc
+                                                        .gameTitlesList[index],
+                                                    isUserWhite: isUserWhite,
+                                                  );
+                                                }
+                                              }),
+                                        );
+                                      },
                                     ),
-                                    trailing: Icon(
-                                      Icons.arrow_forward_ios,
+                                    background: Icon(
+                                      Icons.delete,
                                       color: theme.iconTheme.color,
                                     ),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            fullscreenDialog: false,
-                                            builder: (context) {
-                                              if (currentGame
-                                                      .player02.isEmpty ||
-                                                  currentGame.player02 ==
-                                                      null) {
-                                                return Game(
-                                                  game: currentGame,
-                                                  isUserPremium: true,
-                                                );
-                                              } else {
-                                                return GamePremium(
-                                                  currentGame: currentGame,
-                                                  opponentsName: _gamesBloc
-                                                      .gameTitlesList[index],
-                                                  isUserWhite: isUserWhite,
-                                                );
-                                              }
-                                            }),
-                                      );
+                                    secondaryBackground: Icon(
+                                      Icons.delete,
+                                      color: theme.iconTheme.color,
+                                    ),
+                                    confirmDismiss: (_) async {
+                                      bool confirmed;
+
+                                      await showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: Text("Löschen bestätigen"),
+                                              content: Text(
+                                                  "Willst du diese Partie wirklich löschen? Diese Aktion kann nicht widerrufen werden!"),
+                                              actions: <Widget>[
+                                                FlatButton(
+                                                  child: Text(
+                                                    "Bestätigen",
+                                                    style: TextStyle(
+                                                        color: Colors.red),
+                                                  ),
+                                                  onPressed: () {
+                                                    confirmed = true;
+                                                    // has to be here (showDialog finishes only when the dialog gets popped)
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                                FlatButton(
+                                                    child: Text("Abbrechen"),
+                                                    onPressed: () {
+                                                      confirmed = false;
+                                                      // has to be here (showDialog finishes only when the dialog gets popped)
+                                                      Navigator.pop(context);
+                                                    }),
+                                              ],
+                                            );
+                                          });
+                                      return confirmed;
                                     },
-                                  ),
-                                  background: Icon(
-                                    Icons.delete,
-                                    color: theme.iconTheme.color,
-                                  ),
-                                  secondaryBackground: Icon(
-                                    Icons.delete,
-                                    color: theme.iconTheme.color,
-                                  ),
-                                  onDismissed: (direction) => setState(() {
-                                    _gamesBloc.deleteGameSink.add(currentGame);
-                                  }),
-                                ),
+                                    onDismissed: (direction) {
+                                      print("dismissed");
+                                      setState(() {
+                                        _gamesBloc.deleteGameSink
+                                            .add(currentGame);
+                                      });
+                                    }),
                               ),
-                              Container(
-                                height: 1,
-                                color: Colors.grey,
-                              ),
+                              Divider(),
                             ],
                           );
                         },

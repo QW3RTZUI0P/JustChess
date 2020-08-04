@@ -9,7 +9,9 @@ class CreateGame extends StatefulWidget {
   _CreateGameState createState() => _CreateGameState();
 }
 
-class _CreateGameState extends State<CreateGame> {
+class _CreateGameState extends State<CreateGame> with Validators {
+  // key for the Form widget
+  final _formKey = GlobalKey<FormState>();
   // bloc that manages the local saving of the games
   LocalGamesBloc _localGamesBloc;
   // bloc for refreshing the gamesList
@@ -44,55 +46,63 @@ class _CreateGameState extends State<CreateGame> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
-          child: Column(
-            children: <Widget>[
-              TextField(
-                maxLength: 100,
-                decoration: InputDecoration(labelText: "Name der Partie"),
-                controller: _nameController,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Flexible(
-                    child: Text(
-                      "Ich spiele als",
-                      overflow: TextOverflow.ellipsis,
+          child: Form(
+            autovalidate: false,
+            key: this._formKey,
+            child: Column(
+              children: <Widget>[
+                TextFormField(
+                  maxLength: 100,
+                  decoration: InputDecoration(labelText: "Name der Partie"),
+                  controller: _nameController,
+                  validator: (gameTitle) =>
+                      checkGameTitle(gameTitle: gameTitle),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Flexible(
+                      child: Text(
+                        "Ich spiele als",
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                  Radio(
-                    value: true,
-                    groupValue: _radioGroupValue,
-                    onChanged: (value) => radioButtonChanged(toValue: value),
-                  ),
-                  Expanded(child: Text("Weiß")),
-                  Radio(
-                    value: false,
-                    groupValue: _radioGroupValue,
-                    onChanged: (value) => radioButtonChanged(toValue: value),
-                  ),
-                  Expanded(child: Text("Schwarz"))
-                ],
-              ),
-              RaisedButton(
-                child: Text("Partie erstellen"),
-                onPressed: () async {
-                  GameClass newGame = GameClass(
-                    title: _nameController.text,
-                    player01IsWhite: _radioGroupValue,
-                  );
-                  newGame.createUniqueID();
+                    Radio(
+                      value: true,
+                      groupValue: _radioGroupValue,
+                      onChanged: (value) => radioButtonChanged(toValue: value),
+                    ),
+                    Expanded(child: Text("Weiß")),
+                    Radio(
+                      value: false,
+                      groupValue: _radioGroupValue,
+                      onChanged: (value) => radioButtonChanged(toValue: value),
+                    ),
+                    Expanded(child: Text("Schwarz"))
+                  ],
+                ),
+                RaisedButton(
+                  child: Text("Partie erstellen"),
+                  onPressed: () async {
+                    if (_formKey.currentState.validate()) {
+                      GameClass newGame = GameClass(
+                        title: _nameController.text,
+                        player01IsWhite: _radioGroupValue,
+                      );
+                      newGame.createUniqueID();
 
-                  if (widget.isUserPremium) {
-                    _gamesBloc.addGameSink.add(newGame);
-                  } else {
-                    _localGamesBloc.localGameCreated(newGame: newGame);
-                  }
-                  this._nameController.text = "";
-                  Navigator.pop(context);
-                },
-              ),
-            ],
+                      if (widget.isUserPremium) {
+                        _gamesBloc.addGameSink.add(newGame);
+                      } else {
+                        _localGamesBloc.localGameCreated(newGame: newGame);
+                      }
+                      this._nameController.text = "";
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -1,13 +1,14 @@
 // createOnlineGame.dart
+import 'dart:math';
 import '../../imports.dart';
 
 // page that is shown when CreateGameButton has been pressed
-class CreateGamePremium extends StatefulWidget {
+class CreateOnlineGame extends StatefulWidget {
   @override
-  _CreateGamePremiumState createState() => _CreateGamePremiumState();
+  _CreateOnlineGameState createState() => _CreateOnlineGameState();
 }
 
-class _CreateGamePremiumState extends State<CreateGamePremium> {
+class _CreateOnlineGameState extends State<CreateOnlineGame> {
   GamesBloc _gameBloc;
   FriendsBloc _friendsBloc;
 
@@ -32,18 +33,27 @@ class _CreateGamePremiumState extends State<CreateGamePremium> {
         this.benutzerIstWeiss = true;
         this.radioButtonGroupValue = 0;
       });
-      print(benutzerIstWeiss.toString());
-    } else {
+    } else if (value == 1) {
       setState(() {
         this.benutzerIstWeiss = false;
         this.radioButtonGroupValue = 1;
-        print(benutzerIstWeiss.toString());
+      });
+    } else {
+      Random random = Random();
+      setState(() {
+        this.benutzerIstWeiss = random.nextBool();
+        this.radioButtonGroupValue = 2;
       });
     }
   }
 
   // TODO: store a Map<FriendName, FriensUserID> locallly ont the device
-  void createGame() async {
+  void createGame(BuildContext currentContext) async {
+    if (this.selectedFriend == "") {
+      Failure(context: currentContext, errorMessage: "Bitte wähle einen Freund")
+          .showErrorSnackBar();
+      return;
+    }
     String opponentID = await _gameBloc.cloudFirestoreDatabase
         .getUserIDForUsername(username: this.selectedFriend);
     GameClass neuePartie = GameClass(
@@ -68,11 +78,13 @@ class _CreateGamePremiumState extends State<CreateGamePremium> {
       appBar: AppBar(
         title: Text("Partie erstellen"),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Text("Partie erstellen"),
-        shape: CircleBorder(side: BorderSide()),
-        tooltip: "Partie erstellen",
-        onPressed: () => createGame(),
+      floatingActionButton: Builder(
+        builder: (BuildContext currentContext) => FloatingActionButton(
+          child: Text("Partie erstellen"),
+          shape: CircleBorder(side: BorderSide()),
+          tooltip: "Partie erstellen",
+          onPressed: () => createGame(currentContext),
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
@@ -117,6 +129,16 @@ class _CreateGamePremiumState extends State<CreateGamePremium> {
                   Text("Schwarz"),
                 ],
               ),
+              Row(
+                children: <Widget>[
+                  Radio(
+                    value: 2,
+                    onChanged: (value) => radioButtonChanged(value),
+                    groupValue: radioButtonGroupValue,
+                  ),
+                  Text("Zufällige Farbauswahl"),
+                ],
+              ),
               StreamBuilder<Object>(
                   stream: _friendsBloc.friendsListStream,
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -138,7 +160,8 @@ class _CreateGamePremiumState extends State<CreateGamePremium> {
                         itemBuilder: (BuildContext context, int index) {
                           return ListTile(
                             title: Text(snapshot.data[index]),
-                            selected: this.selectedFriend == snapshot.data[index],
+                            selected:
+                                this.selectedFriend == snapshot.data[index],
                             onTap: () {
                               setState(() {
                                 this.selectedFriend = snapshot.data[index];

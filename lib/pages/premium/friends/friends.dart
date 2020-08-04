@@ -27,19 +27,31 @@ class _FriendsState extends State<Friends> with AfterLayoutMixin<Friends> {
       appBar: AppBar(
         title: Text("Freunde"),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.person_add),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    fullscreenDialog: true,
-                    maintainState: true,
-                    builder: (BuildContext context) {
-                      return FindNewFriend();
-                    }),
-              );
-            },
+          Builder(
+            builder: (BuildContext currentContext) => IconButton(
+              icon: Icon(Icons.person_add),
+              onPressed: () {
+                if (_friendsBloc.friendsList.length > 20) {
+                  Failure(
+                          context: currentContext,
+                          errorMessage:
+                              "Du kannst nicht mehr als zwanzig Freunde hinzufügen")
+                      .showErrorSnackBar();
+                  return;
+                }
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      fullscreenDialog: true,
+                      maintainState: true,
+                      builder: (BuildContext context) {
+                        print("q " +
+                            _friendsBloc.availableFriendsList.toString());
+                        return FindNewFriend();
+                      }),
+                );
+              },
+            ),
           )
         ],
       ),
@@ -73,7 +85,7 @@ class _FriendsState extends State<Friends> with AfterLayoutMixin<Friends> {
                           MaterialPageRoute(
                             fullscreenDialog: true,
                             builder: (BuildContext context) {
-                              return CreateGamePremium();
+                              return CreateOnlineGame();
                             },
                           ),
                         );

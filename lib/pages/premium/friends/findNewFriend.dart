@@ -25,11 +25,12 @@ class _FindNewFriendState extends State<FindNewFriend>
 
   @override
   void afterFirstLayout(BuildContext context) {
-    this._friendsBloc.loadAvailableFriends();
-    setState(() {
-      // has to be this way, otherwise when searchResults changes, the availableFriendsHelperList would also change
-      this.searchResults = List.from(_friendsBloc.availableFriendsList);
-    });
+    // this._friendsBloc.loadAvailableFriends();
+    // setState(() {
+    //   print(_friendsBloc.availableFriendsList.toString());
+    //   // has to be this way, otherwise when searchResults changes, the availableFriendsHelperList would also change
+    //   this.searchResults = List.from(_friendsBloc.availableFriendsList);
+    // });
   }
 
   void addNewFriend({@required String name}) {
@@ -83,7 +84,7 @@ class _FindNewFriendState extends State<FindNewFriend>
                 TextField(
                   controller: _searchBarController,
                   onChanged: (String query) =>
-                      searchFor(query, inList: snapshot.data),
+                      searchFor(query, inList: _friendsBloc.availableFriendsList),
                   decoration: InputDecoration(
                     labelText: "Suche",
                     hintText: "Name des Freundes",

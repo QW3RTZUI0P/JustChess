@@ -157,15 +157,19 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
 
   void deleteUserFromFirestore(
       {@required String userID, @required String username}) async {
+        // deletes the user's document in the users collection
     await _firestore.collection(_userCollection).document(userID).delete();
+    // gets the document with the usernames list and with the Map<username, userID>
     DocumentSnapshot snapshot = await _firestore
         .collection(_userCollection)
         .document("usernames")
         .get();
     List<dynamic> usernames = snapshot["usernames"];
     Map<String, dynamic> userIDs = snapshot["userIDs"];
+    // removes username from the usernames list
     usernames.remove(username);
-    userIDs.remove({username: userID});
+    // removes the MapEntry with the username as the key and the userID as the value from the map
+    userIDs.remove(username);
     await _firestore
         .collection(_userCollection)
         .document("usernames")

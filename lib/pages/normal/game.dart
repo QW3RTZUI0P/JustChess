@@ -117,10 +117,14 @@ class _GameState extends State<Game> {
                       onMove: (_) {
                         setState(() {
                           currentGame.pgn = _chessBoardController.game.pgn();
-                          currentGame.moveCount =
-                              _chessBoardController.game.move_number;
+                          currentGame.moveCount = int.parse(
+                              (_chessBoardController.game.history.length / 2)
+                                  .toStringAsFixed(0));
                           if (widget.isUserPremium) {
-                            this._gamesBloc.updateGameSink.add(this.currentGame);
+                            this
+                                ._gamesBloc
+                                .updateGameSink
+                                .add(this.currentGame);
                           } else {
                             _localGamesBloc.localGameUpdated(
                                 updatedGame: currentGame);
@@ -156,10 +160,14 @@ class _GameState extends State<Game> {
                             // loads the last saved state (pgn) of the game
                             this._chessBoardController.loadPGN(widget.game.pgn);
                             currentGame.pgn = _chessBoardController.game.pgn();
-                            currentGame.moveCount =
-                                _chessBoardController.game.move_number;
+                            currentGame.moveCount = int.parse(
+                                (_chessBoardController.game.history.length / 2)
+                                    .toStringAsFixed(0));
                             if (widget.isUserPremium) {
-                              this._gamesBloc.updateGameSink.add(this.currentGame);
+                              this
+                                  ._gamesBloc
+                                  .updateGameSink
+                                  .add(this.currentGame);
                             } else {
                               _localGamesBloc.localGameUpdated(
                                   updatedGame: currentGame);
@@ -181,8 +189,12 @@ class _GameState extends State<Game> {
                                     .undo_move());
                                 currentGame.pgn =
                                     _chessBoardController.game.pgn();
-                                currentGame.moveCount =
-                                    _chessBoardController.game.move_number;
+
+                                currentGame.moveCount = int.parse(
+                                    (_chessBoardController.game.history.length /
+                                            2)
+                                        .toStringAsFixed(0));
+
                                 if (widget.isUserPremium) {
                                   this
                                       ._gamesBloc
@@ -209,8 +221,10 @@ class _GameState extends State<Game> {
                                 this.movesList.removeLast();
                                 currentGame.pgn =
                                     _chessBoardController.game.pgn();
-                                currentGame.moveCount =
-                                    _chessBoardController.game.move_number;
+                                currentGame.moveCount = int.parse(
+                                    (_chessBoardController.game.history.length /
+                                            2)
+                                        .toString());
                                 if (widget.isUserPremium) {
                                   this
                                       ._gamesBloc

@@ -48,7 +48,7 @@ class _GameTypeSelectionState extends State<GameTypeSelection> {
 
   void createGamePremium() {
     setState(() {
-      this.currentPage = CreateGamePremium();
+      this.currentPage = CreateOnlineGame();
     });
   }
 

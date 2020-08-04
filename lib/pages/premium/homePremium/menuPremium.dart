@@ -113,46 +113,57 @@ class _MenuPremiumState extends State<MenuPremium> {
     return Drawer(
       child: Column(
         children: <Widget>[
-          DrawerHeader(
-            child: Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    GestureDetector(
-                      child: CircleAvatar(),
-                      onTap: () => showUserOptionsDialog(),
-                    ),
-                    Text("Benutzername: $username"),
-                  ],
-                ),
-                Text("Email: $emailAdress"),
-                FlatButton(
-                  child: Text("werde Normal"),
-                  onPressed: () async {
-                    SharedPreferences sharedPreferences =
-                        await SharedPreferences.getInstance();
-                    sharedPreferences.setBool("isUserPremium", false);
-                    this._authenticationBloc.isUserPremiumSink.add(false);
-                  },
-                )
-              ],
-            ),
-          ),
+          DrawerHeader(),
+          // display some basic information (number of games, number of wins, number of moves) instead 
+          //
+          // DrawerHeader(
+          //   child: Column(
+          //     children: <Widget>[
+          //       Row(
+          //         children: <Widget>[
+          //           GestureDetector(
+          //             child: CircleAvatar(),
+          //             onTap: () => showUserOptionsDialog(),
+          //           ),
+          //           Text("Benutzername: $username"),
+          //         ],
+          //       ),
+          //       Text("Email: $emailAdress"),
+          //       FlatButton(
+          //         child: Text("werde Normal"),
+          //         onPressed: () async {
+          //           SharedPreferences sharedPreferences =
+          //               await SharedPreferences.getInstance();
+          //           sharedPreferences.setBool("isUserPremium", false);
+          //           this._authenticationBloc.isUserPremiumSink.add(false);
+          //         },
+          //       )
+          //     ],
+          //   ),
+          // ),
           ListTile(
-            title: Text("Partien"),
+            title: Text(
+              "Partien",
+              style: theme.textTheme.headline5,
+            ),
+            // black white chess board icon
+            leading: Image.asset(
+              "assets/images/black_white_board.png",
+              width: theme.iconTheme.size,
+            ),
             onTap: () {
               Navigator.pop(context);
             },
           ),
-          // ListTile(
-          //   title: Text("Freunde"),
-          //   onTap: () {
-          //     Navigator.pop(context);
-          //     Navigator.pushNamed(context, "/friends");
-          //   },
-          // ),
           ListTile(
-            title: Text("Freunde"),
+            title: Text(
+              "Freunde",
+              style: theme.textTheme.headline5,
+            ),
+            leading: Icon(
+              Icons.group,
+              color: theme.iconTheme.color,
+            ),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -166,7 +177,14 @@ class _MenuPremiumState extends State<MenuPremium> {
             },
           ),
           ListTile(
-            title: Text("Über"),
+            title: Text(
+              "Über",
+              style: theme.textTheme.headline5,
+            ),
+            leading: Icon(
+              Icons.info_outline,
+              color: theme.iconTheme.color,
+            ),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -180,7 +198,14 @@ class _MenuPremiumState extends State<MenuPremium> {
             },
           ),
           ListTile(
-            title: Text("Einstellungen"),
+            title: Text(
+              "Einstellungen",
+              style: theme.textTheme.headline5,
+            ),
+            leading: Icon(
+              Icons.settings,
+              color: theme.iconTheme.color,
+            ),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
