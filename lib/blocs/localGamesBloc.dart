@@ -1,8 +1,5 @@
 // localGamesBloc.dart
 import "../imports.dart";
-import "dart:convert";
-
-// TODO: remove database Class and use instead only a list<GameClass>
 
 class LocalGamesBloc {
   List<GameClass> gamesList = [];
@@ -87,7 +84,7 @@ class LocalGamesBlocProvider extends InheritedWidget {
     Key key,
     Widget child,
     this.localGamesBloc,
-  }) : super(key: key, child: child) {}
+  }) : super(key: key, child: child);
   static LocalGamesBlocProvider of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<LocalGamesBlocProvider>();
   }

@@ -32,11 +32,11 @@ class _FriendsState extends State<Friends> with AfterLayoutMixin<Friends> {
               icon: Icon(Icons.person_add),
               onPressed: () {
                 if (_friendsBloc.friendsList.length > 20) {
-                  Failure(
+                  SnackbarMessage(
                           context: currentContext,
-                          errorMessage:
+                          message:
                               "Du kannst nicht mehr als zwanzig Freunde hinzufügen")
-                      .showErrorSnackBar();
+                      .showSnackBar();
                   return;
                 }
                 Navigator.push(
@@ -85,7 +85,9 @@ class _FriendsState extends State<Friends> with AfterLayoutMixin<Friends> {
                           MaterialPageRoute(
                             fullscreenDialog: true,
                             builder: (BuildContext context) {
-                              return CreateOnlineGame();
+                              return CreateOnlineGame(
+                                selectedFriend: snapshot.data[index],
+                              );
                             },
                           ),
                         );

@@ -1,14 +1,15 @@
 // chessBoardWidgetPremium.dart
 
 import "../../../imports.dart";
+import "package:chess/chess.dart" as chess;
 
 // TODO: add text widget which says who's turn it is
 class ChessBoardWidgetPremium extends StatefulWidget {
-  GameClass currentGame;
-  ChessBoardController chessBoardController;
-  bool isUserWhite;
-  bool isUsersTurn;
-  double boardSize;
+  final GameClass currentGame;
+  final ChessBoardController chessBoardController;
+  final bool isUserWhite;
+  final bool isUsersTurn;
+  final double boardSize;
   ChessBoardWidgetPremium({
     @required this.currentGame,
     @required this.chessBoardController,
@@ -23,7 +24,7 @@ class ChessBoardWidgetPremium extends StatefulWidget {
 }
 
 class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium> {
-  GamesBloc _gameBloc;
+  GamesBloc _gamesBloc;
   GameClass _currentGame;
   bool isUsersTurn;
 
@@ -39,7 +40,7 @@ class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this._gameBloc = GamesBlocProvider.of(context).gamesBloc;
+    this._gamesBloc = GamesBlocProvider.of(context).gamesBloc;
     this._currentGame = widget.currentGame;
     widget.chessBoardController.loadPGN(_currentGame.pgn);
   }
@@ -92,8 +93,15 @@ class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium> {
                       icon: Icon(Icons.done),
                       tooltip: "Bestätigen",
                       onPressed: () {
-                        widget.isUsersTurn = false;
+                        GameClass updatedGame = GameClass.from(_currentGame);
+                        updatedGame.pgn =
+                            widget.chessBoardController.game.pgn();
+                        updatedGame.moveCount =
+                            widget.chessBoardController.game.move_number;
+                        updatedGame.whitesTurn =
+                            widget.isUserWhite ? false : true;
                         setState(() {
+                          this.isUsersTurn = false;
                           this._currentGame.pgn =
                               widget.chessBoardController.game.pgn();
                           this._currentGame.moveCount =
@@ -104,12 +112,20 @@ class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium> {
                           _currentGame.whitesTurn =
                               widget.isUserWhite ? false : true;
                         });
+                        saveGame(game: updatedGame);
 
-                        saveGame(game: _currentGame);
                         Navigator.pop(context);
 
                         widget.chessBoardController
                             .loadPGN(this._currentGame.pgn ?? "");
+                        if (widget.chessBoardController.game.in_checkmate) {
+                          PieceColor loserColor = onCheckmate();
+                          updatedGame.gameStatus =
+                              loserColor == PieceColor.Black
+                                  ? GameStatus.whiteWon
+                                  : GameStatus.blackWon;
+                          saveGame(game: updatedGame);
+                        }
                       },
                     ),
                   ),
@@ -121,7 +137,69 @@ class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium> {
   }
 
   void saveGame({GameClass game}) {
-    _gameBloc.updateGameSink.add(game);
+    _gamesBloc.updateGameSink.add(game);
+  }
+
+  PieceColor onCheckmate() {
+    PieceColor loserColor =
+        widget.chessBoardController.game.turn == chess.Color.WHITE
+            ? PieceColor.White
+            : PieceColor.Black;
+    ThemeData theme = Theme.of(context);
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: theme.dialogTheme.backgroundColor,
+            child: Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Schachmatt",
+                    style: theme.dialogTheme.titleTextStyle,
+                  ),
+                  const SizedBox(
+                    height: 5.0,
+                  ),
+                  Text(
+                    loserColor == PieceColor.White
+                        ? "Weiß hat gewonnen"
+                        : "Schwarz hat gewonnen",
+                    style: theme.dialogTheme.contentTextStyle,
+                  ),
+                  Row(
+                    children: [
+                      FlatButton(
+                        child: Text("Partie löschen"),
+                        onPressed: () {
+                          GameClass updatedGame = GameClass.from(_currentGame);
+                          updatedGame.gameStatus =
+                              loserColor == PieceColor.Black
+                                  ? GameStatus.whiteWon
+                                  : GameStatus.blackWon;
+                          _gamesBloc.deleteGameSink.add(updatedGame);
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                          // TODO: build a method that doesn't fetch all the games again from firestore (instead just add / delete the games locally)
+                          _gamesBloc.refreshAll();
+                        },
+                      ),
+                      FlatButton(
+                        child: Text("OK"),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+    return loserColor;
   }
 
   @override
@@ -137,20 +215,27 @@ class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium> {
         // partie.anzahlDerZuege += 0.5;
         print(move);
       },
-      onCheckMate: (color) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            content: Text("$color hat gewonnen!"),
-            actions: <Widget>[
-              FlatButton(
-                child: Text("Ok"),
-                onPressed: () => Navigator.pop(context),
-              )
-            ],
-          ),
-        );
-      },
+      onCheckMate: (_) {},
+      // (color) {
+      //   print("checkMate");
+      //   GameClass updatedGame = GameClass.from(_currentGame);
+      //   updatedGame.gameStatus = color == PieceColor.White
+      //       ? GameStatus.whiteWon
+      //       : GameStatus.blackWon;
+      //   saveGame(game: updatedGame);
+      //   showDialog(
+      //     context: context,
+      //     builder: (context) => AlertDialog(
+      //       content: Text("$color hat gewonnen!"),
+      //       actions: <Widget>[
+      //         FlatButton(
+      //           child: Text("Ok"),
+      //           onPressed: () => Navigator.pop(context),
+      //         )
+      //       ],
+      //     ),
+      //   );
+      // },
       onDraw: () {
         showDialog(
           context: context,
@@ -164,6 +249,9 @@ class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium> {
             ],
           ),
         );
+        GameClass updatedGame = GameClass.from(_currentGame);
+        updatedGame.gameStatus = GameStatus.stalemate;
+        saveGame(game: updatedGame);
       },
       onCheck: (_) {},
       chessBoardController: widget.chessBoardController,

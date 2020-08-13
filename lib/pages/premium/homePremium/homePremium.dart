@@ -19,7 +19,6 @@ class HomePremium extends StatefulWidget {
 // WidgetsBindingObserver helps observing the AppLifecycleState (to refresh _gamesBloc when app is resumed)
 class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
   GamesBloc _gamesBloc;
-  AppLifecycleState _appLifecycleState;
 
   @override
   void initState() {
@@ -34,54 +33,50 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
   }
 
   @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    setState(() {
-      this._appLifecycleState = state;
-    });
+    if (state.index == 0) {
+      refresh();
+    }
   }
 
   // this has to be like this; onRefresh has to get a value
   Future<void> refresh() async {
-    _gamesBloc.refresh();
+    await _gamesBloc.refreshAll();
+    return;
   }
 
   // TODO: create invitations
   @override
   Widget build(BuildContext context) {
-    if (_appLifecycleState?.index == 0) {
-      refresh();
-    }
-
+    print("building home");
     ThemeData theme = Theme.of(context);
+    MediaQueryData mediaQueryData = MediaQuery.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "JustChess",
-        ),
-        textTheme: theme.appBarTheme.textTheme,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.local_post_office),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    fullscreenDialog: false,
-                    builder: (BuildContext context) {
-                      return Invitations();
-                    }),
-              );
-            },
-          ),
-        ],
+    var appBar = AppBar(
+      title: Text(
+        "JustChess",
       ),
+      textTheme: theme.appBarTheme.textTheme,
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.local_post_office),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  fullscreenDialog: false,
+                  builder: (BuildContext context) {
+                    return Invitations(
+                      gamesBloc: this._gamesBloc,
+                    );
+                  }),
+            );
+          },
+        ),
+      ],
+    );
+    return Scaffold(
+      appBar: appBar,
       floatingActionButton: CreateGameButton(
         isUserPremium: true,
       ),
@@ -94,26 +89,33 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
               initialData: _gamesBloc.gamesList,
               stream: _gamesBloc.gamesListStream,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
+                if (snapshot.connectionState == ConnectionState.waiting ||
+                    snapshot.data.isEmpty) {
                   // has to be scrollable (to enable pull to refresh)
                   return ListView(
                     children: [
                       Container(
-                        height: MediaQuery.of(context).size.height,
+                        height: mediaQueryData.size.height -
+                            appBar.preferredSize.height -
+                            mediaQueryData.padding.top -
+                            mediaQueryData.padding.bottom,
                         child: Center(
                           child: CircularProgressIndicator(),
                         ),
                       ),
                     ],
                   );
-                } else if (snapshot.data == [] || snapshot.data.isEmpty) {
+                } else if (snapshot.data == []) {
                   // has to be scrollable (to enable pull to refresh)
                   return ListView(
                     children: <Widget>[
                       Container(
                         height: MediaQuery.of(context).size.height,
                         child: Center(
-                          child: Text("Noch keine Partien hinzugefügt"),
+                          child: Text(
+                            "Noch keine Partien hinzugefügt",
+                            style: theme.textTheme.bodyText1,
+                          ),
                         ),
                       ),
                     ],
@@ -153,19 +155,20 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
 
                           bool isUsersTurn = usersTurn();
 
-                          return Column(
-                            children: <Widget>[
-                              Container(
-                                color:
-                                    isUsersTurn ? theme.indicatorColor : null,
-                                child: Dismissible(
-                                    key: Key(
-                                      currentGame.id,
-                                    ),
+                          return Dismissible(
+                              key: Key(
+                                currentGame.id,
+                              ),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    color: isUsersTurn
+                                        ? theme.indicatorColor
+                                        : null,
                                     child: ListTile(
                                       title: Text(
                                         _gamesBloc.gameTitlesList[index] ?? "",
-                                        style: theme.textTheme.headline6,
+                                        style: theme.textTheme.headline5,
                                       ),
                                       subtitle: Text(
                                         currentGame.player02.isEmpty
@@ -209,60 +212,59 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
                                         );
                                       },
                                     ),
-                                    background: Icon(
-                                      Icons.delete,
-                                      color: theme.iconTheme.color,
-                                    ),
-                                    secondaryBackground: Icon(
-                                      Icons.delete,
-                                      color: theme.iconTheme.color,
-                                    ),
-                                    confirmDismiss: (_) async {
-                                      bool confirmed;
-
-                                      await showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return AlertDialog(
-                                              title: Text("Löschen bestätigen"),
-                                              content: Text(
-                                                  "Willst du diese Partie wirklich löschen? Diese Aktion kann nicht widerrufen werden!"),
-                                              actions: <Widget>[
-                                                FlatButton(
-                                                  child: Text(
-                                                    "Bestätigen",
-                                                    style: TextStyle(
-                                                        color: Colors.red),
-                                                  ),
-                                                  onPressed: () {
-                                                    confirmed = true;
-                                                    // has to be here (showDialog finishes only when the dialog gets popped)
-                                                    Navigator.pop(context);
-                                                  },
-                                                ),
-                                                FlatButton(
-                                                    child: Text("Abbrechen"),
-                                                    onPressed: () {
-                                                      confirmed = false;
-                                                      // has to be here (showDialog finishes only when the dialog gets popped)
-                                                      Navigator.pop(context);
-                                                    }),
-                                              ],
-                                            );
-                                          });
-                                      return confirmed;
-                                    },
-                                    onDismissed: (direction) {
-                                      print("dismissed");
-                                      setState(() {
-                                        _gamesBloc.deleteGameSink
-                                            .add(currentGame);
-                                      });
-                                    }),
+                                  ),
+                                  Divider(),
+                                ],
                               ),
-                              Divider(),
-                            ],
-                          );
+                              background: Icon(
+                                Icons.delete,
+                                color: theme.iconTheme.color,
+                              ),
+                              secondaryBackground: Icon(
+                                Icons.delete,
+                                color: theme.iconTheme.color,
+                              ),
+                              confirmDismiss: (_) async {
+                                bool confirmed;
+
+                                await showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text("Löschen bestätigen"),
+                                        content: Text(
+                                            "Willst du diese Partie wirklich löschen? Diese Aktion kann nicht widerrufen werden!"),
+                                        actions: <Widget>[
+                                          FlatButton(
+                                            child: Text(
+                                              "Bestätigen",
+                                              style:
+                                                  TextStyle(color: Colors.red),
+                                            ),
+                                            onPressed: () {
+                                              confirmed = true;
+                                              // has to be here (showDialog finishes only when the dialog gets popped)
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                          FlatButton(
+                                              child: Text("Abbrechen"),
+                                              onPressed: () {
+                                                confirmed = false;
+                                                // has to be here (showDialog finishes only when the dialog gets popped)
+                                                Navigator.pop(context);
+                                              }),
+                                        ],
+                                      );
+                                    });
+                                return confirmed;
+                              },
+                              onDismissed: (direction) {
+                                print("dismissed");
+                                setState(() {
+                                  _gamesBloc.deleteGameSink.add(currentGame);
+                                });
+                              });
                         },
                         itemCount: snapshot.data.length),
                   );

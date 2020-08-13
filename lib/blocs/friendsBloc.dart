@@ -69,7 +69,6 @@ class FriendsBloc {
     });
     this.friendsListStream.listen((newFriendsList) {
       availableFriendsList = List.from(this.usernamesList);
-      print("newFriendsList: " + newFriendsList.toString());
       // removes the added friends from the availableFriends list
       for (String currentFriend in newFriendsList) {
         availableFriendsList.remove(currentFriend);
@@ -136,20 +135,23 @@ class FriendsBloc {
     this.friendsList.clear();
     // checks if the user has already added any friends
     String currentUserID = await authenticationService.currentUserUid();
-    List<dynamic> friendsList =
+    List<dynamic> friendsListInFunction =
         await cloudFirestoreDatabase.getFriendsList(userID: currentUserID) ??
             [];
-    print(friendsList.toString());
+    for (String currentFriend in friendsListInFunction) {
+      this.friendsList.add(currentFriend);
+    }
+    // probably unneccesary
     // adds all the usernames (except the user's username) to the availableFriendsSink
-    if (friendsList.isEmpty) {
-      List<String> availableFriendsInIf = List.from(this.usernamesList);
-      this.availableFriendsList = List.from(this.usernamesList);
-      this.availableFriendsList.remove(this.username);
-    }
+    // if (friendsList.isEmpty) {
+    //   this.availableFriendsList = List.from(this.usernamesList);
+    //   this.availableFriendsList.remove(this.username);
+    // }
     // adds all the friends to the StreamTree
-    for (dynamic friend in friendsList) {
-      friendSink.add(friend);
-    }
+    friendsListSink.add(this.friendsList ?? []);
+    // for (dynamic friend in friendsList) {
+    //   friendSink.add(friend);
+    // }
   }
 
   // is called when FindNewFriend() loads

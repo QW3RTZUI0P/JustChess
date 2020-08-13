@@ -88,6 +88,7 @@ class _CreateGameState extends State<CreateGame> with Validators {
                       GameClass newGame = GameClass(
                         title: _nameController.text,
                         player01IsWhite: _radioGroupValue,
+                        isOnline: false,
                       );
                       newGame.createUniqueID();
 

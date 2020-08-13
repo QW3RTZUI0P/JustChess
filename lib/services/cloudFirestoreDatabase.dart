@@ -8,20 +8,24 @@ abstract class CloudFirestoreDatabaseApi {
   Future<List<String>> getUsernamesList();
   Future<String> getUsernameForUserID({@required String userID});
   Future<dynamic> getUserIDForUsername({@required String username});
+  Future<List<dynamic>> getInvitations({@required String userID});
+  Future<List<dynamic>> getFriendsList({@required String userID});
+  //
   // adds a gameID to the gameIDs value of the current user's object in the user collection
   void addGameIDToFirestore({@required String userID, @required String gameID});
   // deletes a gameID to the gameIDs value of the current user's object in the user collection
   void deleteGameIDFromFirestore(
       {@required String userID, @required String gameID});
+  void addInvitationToFirestore(
+      {@required String userID, @required InvitationClass invitation});
+  void deleteInvitationFromFirestore(
+      {@required String userID, @required InvitationClass invitation});
   // adds a user object with all the important values to the users collection
   void addUserToFirestore({@required String userID, @required String username});
   void deleteUserFromFirestore(
       {@required String userID, @required String username});
   //
   //
-  //
-  Future<List<dynamic>> getInvitations({@required String userID});
-  Future<List<dynamic>> getFriendsList({@required String userID});
   // fetches the game with the given gameID
   Future<GameClass> getGameFromFirestore({@required String gameID});
   // adds a game in the games collection
@@ -89,8 +93,11 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
     return userID;
   }
 
+  // gets the user's invitations
   Future<List<dynamic>> getInvitations({@required String userID}) async {
-    return [];
+    DocumentSnapshot snapshot =
+        await _firestore.collection(_userCollection).document(userID).get();
+    return snapshot.data["invitations"] ?? [];
   }
 
   // gets the List of friends of the user with the given userID
@@ -121,13 +128,43 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
     DocumentSnapshot snapshot =
         await _firestore.collection(_userCollection).document(userID).get();
     List<dynamic> gameIDs = snapshot.data["gameIDs"];
-    String username = snapshot.data["username"];
+    // String username = snapshot.data["username"];
     gameIDs.remove(gameID);
-    print(gameIDs.toString());
     await _firestore.collection(_userCollection).document(userID).updateData({
       "gameIDs": gameIDs,
-      "username": username,
+      // "username": username,
     });
+  }
+
+  // adds an invitation to the user's document
+  void addInvitationToFirestore(
+      {@required String userID, @required InvitationClass invitation}) async {
+    DocumentSnapshot snapshot =
+        await _firestore.collection(_userCollection).document(userID).get();
+    List<dynamic> invitations = snapshot.data["invitations"] ?? [];
+    print(
+      "add invitation " + invitation.toJsonMap().toString(),
+    );
+    invitations.add(invitation.toJsonMap());
+    await _firestore
+        .collection(_userCollection)
+        .document(userID)
+        .updateData({"invitations": invitations});
+  }
+
+  // deletes an invitation from the user's document
+  void deleteInvitationFromFirestore(
+      {@required String userID, @required InvitationClass invitation}) async {
+    DocumentSnapshot snapshot =
+        await _firestore.collection(_userCollection).document(userID).get();
+    List<dynamic> invitations = snapshot.data["invitations"] ?? [];
+    invitations.removeWhere(
+        (invitationToTest) => invitationToTest["gameID"] == invitation.gameID);
+    // print(invitations.remove(invitation.toJsonMap()).toString());
+    await _firestore
+        .collection(_userCollection)
+        .document(userID)
+        .updateData({"invitations": invitations});
   }
 
   // adds an user to the users collection
@@ -157,7 +194,7 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
 
   void deleteUserFromFirestore(
       {@required String userID, @required String username}) async {
-        // deletes the user's document in the users collection
+    // deletes the user's document in the users collection
     await _firestore.collection(_userCollection).document(userID).delete();
     // gets the document with the usernames list and with the Map<username, userID>
     DocumentSnapshot snapshot = await _firestore

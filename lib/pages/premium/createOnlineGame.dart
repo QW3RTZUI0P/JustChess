@@ -4,6 +4,8 @@ import '../../imports.dart';
 
 // page that is shown when CreateGameButton has been pressed
 class CreateOnlineGame extends StatefulWidget {
+  final String selectedFriend;
+  CreateOnlineGame({this.selectedFriend = ""});
   @override
   _CreateOnlineGameState createState() => _CreateOnlineGameState();
 }
@@ -18,6 +20,12 @@ class _CreateOnlineGameState extends State<CreateOnlineGame> {
 
   // the friend the user wants to play against
   String selectedFriend = "";
+
+  @override
+  void initState() {
+    super.initState();
+    this.selectedFriend = widget.selectedFriend;
+  }
 
   @override
   void didChangeDependencies() {
@@ -50,8 +58,9 @@ class _CreateOnlineGameState extends State<CreateOnlineGame> {
   // TODO: store a Map<FriendName, FriensUserID> locallly ont the device
   void createGame(BuildContext currentContext) async {
     if (this.selectedFriend == "") {
-      Failure(context: currentContext, errorMessage: "Bitte wähle einen Freund")
-          .showErrorSnackBar();
+      SnackbarMessage(
+              context: currentContext, message: "Bitte wähle einen Freund")
+          .showSnackBar();
       return;
     }
     String opponentID = await _gameBloc.cloudFirestoreDatabase
@@ -63,6 +72,8 @@ class _CreateOnlineGameState extends State<CreateOnlineGame> {
       player01IsWhite: this.benutzerIstWeiss,
       player02: opponentID,
       moveCount: 0,
+      gameStatus: GameStatus.playing,
+      isOnline: true,
       canBeDeleted: false,
     );
     neuePartie.createUniqueID();
@@ -74,14 +85,14 @@ class _CreateOnlineGameState extends State<CreateOnlineGame> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Partie erstellen"),
       ),
       floatingActionButton: Builder(
-        builder: (BuildContext currentContext) => FloatingActionButton(
-          child: Text("Partie erstellen"),
-          shape: CircleBorder(side: BorderSide()),
+        builder: (BuildContext currentContext) => FloatingActionButton.extended(
+          label: Text("Partie erstellen"),
           tooltip: "Partie erstellen",
           onPressed: () => createGame(currentContext),
         ),
@@ -141,12 +152,12 @@ class _CreateOnlineGameState extends State<CreateOnlineGame> {
               ),
               StreamBuilder<Object>(
                   stream: _friendsBloc.friendsListStream,
+                  initialData: _friendsBloc.friendsList,
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    } else if (snapshot.data == null ||
+                    if (snapshot.data == null ||
                         !snapshot.hasData ||
-                        snapshot.data == []) {
+                        snapshot.data == [] ||
+                        snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
                         child: Text(
                           "Noch keine Freunde hinzugefügt",

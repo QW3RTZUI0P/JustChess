@@ -119,10 +119,10 @@ class _SettingsPremiumState extends State<SettingsPremium> {
                               );
                             } on PlatformException catch (platformException) {
                               Navigator.pop(context);
-                              Failure(
+                              SnackbarMessage(
                                       context: currentContext,
-                                      errorMessage: platformException.code)
-                                  .showErrorSnackBar();
+                                      message: platformException.code)
+                                  .showSnackBar();
                             } catch (error) {
                               print(error.runtimeType);
                               Navigator.pop(context);
@@ -187,13 +187,10 @@ class _SettingsPremiumState extends State<SettingsPremium> {
                 ),
               ),
               ListTile(
-                title: Text("Einstellungen"),
-              ),
-              ListTile(
                 title: Text("Premium"),
                 trailing: Switch(
                   value: true,
-
+                  onChanged: null,
                   // onChanged: (switchValue) => switchValueChanged(switchValue),
                 ),
               ),

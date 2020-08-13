@@ -33,88 +33,93 @@ class _MenuPremiumState extends State<MenuPremium> {
     });
   }
 
-  void showUserOptionsDialog() {
-    showDialog(
-      context: context,
-      child: AlertDialog(
-        title: Text("Account Optionen"),
-        content: Container(
-          child: Column(
-            children: <Widget>[
-              FlatButton(
-                child: Text("Account löschen"),
+  // we don't need this any more, this options are now in SettingsPremium
+  // void showUserOptionsDialog() {
+  //   showDialog(
+  //     context: context,
+  //     child: AlertDialog(
+  //       title: Text("Account Optionen"),
+  //       content: Container(
+  //         child: Column(
+  //           children: <Widget>[
+  //             FlatButton(
+  //               child: Text("Account löschen"),
 
-                // onPressed: () {
-                //   showDialog(
-                //     context: context,
-                //     child: AlertDialog(
-                //       title: Text("Bestätigung"),
-                //       content: Container(
-                //         child: Row(
-                //           children: <Widget>[
-                //             FlatButton(
-                //               child: Text("Abbrechen"),
-                //               onPressed: () => Navigator.pop(context),
-                //             ),
-                //             FlatButton(
-                //               child: Text("Ok"),
-                //               onPressed: () async {
-                //                 // deletes Account from FirebaseAuth
-                //                 _authenticationBloc.authenticationService
-                //                     .deleteAccount();
-                //                 String usernameInFunction = await _gameBloc
-                //                     .cloudFirestoreDatabase
-                //                     .getUsernameForUserID(
-                //                         userID: _gameBloc.currentUserID);
-                //                 // deletes Account Info from CloudFirestore
-                //                 _gameBloc.cloudFirestoreDatabase
-                //                     .deleteUserFromFirestore(
-                //                         userID: _gameBloc.currentUserID,
-                //                         username: usernameInFunction);
-                //                 Navigator.pop(context);
-                //                 Navigator.pop(context);
-                //               },
-                //             ),
-                //           ],
-                //         ),
-                //       ),
-                //     ),
-                //   );
-                // },
-              ),
-              FlatButton(
-                child: Text("Passwort zurücksetzen"),
-                onPressed: () {
-                  _authenticationBloc.authenticationService
-                      .sendResetPasswortEmail();
-                },
-              ),
-              FlatButton(
-                child: Text("Datenschutzerklärung"),
-                onPressed: () {},
-              ),
-              Row(
-                children: <Widget>[
-                  FlatButton(
-                    child: Text("Abbrechen"),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  //               // onPressed: () {
+  //               //   showDialog(
+  //               //     context: context,
+  //               //     child: AlertDialog(
+  //               //       title: Text("Bestätigung"),
+  //               //       content: Container(
+  //               //         child: Row(
+  //               //           children: <Widget>[
+  //               //             FlatButton(
+  //               //               child: Text("Abbrechen"),
+  //               //               onPressed: () => Navigator.pop(context),
+  //               //             ),
+  //               //             FlatButton(
+  //               //               child: Text("Ok"),
+  //               //               onPressed: () async {
+  //               //                 // deletes Account from FirebaseAuth
+  //               //                 _authenticationBloc.authenticationService
+  //               //                     .deleteAccount();
+  //               //                 String usernameInFunction = await _gameBloc
+  //               //                     .cloudFirestoreDatabase
+  //               //                     .getUsernameForUserID(
+  //               //                         userID: _gameBloc.currentUserID);
+  //               //                 // deletes Account Info from CloudFirestore
+  //               //                 _gameBloc.cloudFirestoreDatabase
+  //               //                     .deleteUserFromFirestore(
+  //               //                         userID: _gameBloc.currentUserID,
+  //               //                         username: usernameInFunction);
+  //               //                 Navigator.pop(context);
+  //               //                 Navigator.pop(context);
+  //               //               },
+  //               //             ),
+  //               //           ],
+  //               //         ),
+  //               //       ),
+  //               //     ),
+  //               //   );
+  //               // },
+  //             ),
+  //             FlatButton(
+  //               child: Text("Passwort zurücksetzen"),
+  //               onPressed: () {
+  //                 _authenticationBloc.authenticationService
+  //                     .sendResetPasswortEmail();
+  //               },
+  //             ),
+  //             FlatButton(
+  //               child: Text("Datenschutzerklärung"),
+  //               onPressed: () {},
+  //             ),
+  //             Row(
+  //               children: <Widget>[
+  //                 FlatButton(
+  //                   child: Text("Abbrechen"),
+  //                   onPressed: () => Navigator.pop(context),
+  //                 ),
+  //               ],
+  //             )
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: Column(
         children: <Widget>[
-          DrawerHeader(),
-          // display some basic information (number of games, number of wins, number of moves) instead 
+          DrawerHeader(
+            child: Center(
+              child: Text(""),
+            ),
+          ),
+          // display some basic information (number of games, number of wins, number of moves) instead
           //
           // DrawerHeader(
           //   child: Column(
@@ -144,7 +149,7 @@ class _MenuPremiumState extends State<MenuPremium> {
           ListTile(
             title: Text(
               "Partien",
-              style: theme.textTheme.headline5,
+              style: theme.textTheme.headline6,
             ),
             // black white chess board icon
             leading: Image.asset(
@@ -158,7 +163,7 @@ class _MenuPremiumState extends State<MenuPremium> {
           ListTile(
             title: Text(
               "Freunde",
-              style: theme.textTheme.headline5,
+              style: theme.textTheme.headline6,
             ),
             leading: Icon(
               Icons.group,
@@ -179,7 +184,7 @@ class _MenuPremiumState extends State<MenuPremium> {
           ListTile(
             title: Text(
               "Über",
-              style: theme.textTheme.headline5,
+              style: theme.textTheme.headline6,
             ),
             leading: Icon(
               Icons.info_outline,
@@ -200,7 +205,7 @@ class _MenuPremiumState extends State<MenuPremium> {
           ListTile(
             title: Text(
               "Einstellungen",
-              style: theme.textTheme.headline5,
+              style: theme.textTheme.headline6,
             ),
             leading: Icon(
               Icons.settings,

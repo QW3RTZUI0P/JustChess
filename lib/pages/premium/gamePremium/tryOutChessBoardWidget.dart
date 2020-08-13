@@ -34,125 +34,118 @@ class _TryOutChessBoardWidgetState extends State<TryOutChessBoardWidget> {
         size.width < size.height ? size.width * 0.9 : size.height * 0.9;
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: Padding(
           padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
-          child: Container(
-            height: size.height -
-                mediaQueryData.padding.top -
-                mediaQueryData.padding.bottom,
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: IconButton(
-                    icon: Icon(Icons.clear),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Align(
+                alignment: Alignment.topLeft,
+                child: IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                 ),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          widget.isUserWhite
-                              ? VerticalNumbersWhite(
-                                  height: boardSize,
-                                )
-                              : VerticalNumbersBlack(
-                                  height: boardSize,
-                                ),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          ChessBoard(
-                            chessBoardController: _chessBoardController,
-                            whiteSideTowardsUser: widget.isUserWhite,
-                            size: boardSize,
-                            onMove: (move) {},
-                            onDraw: () {},
-                            onCheckMate: (color) {},
-                            onCheck: (_) {},
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      widget.isUserWhite
-                          ? Center(
-                              child: HorizontalLettersWhite(
-                                width: boardSize,
+              ),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        widget.isUserWhite
+                            ? VerticalNumbersWhite(
+                                height: boardSize,
+                              )
+                            : VerticalNumbersBlack(
+                                height: boardSize,
                               ),
-                            )
-                          : Center(
-                              child: HorizontalLettersBlack(
-                                width: boardSize,
-                              ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        ChessBoard(
+                          chessBoardController: _chessBoardController,
+                          whiteSideTowardsUser: widget.isUserWhite,
+                          size: boardSize,
+                          onMove: (move) {},
+                          onDraw: () {},
+                          onCheckMate: (color) {},
+                          onCheck: (_) {},
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    widget.isUserWhite
+                        ? Center(
+                            child: HorizontalLettersWhite(
+                              width: boardSize,
                             ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Flexible(
-                            child: RaisedButton(
-                              child: Text("Zurücksetzen",
-                                  overflow: TextOverflow.ellipsis),
-                              onPressed: () {
-                                setState(() {
-                                  this.movesList.clear();
-                                  // loads the last saved state (pgn) of the game
-                                  this
-                                      ._chessBoardController
-                                      .loadPGN(widget.pgn);
-                                });
-                              },
+                          )
+                        : Center(
+                            child: HorizontalLettersBlack(
+                              width: boardSize,
                             ),
                           ),
-                          IconButton(
-                            icon: Icon(Icons.arrow_back_ios),
-                            tooltip: "Zug zurück",
-                            onPressed:
-                                this._chessBoardController.game.history.isEmpty
-                                    ? null
-                                    : () {
-                                        setState(() {
-                                          this.movesList.add(this
-                                              ._chessBoardController
-                                              .game
-                                              .undo_move());
-                                        });
-                                      },
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Flexible(
+                          child: RaisedButton(
+                            child: Text("Zurücksetzen",
+                                overflow: TextOverflow.ellipsis),
+                            onPressed: () {
+                              setState(() {
+                                this.movesList.clear();
+                                // loads the last saved state (pgn) of the game
+                                this._chessBoardController.loadPGN(widget.pgn);
+                              });
+                            },
                           ),
-                          IconButton(
-                            icon: Icon(Icons.arrow_forward_ios),
-                            tooltip: "Zug vor",
-                            onPressed: this.movesList.isEmpty
-                                ? null
-                                : () {
-                                    setState(() {
-                                      this
-                                          ._chessBoardController
-                                          .game
-                                          .make_move(movesList.last);
-                                      this.movesList.removeLast();
-                                    });
-                                  },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.arrow_back_ios),
+                          tooltip: "Zug zurück",
+                          onPressed:
+                              this._chessBoardController.game.history.isEmpty
+                                  ? null
+                                  : () {
+                                      setState(() {
+                                        this.movesList.add(this
+                                            ._chessBoardController
+                                            .game
+                                            .undo_move());
+                                      });
+                                    },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.arrow_forward_ios),
+                          tooltip: "Zug vor",
+                          onPressed: this.movesList.isEmpty
+                              ? null
+                              : () {
+                                  setState(() {
+                                    this
+                                        ._chessBoardController
+                                        .game
+                                        .make_move(movesList.last);
+                                    this.movesList.removeLast();
+                                  });
+                                },
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

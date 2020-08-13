@@ -32,6 +32,7 @@ class PartienProvider with ChangeNotifier {
       datenbankZuJson(this.datenbank),
     );
     notifyListeners();
+    return null;
   }
 
   Future<void> partieUpgedatet(
@@ -42,6 +43,7 @@ class PartienProvider with ChangeNotifier {
       datenbankZuJson(this.datenbank),
     );
     notifyListeners();
+    return null;
   }
 }
 

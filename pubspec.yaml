@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.1.0+1
+version: 0.3.2+1
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -35,8 +35,6 @@ dependencies:
   # packages for the cloned flutter_chess_board widget to function
   scoped_model: ^1.0.1
   chess_vectors_flutter: ^1.0.12
-  # dependency for firebase/google analytics
-  firebase_analytics: ^5.0.15
   # dependencies for firebase products
   cloud_firestore: ^0.13.6
   firebase_auth: ^0.16.1

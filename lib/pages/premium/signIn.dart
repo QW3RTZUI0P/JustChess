@@ -1,4 +1,6 @@
 // signIn.dart
+import 'package:flutter/services.dart';
+
 import "../../imports.dart";
 
 class SignIn extends StatefulWidget {
@@ -16,12 +18,12 @@ class _SignInState extends State<SignIn> with Validators {
   LoginBloc _loginBloc;
   GamesBloc _gameBloc;
 
-  // authenticationService, um den User anzumelden
+  // authenticationService to sign in the user
   AuthenticationService authenticationService = AuthenticationService();
-  // controller für die beiden TextFormFields
+  // controller for both TextFormFields
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwortController = TextEditingController();
-  // fields für das Passwort TextFormField
+  // fields for the password TextFormField
   bool _passwortIstVerdeckt = true;
   Icon _passwortIcon = Icon(Icons.visibility);
 
@@ -40,6 +42,92 @@ class _SignInState extends State<SignIn> with Validators {
     this._gameBloc = GamesBlocProvider.of(context).gamesBloc;
   }
 
+  // gets called when the user wants to reset his password
+  void resetPassword(BuildContext currentContext) async {
+    await showDialog(
+        context: currentContext,
+        builder: (BuildContext context) {
+          DialogTheme dialogTheme = Theme.of(context).dialogTheme;
+          TextEditingController _emailControllerInFunction =
+              TextEditingController();
+          _emailControllerInFunction.text = "";
+          return Dialog(
+            child: Container(
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "Passwort zurücksetzen",
+                      style: dialogTheme.titleTextStyle,
+                    ),
+                    Text(
+                      "Bitte gib die Email Adresse deines JustChess Kontos an",
+                      style: dialogTheme.contentTextStyle,
+                    ),
+                    TextField(
+                      controller: _emailControllerInFunction,
+                      style: dialogTheme.contentTextStyle,
+                      decoration: InputDecoration(
+                        labelText: "Email Adresse",
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        FlatButton(
+                          child: Text(
+                            "Bestätigen",
+                            style: dialogTheme.contentTextStyle,
+                          ),
+                          onPressed: () async {
+                            try {
+                              await authenticationService
+                                  .sendResetPasswortEmail(
+                                      email: _emailControllerInFunction.text ??
+                                          "");
+                              Navigator.pop(context);
+                              Scaffold.of(currentContext).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      "Passwort zurücksetzen Email versendet"),
+                                ),
+                              );
+                            } on PlatformException catch (platformException) {
+                              Navigator.pop(context);
+                              // shows a SnackBar with the given error
+                              SnackbarMessage(
+                                context: currentContext,
+                                message: platformException.message ?? "",
+                              ).showSnackBar();
+                            } catch (error) {
+                              Navigator.pop(context);
+                              SnackbarMessage(
+                                context: currentContext,
+                                message: error.toString(),
+                              ).showSnackBar();
+                              print(error.toString());
+                            }
+                          },
+                        ),
+                        FlatButton(
+                          child: Text(
+                            "Abbrechen",
+                            style: dialogTheme.contentTextStyle,
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
@@ -55,6 +143,7 @@ class _SignInState extends State<SignIn> with Validators {
             key: _formKey,
             autovalidate: false,
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 // TODO: create better validators
                 TextFormField(
@@ -62,6 +151,7 @@ class _SignInState extends State<SignIn> with Validators {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   maxLines: 1,
+                  autocorrect: false,
                   validator: (String email) {
                     return checkEmail(email: email);
                   },
@@ -87,17 +177,20 @@ class _SignInState extends State<SignIn> with Validators {
                     ),
                     counter: Align(
                       alignment: Alignment.centerLeft,
-                      child: FlatButton(
-                        child: Text(
-                          "Passwort zurücksetzen",
+                      child: Builder(
+                        builder: (BuildContext currentContext) => FlatButton(
+                          child: Text(
+                            "Passwort zurücksetzen",
+                          ),
+                          onPressed: () => resetPassword(currentContext),
                         ),
-                        // onPressed: () {},
                       ),
                     ),
                   ),
                   controller: _passwortController,
                   obscureText: _passwortIstVerdeckt,
                   maxLines: 1,
+                  autocorrect: false,
                   validator: (String passwort) {
                     return checkPassword(passwort: passwort);
                   },
@@ -105,17 +198,14 @@ class _SignInState extends State<SignIn> with Validators {
                 // TODO: dem User eine Benachrichtigung / ein Feedback anzeigen, z.B. "Passwort ist falsch"
                 RaisedButton(
                   child: Text("Anmelden"),
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState.validate()) {
-                      _loginBloc
-                          .signIn(
-                              email: _emailController.text,
-                              password: _passwortController.text)
-                          // refreshes the list of games (otherwise snapshot wouldn't connect)
-                          .then((value) {
-                        _gameBloc.refresh();
-                        Navigator.pop(context);
-                      });
+                      await _loginBloc.signIn(
+                          email: _emailController.text,
+                          password: _passwortController.text);
+                      // refreshes the list of games (otherwise snapshot wouldn't connect)
+                      _gameBloc.refreshAll();
+                      Navigator.pop(context);
                     }
                   },
                 ),

@@ -3,8 +3,6 @@ import "imports.dart";
 
 void main() => runApp(JustChess());
 
-// TODO: find solution so that GameBloc Provider doesn't call currentUserID when no user is signed in
-
 class JustChess extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

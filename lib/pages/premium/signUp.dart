@@ -19,7 +19,6 @@ class _SignUpState extends State<SignUp> with Validators {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwortController = TextEditingController();
 
-
   // fields die speichern, ob der Text in den Passwörter Textfeldern angezeigt werden soll
   bool _passwortIstVerdeckt = true;
   // fields die die angezeigten icons in den Passwört Textfeldern speichern
@@ -130,14 +129,13 @@ class _SignUpState extends State<SignUp> with Validators {
                     if (_formKey.currentState.validate()) {
                       if (await _loginBloc.isUsernameAvailable(
                           username: _benutzernameController.text)) {
-                        _loginBloc
-                            .createAccount(
-                              email: _emailController.text,
-                              password: _passwortController.text,
-                              username: _benutzernameController.text,
-                            )
-                            // refreshes the list of games (otherwise snapshot wouldn't connect)
-                            .then((value) => _gamesBloc.refresh());
+                        await _loginBloc.createAccount(
+                          email: _emailController.text,
+                          password: _passwortController.text,
+                          username: _benutzernameController.text,
+                        );
+                        // refreshes the list of games (otherwise snapshot wouldn't connect)
+                        _gamesBloc.refreshAll();
                       } else {
                         showDialog(
                             context: context,

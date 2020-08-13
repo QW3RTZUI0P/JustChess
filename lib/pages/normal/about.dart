@@ -22,8 +22,10 @@ class About extends StatelessWidget {
     );
     return Scaffold(
       appBar: appBar,
+
       body: SafeArea(
         child: ListView(
+          
           children: <Widget>[
             Card(
               child: Text(

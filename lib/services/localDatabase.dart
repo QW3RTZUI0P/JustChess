@@ -31,9 +31,9 @@ class LocalDatabaseFileRoutines {
       }
       String content = await file.readAsString();
       return content;
-    } catch (e) {
-      print("Error reading file: $e");
-      return "";
+    } catch (error) {
+      print("Error reading file: ${error.toString()}");
+      throw error;
     }
   }
 

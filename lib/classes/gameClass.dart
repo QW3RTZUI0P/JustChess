@@ -24,8 +24,26 @@ class GameClass {
   // if the game is offline, this value is empty
   String player02;
   bool player01IsWhite;
+  // whether white has to make a turn
   bool whitesTurn;
+  // shows the overall move number (one move = white did one turn and black did one)
   int moveCount;
+  // shows the current status of the game
+  // "playing": game is currently being played
+  // "stalemate": game is in stalemate
+  // "whiteWon": white won the game
+  // "blackWon": black won the game
+  // "draw": one player proposed a draw
+  // "whiteGaveUp": white gave up
+  // "blackGaveUp": black gave up
+  //
+  // is stored in CloudFirestore as String values
+  // is converted to Strings in toJson()
+  GameStatus gameStatus;
+  // whether the game is online or offline
+  // for games stored in CloudFirestore this is always true
+  // for games stored locally this is always false
+  bool isOnline;
   // default is false
   // if the first player deletes this game, this will change to true
   // if the second player deletes this game, this game will actually be deleted
@@ -40,6 +58,8 @@ class GameClass {
     this.player01IsWhite = true,
     this.whitesTurn = true,
     this.moveCount = 0,
+    this.gameStatus = GameStatus.playing,
+    this.isOnline = false,
     this.canBeDeleted = false,
   });
 
@@ -54,11 +74,13 @@ class GameClass {
       player01IsWhite: otherGame.player01IsWhite,
       whitesTurn: otherGame.whitesTurn,
       moveCount: otherGame.moveCount,
+      gameStatus: otherGame.gameStatus,
+      isOnline: otherGame.isOnline,
       canBeDeleted: otherGame.canBeDeleted,
     );
   }
 
-  // transforms a DocumentSnapshot from Cloud Firestore to a GameClass object
+  // transforms a DocumentSnapshot from CloudFirestore to a GameClass object
   factory GameClass.fromDocumentSnapshot(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = snapshot.data ?? {};
     return GameClass(
@@ -70,6 +92,9 @@ class GameClass {
       player01IsWhite: data["player01IsWhite"],
       whitesTurn: data["whitesTurn"],
       moveCount: data["moveCount"],
+      gameStatus: transformStringToGameStatus(string: data["gameStatus"]) ??
+          GameStatus.playing,
+      isOnline: data["isOnline"] ?? true,
       canBeDeleted: data["canBeDeleted"] ?? false,
     );
   }
@@ -85,12 +110,15 @@ class GameClass {
       player01IsWhite: jsonObject["player01IsWhite"] ?? "",
       whitesTurn: jsonObject["whitesTurn"],
       moveCount: jsonObject["moveCount"],
+      gameStatus: transformStringToGameStatus(string: jsonObject["gameStatus"]) ?? GameStatus.playing,
+      isOnline: jsonObject["isOnline"] ?? false,
       canBeDeleted: jsonObject["canBeDeleted"],
     );
     return game;
   }
 
   /// returns a map with the values of this GameClass object
+  /// suits for local json storing and for CloudFirestore
   Map<String, dynamic> toJson() => {
         "id": this.id ?? "",
         "title": this.title,
@@ -100,11 +128,51 @@ class GameClass {
         "player01IsWhite": this.player01IsWhite,
         "whitesTurn": this.whitesTurn,
         "moveCount": this.moveCount,
+        "gameStatus": this.gameStatus.toString(),
+        "isOnline": this.isOnline,
         "canBeDeleted": this.canBeDeleted,
       };
 
   /// creates a unique ID for this GameClass
   void createUniqueID() {
     this.id = Uuid().v4();
+  }
+}
+
+enum GameStatus {
+  playing,
+  stalemate,
+  whiteWon,
+  blackWon,
+  draw,
+  whiteProposedDraw,
+  blackProposedDraw,
+  whiteGaveUp,
+  blackGaveUp,
+}
+
+/// transforms the given String to a GameStatus value
+GameStatus transformStringToGameStatus({String string}) {
+  switch (string) {
+    case "GameStatus.playing":
+      return GameStatus.playing;
+    case "GameStatus.stalemate":
+      return GameStatus.stalemate;
+    case "GameStatus.whiteWon":
+      return GameStatus.whiteWon;
+    case "GameStatus.blackWon":
+      return GameStatus.blackWon;
+    case "GameStatus.draw":
+      return GameStatus.draw;
+    case "GameStatus.whiteProposedDraw":
+      return GameStatus.whiteProposedDraw;
+    case "GameStatus.blackProposedDraw":
+      return GameStatus.blackProposedDraw;
+    case "GameStatus.whiteGaveUp":
+      return GameStatus.whiteGaveUp;
+    case "GameStatus.blackGaveUp":
+      return GameStatus.blackGaveUp;
+    default:
+      return GameStatus.playing;
   }
 }

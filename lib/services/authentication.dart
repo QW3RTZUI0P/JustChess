@@ -18,7 +18,7 @@ abstract class AuthenticationApi {
   });
   Future<void> sendEmailVerification();
   Future<AuthResult> deleteAccount({String email, String password});
-  Future<void> sendResetPasswortEmail();
+  Future<void> sendResetPasswortEmail({String email});
   Future<bool> isEmailVerified();
 }
 
@@ -94,9 +94,18 @@ class AuthenticationService implements AuthenticationApi {
     }
   }
 
-  Future<void> sendResetPasswortEmail() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
-    _firebaseAuth.sendPasswordResetEmail(email: user.email);
+  Future<void> sendResetPasswortEmail({String email}) async {
+    String emailInFunction = email;
+    // if the user is signed in, the stored user email is used
+    if (email == null) {
+      FirebaseUser user = await _firebaseAuth.currentUser();
+      emailInFunction = user.email;
+    }
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: emailInFunction);
+    } catch (error) {
+      throw error;
+    }
     return null;
   }
 

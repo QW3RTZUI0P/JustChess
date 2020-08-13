@@ -8,7 +8,6 @@ export "package:shared_preferences/shared_preferences.dart";
 export "package:url_launcher/url_launcher.dart";
 // Firebase
 export "package:firebase_core/firebase_core.dart";
-export "package:firebase_analytics/firebase_analytics.dart";
 export "package:cloud_firestore/cloud_firestore.dart";
 export "package:firebase_auth/firebase_auth.dart";
 export "package:firebase_dynamic_links/firebase_dynamic_links.dart";
@@ -43,6 +42,8 @@ export "./pages/premium/homePremium/menuPremium.dart";
 export "./pages/premium/gamePremium/gamePremium.dart";
 export "./pages/premium/gamePremium/chessBoardWidgetPremium.dart";
 export "./pages/premium/gamePremium/tryOutChessBoardWidget.dart";
+export "./pages/premium/gamePremium/gameStatusDialogs.dart";
+export "./pages/premium/gamePremium/gamePremiumOptionsButton.dart";
 // friends:
 export "./pages/premium/friends/friends.dart";
 export "./pages/premium/friends/findNewFriend.dart";
@@ -74,7 +75,7 @@ export "./blocs/localGamesBloc.dart";
 export "./widgets/theme.dart";
 export "./widgets/labeling.dart";
 export "./widgets/createGameButton.dart";
-export "./widgets/failure.dart";
+export "./widgets/snackbarMessage.dart";
 //
 //
 // flutter_chess_board:

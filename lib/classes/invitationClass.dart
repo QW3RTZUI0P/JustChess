@@ -1,5 +1,4 @@
 // invitationClass.dart
-import "dart:convert";
 
 class InvitationClass {
   String fromUsername;
