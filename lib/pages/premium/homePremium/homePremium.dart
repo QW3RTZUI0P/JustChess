@@ -3,12 +3,10 @@ import "../../../imports.dart";
 
 // TODO: clean everything up, split some widgets up and improve performance
 
-// TODO: add ability to delete account
 // TODO: add routes to MaterialApp and make everything Navigator.pushNamed
 // TODO: add the sources for the app icon to the "about" page
 
 // bigger projects:
-// TODO: add offline support
 // TODO: add in app purchases
 // TODO: add starter tutorial
 class HomePremium extends StatefulWidget {
@@ -19,6 +17,7 @@ class HomePremium extends StatefulWidget {
 // WidgetsBindingObserver helps observing the AppLifecycleState (to refresh _gamesBloc when app is resumed)
 class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
   GamesBloc _gamesBloc;
+  int invitationsBadge;
 
   @override
   void initState() {
@@ -41,11 +40,12 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
 
   // this has to be like this; onRefresh has to get a value
   Future<void> refresh() async {
-    await _gamesBloc.refreshAll();
+    await _gamesBloc.refreshAll(
+      updateInvitationsListStream: true,
+    );
     return;
   }
 
-  // TODO: create invitations
   @override
   Widget build(BuildContext context) {
     print("building home");
@@ -58,21 +58,72 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
       ),
       textTheme: theme.appBarTheme.textTheme,
       actions: <Widget>[
-        IconButton(
-          icon: Icon(Icons.local_post_office),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  fullscreenDialog: false,
-                  builder: (BuildContext context) {
-                    return Invitations(
-                      gamesBloc: this._gamesBloc,
+        // TODO: move the notification badge to the right side (in release mode)
+        StreamBuilder(
+            stream: _gamesBloc.invitationsListStream,
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting ||
+                  snapshot.data.isEmpty) {
+                return IconButton(
+                  icon: Icon(Icons.local_post_office),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          fullscreenDialog: false,
+                          builder: (BuildContext context) {
+                            return Invitations(
+                              gamesBloc: this._gamesBloc,
+                            );
+                          }),
                     );
-                  }),
-            );
-          },
-        ),
+                  },
+                );
+              }
+              return Stack(
+                children: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.local_post_office),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            fullscreenDialog: false,
+                            builder: (BuildContext context) {
+                              return Invitations(
+                                gamesBloc: this._gamesBloc,
+                              );
+                            }),
+                      );
+                    },
+                  ),
+                  // notification badge
+                  Positioned(
+                    top: 5,
+                    left: 5,
+                    child: Container(
+                      padding: EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: BoxConstraints(
+                        minWidth: mediaQueryData.size.width * 0.049,
+                        minHeight: mediaQueryData.size.width * 0.049,
+                      ),
+                      child: Text(
+                        snapshot.data.length.toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14.0,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }),
       ],
     );
     return Scaffold(
@@ -194,8 +245,7 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
                                               builder: (context) {
                                                 if (currentGame
                                                         .player02.isEmpty ||
-                                                    currentGame.player02 ==
-                                                        null) {
+                                                    !currentGame.isOnline) {
                                                   return Game(
                                                     game: currentGame,
                                                     isUserPremium: true,

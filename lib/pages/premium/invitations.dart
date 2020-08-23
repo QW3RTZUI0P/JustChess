@@ -2,7 +2,7 @@
 import "../../imports.dart";
 
 class Invitations extends StatefulWidget {
-  GamesBloc gamesBloc;
+  final GamesBloc gamesBloc;
 
   Invitations({this.gamesBloc});
 

@@ -1,5 +1,6 @@
 // gamePremium.dart
 import "../../../imports.dart";
+import "package:chess/chess.dart" as chess;
 
 // TODO: implement chessBoard to try out ones move
 class GamePremium extends StatefulWidget {
@@ -24,6 +25,9 @@ class GamePremiumState extends State<GamePremium>
   GameClass currentGame;
   // ChessBoardController for the ChessBoardWidget
   ChessBoardController chessBoardController = ChessBoardController();
+  // the move the chessBoardController undoes in initState()
+  // will be done in ChessBoardWidgetPremium to show the user his opponents last turn
+  dynamic lastMove;
   // tells whether the user is allowed to make turns
   bool isUsersTurn;
   // value for the DropdownButton in the AppBar
@@ -35,8 +39,10 @@ class GamePremiumState extends State<GamePremium>
   void initState() {
     super.initState();
     this.currentGame = GameClass.from(widget.currentGame);
+    currentGame.isOnline = true;
     this.isUsersTurn = usersTurn();
     this.chessBoardController.loadPGN(widget.currentGame.pgn);
+    lastMove = chessBoardController.game.undo();
   }
 
   @override
@@ -55,7 +61,7 @@ class GamePremiumState extends State<GamePremium>
       gameStatusChanged(
         currentContext: context,
         gameStatus: currentGame.gameStatus,
-        durationInMilliseconds: 750,
+        durationInMilliseconds: 400,
       );
     }
   }
@@ -111,7 +117,9 @@ class GamePremiumState extends State<GamePremium>
             });
           },
         ),
-        buildOptionsButton(),
+        buildOptionsButton(
+          currentGame: this.currentGame,
+        ),
       ],
     );
 
@@ -152,6 +160,7 @@ class GamePremiumState extends State<GamePremium>
                     isUserWhite: widget.isUserWhite,
                     isUsersTurn: this.isUsersTurn,
                     boardSize: boardSize,
+                    lastMove: lastMove,
                   ),
                 ],
               ),
@@ -180,6 +189,7 @@ class GamePremiumState extends State<GamePremium>
                           return TryOutChessBoardWidget(
                             pgn: this.currentGame.pgn,
                             isUserWhite: widget.isUserWhite,
+                            appBarHeight: appBar.preferredSize.height,
                           );
                         }),
                   );
@@ -190,5 +200,10 @@ class GamePremiumState extends State<GamePremium>
         ),
       ),
     );
+  }
+
+  // helper function for the extension GamePremiumOptionsButton
+  void doSetState(Function setStateFunction) {
+    setState(setStateFunction);
   }
 }

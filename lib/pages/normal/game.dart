@@ -31,8 +31,8 @@ class _GameState extends State<Game> {
   @override
   void initState() {
     super.initState();
-    print("pgn " + widget.game.pgn);
     this.currentGame = GameClass.from(widget.game);
+    currentGame.isOnline = false;
     _chessBoardController.loadPGN(this.currentGame.pgn);
   }
 

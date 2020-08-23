@@ -103,10 +103,9 @@ class GamesBloc {
     // adds an invitation to the user's opponent's user document
     // not when the games are being fetched from Firebase and not when the user accepts an invitation
     this.addGameStream.listen((addedGame) async {
+      // TODO: remove addedGame.player02.isEmpty
       // executes when the game is offline
-      if (addedGame.player02.isEmpty ||
-          addedGame.player02 == null ||
-          addedGame.player02 == "") {
+      if (addedGame.isOnline == false || addedGame.player02.isEmpty) {
         this.gamesList.add(addedGame);
         this.localGamesList.add(addedGame);
         this.gameTitlesList.add(addedGame.title);
@@ -148,12 +147,15 @@ class GamesBloc {
       // updates this.games with updatedGame
       this.gamesList.replaceRange(index, index + 1, [updatedGame]);
       // executes when the game is offline
-      if (updatedGame.player02.isEmpty || updatedGame.player02 == null || !updatedGame.isOnline) {
+      if (updatedGame.player02.isEmpty || updatedGame.isOnline == false) {
         int indexInIf = this.localGamesList.indexWhere(
             (GameClass outdatedGame) => outdatedGame.id == updatedGame.id);
+        print("games " + gamesList.toString());
+        print("index " + indexInIf.toString());
         this
             .localGamesList
             .replaceRange(indexInIf, indexInIf + 1, [updatedGame]);
+
         LocalDatabaseFileRoutines().writeFile(
           jsonString: gamesListToJsonString(this.localGamesList),
         );
@@ -167,10 +169,7 @@ class GamesBloc {
     });
     this.deleteGameStream.listen((deletedGame) {
       // executes when the game is offline
-      if (deletedGame.player02.isEmpty ||
-          deletedGame.player02 == "" ||
-          deletedGame.player02 == null ||
-          !deletedGame.isOnline) {
+      if (deletedGame.player02.isEmpty || deletedGame.isOnline == false) {
         // deletes the entry in the opponentsNamesList
         this.gameTitlesList.removeAt(this.gamesList.indexOf(deletedGame));
         // deletes the game locally
@@ -267,17 +266,25 @@ class GamesBloc {
             InvitationClass.fromJsonMap(currentInvitationMap);
         this.invitationsList.add(currentInvitation);
       }
+      invitationsListSink.add(invitationsList);
     }
   }
 
   // refreshes, reloads and refetches the list of games from Firebase
-  Future<void> refreshAll() async {
+  Future<void> refreshAll({bool updateInvitationsListStream = false}) async {
+    // resolves the issue of showing the same games multiple times
+    if (gameIDsList.isEmpty) {
+      return;
+    }
     gameIDsList.clear();
     gamesList.clear();
     localGamesList.clear();
     gameTitlesList.clear();
     invitationsList.clear();
     await getGamesAndImportantValues();
+    if (updateInvitationsListStream) {
+      invitationsListSink.add(invitationsList);
+    }
   }
 
   Future<void> refreshOnlineGames() async {

@@ -10,12 +10,14 @@ class ChessBoardWidgetPremium extends StatefulWidget {
   final bool isUserWhite;
   final bool isUsersTurn;
   final double boardSize;
+  final dynamic lastMove;
   ChessBoardWidgetPremium({
     @required this.currentGame,
     @required this.chessBoardController,
     @required this.isUserWhite,
     @required this.isUsersTurn,
     @required this.boardSize,
+    @required this.lastMove,
   });
 
   @override
@@ -23,7 +25,8 @@ class ChessBoardWidgetPremium extends StatefulWidget {
       _ChessBoardWidgetPremiumState();
 }
 
-class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium> {
+class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium>
+    with AfterLayoutMixin {
   GamesBloc _gamesBloc;
   GameClass _currentGame;
   bool isUsersTurn;
@@ -33,22 +36,25 @@ class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium> {
     super.initState();
     this._currentGame = widget.currentGame;
     this.isUsersTurn = widget.isUsersTurn;
-
-    print(this.isUsersTurn);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this._gamesBloc = GamesBlocProvider.of(context).gamesBloc;
-    this._currentGame = widget.currentGame;
-    widget.chessBoardController.loadPGN(_currentGame.pgn);
+    _gamesBloc = GamesBlocProvider.of(context).gamesBloc;
+    _currentGame = widget.currentGame;
+    // widget.chessBoardController.loadPGN(_currentGame.pgn);
   }
 
   @override
   void didUpdateWidget(ChessBoardWidgetPremium oldWidget) {
     super.didUpdateWidget(oldWidget);
     this.isUsersTurn = widget.isUsersTurn;
+  }
+
+  @override
+  void afterFirstLayout(BuildContext context) {
+    makeLastMove(lastMove: widget.lastMove);
   }
 
   void confirmMove() {
@@ -140,6 +146,15 @@ class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium> {
     _gamesBloc.updateGameSink.add(game);
   }
 
+  void makeLastMove({dynamic lastMove}) async {
+    await Future.delayed(
+      Duration(milliseconds: 500),
+    );
+    setState(() {
+      widget.chessBoardController.game.move(widget.lastMove);
+    });
+  }
+
   PieceColor onCheckmate() {
     PieceColor loserColor =
         widget.chessBoardController.game.turn == chess.Color.WHITE
@@ -165,8 +180,8 @@ class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium> {
                   ),
                   Text(
                     loserColor == PieceColor.White
-                        ? "Weiß hat gewonnen"
-                        : "Schwarz hat gewonnen",
+                        ? "Schwarz hat gewonnen"
+                        : "Weiß hat gewonnen",
                     style: theme.dialogTheme.contentTextStyle,
                   ),
                   Row(

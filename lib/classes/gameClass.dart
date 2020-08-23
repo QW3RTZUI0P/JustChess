@@ -59,7 +59,7 @@ class GameClass {
     this.whitesTurn = true,
     this.moveCount = 0,
     this.gameStatus = GameStatus.playing,
-    this.isOnline = false,
+    this.isOnline,
     this.canBeDeleted = false,
   });
 

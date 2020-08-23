@@ -4,7 +4,10 @@ import 'package:flutter/services.dart';
 
 extension GamePremiumOptionsButton on GamePremiumState {
 // button that provides more options for the user (e.g. edit name of game, export pgn, give up, propose remis, ...)
-  Widget buildOptionsButton() => Builder(
+  Widget buildOptionsButton({
+    @required GameClass currentGame,
+  }) =>
+      Builder(
         builder: (BuildContext currentContext) {
           return PopupMenuButton(
             icon: Icon(
@@ -51,7 +54,7 @@ extension GamePremiumOptionsButton on GamePremiumState {
                                       ),
                                       onPressed: () {
                                         Navigator.pop(context);
-                                        setState(() {
+                                        doSetState(() {
                                           widget.isUserWhite
                                               ? currentGame.gameStatus =
                                                   GameStatus.whiteGaveUp
@@ -119,7 +122,7 @@ extension GamePremiumOptionsButton on GamePremiumState {
                                       ),
                                       onPressed: () {
                                         Navigator.pop(context);
-                                        setState(() {
+                                        doSetState(() {
                                           widget.isUserWhite
                                               ? currentGame.gameStatus =
                                                   GameStatus.whiteProposedDraw
@@ -167,13 +170,15 @@ extension GamePremiumOptionsButton on GamePremiumState {
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
-              const PopupMenuItem<int>(
+              PopupMenuItem<int>(
                 value: 0,
                 child: Text("Aufgeben"),
+                enabled: canUserGiveUp(currentGame.gameStatus),
               ),
-              const PopupMenuItem<int>(
+              PopupMenuItem<int>(
                 value: 1,
                 child: Text("Remis vorschlagen"),
+                enabled: canUserProposeDraw(currentGame.gameStatus),
               ),
               const PopupMenuItem<int>(
                 value: 2,
@@ -183,4 +188,62 @@ extension GamePremiumOptionsButton on GamePremiumState {
           );
         },
       );
+}
+
+// whether the user is allowed to give up
+bool canUserGiveUp(GameStatus gameStatus) {
+  switch (gameStatus) {
+    case GameStatus.playing:
+      return true;
+    case GameStatus.stalemate:
+      return false;
+    case GameStatus.draw:
+      return false;
+    case GameStatus.whiteWon:
+      return false;
+    case GameStatus.blackWon:
+      return false;
+    case GameStatus.whiteGaveUp:
+      return false;
+    case GameStatus.blackGaveUp:
+      return false;
+    case GameStatus.whiteProposedDraw:
+      return true;
+    case GameStatus.blackProposedDraw:
+      return true;
+    default:
+      return true;
+  }
+}
+
+// whether the user is allowed to propose draw
+bool canUserProposeDraw(GameStatus gameStatus) {
+  if (gameStatus == GameStatus.playing) {
+    return true;
+  } else {
+    return false;
+  }
+  // switch (gameStatus) {
+  //   case GameStatus.playing:
+  //     return true;
+  //   case GameStatus.stalemate:
+  //     return false;
+  //   case GameStatus.draw:
+  //     return false;
+  //   case GameStatus.whiteWon:
+  //     return false;
+  //   case GameStatus.blackWon:
+  //     return false;
+  //   case GameStatus.whiteGaveUp:
+  //     return false;
+  //   case GameStatus.blackGaveUp:
+  //     return false;
+  //   case GameStatus.whiteProposedDraw:
+  //     return false;
+  //   case GameStatus.blackProposedDraw:
+  //     return false;
+
+  //   default:
+  //     return true;
+  // }
 }

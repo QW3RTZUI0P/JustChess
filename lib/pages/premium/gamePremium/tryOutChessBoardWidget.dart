@@ -5,9 +5,11 @@ import "package:chess/chess.dart" as chess;
 class TryOutChessBoardWidget extends StatefulWidget {
   final String pgn;
   final bool isUserWhite;
+  final double appBarHeight;
   TryOutChessBoardWidget({
     @required this.pgn,
     @required this.isUserWhite,
+    @required this.appBarHeight,
   });
 
   @override
@@ -30,8 +32,9 @@ class _TryOutChessBoardWidgetState extends State<TryOutChessBoardWidget> {
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     Size size = mediaQueryData.size;
 
-    double boardSize =
-        size.width < size.height ? size.width * 0.9 : size.height * 0.9;
+    double boardSize = size.width < size.height
+        ? size.width * 0.9
+        : size.height * 0.8 - widget.appBarHeight;
     return Scaffold(
       body: SafeArea(
         child: Padding(

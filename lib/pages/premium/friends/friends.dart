@@ -23,6 +23,8 @@ class _FriendsState extends State<Friends> with AfterLayoutMixin<Friends> {
 
   @override
   Widget build(BuildContext context) {
+    print("building friends");
+    print(_friendsBloc.friendsList.toString());
     return Scaffold(
       appBar: AppBar(
         title: Text("Freunde"),
@@ -30,6 +32,7 @@ class _FriendsState extends State<Friends> with AfterLayoutMixin<Friends> {
           Builder(
             builder: (BuildContext currentContext) => IconButton(
               icon: Icon(Icons.person_add),
+              tooltip: "Neuen Freund hinzufügen",
               onPressed: () {
                 if (_friendsBloc.friendsList.length > 20) {
                   SnackbarMessage(
@@ -57,8 +60,9 @@ class _FriendsState extends State<Friends> with AfterLayoutMixin<Friends> {
       ),
       body: StreamBuilder(
         stream: _friendsBloc.friendsListStream,
+        initialData: _friendsBloc.friendsList,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null) {
+          if (snapshot.data == null || snapshot.data.isEmpty) {
             return Center(
               child: Text("Noch keine Freunde hinzugefügt"),
             );

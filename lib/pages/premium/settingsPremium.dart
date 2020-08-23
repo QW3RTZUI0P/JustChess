@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import "../../imports.dart";
 
 class SettingsPremium extends StatefulWidget {
-  String username;
-  String emailAdress;
+  final String username;
+  final String emailAdress;
   SettingsPremium({@required this.username, @required this.emailAdress});
 
   @override
@@ -186,34 +186,50 @@ class _SettingsPremiumState extends State<SettingsPremium> {
                   ],
                 ),
               ),
-              ListTile(
-                title: Text("Premium"),
-                trailing: Switch(
-                  value: true,
-                  onChanged: null,
-                  // onChanged: (switchValue) => switchValueChanged(switchValue),
+              // ListTile(
+              //   title: Text("Premium"),
+              //   trailing: Switch(
+              //     value: true,
+              //     onChanged: null,
+              //     // onChanged: (switchValue) => switchValueChanged(switchValue),
+              //   ),
+              // ),
+              Row(
+                children: [
+                  const SizedBox(
+                    width: 10.0,
+                  ),
+                  Text(
+                    "ACCOUNT OPTIONEN",
+                    style: theme.textTheme.subtitle2,
+                  ),
+                ],
+              ),
+              Card(
+                child: Column(
+                  children: [
+                    ListTile(
+                      title: Text("Ausloggen"),
+                      trailing: Icon(Icons.exit_to_app),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        _gamesBloc.signOut();
+                      },
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text("Passwort zurücksetzen"),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      onTap: () => resetPassword(currentContext),
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text("Account löschen"),
+                      trailing: Icon(Icons.delete_outline),
+                      onTap: () => deleteAccount(currentContext),
+                    ),
+                  ],
                 ),
-              ),
-              // TODO: lay this out a bit better (with titles for different sections etc.)
-              Align(
-                alignment: Alignment.center,
-                child: ListTile(
-                  title: Text("Ausloggen"),
-                  trailing: Icon(Icons.exit_to_app),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    _gamesBloc.signOut();
-                  },
-                ),
-              ),
-              ListTile(
-                title: Text("Passwort zurücksetzen"),
-                onTap: () => resetPassword(currentContext),
-              ),
-
-              ListTile(
-                title: Text("Account löschen"),
-                onTap: () => deleteAccount(currentContext),
               ),
             ],
           ),

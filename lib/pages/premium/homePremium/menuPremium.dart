@@ -154,7 +154,7 @@ class _MenuPremiumState extends State<MenuPremium> {
             // black white chess board icon
             leading: Image.asset(
               "assets/images/black_white_board.png",
-              width: theme.iconTheme.size,
+              width: theme.iconTheme.size * 0.9,
             ),
             onTap: () {
               Navigator.pop(context);
@@ -183,27 +183,6 @@ class _MenuPremiumState extends State<MenuPremium> {
           ),
           ListTile(
             title: Text(
-              "Über",
-              style: theme.textTheme.headline6,
-            ),
-            leading: Icon(
-              Icons.info_outline,
-              color: theme.iconTheme.color,
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    fullscreenDialog: false,
-                    builder: (BuildContext context) {
-                      return About();
-                    }),
-              );
-            },
-          ),
-          ListTile(
-            title: Text(
               "Einstellungen",
               style: theme.textTheme.headline6,
             ),
@@ -223,6 +202,27 @@ class _MenuPremiumState extends State<MenuPremium> {
                           emailAdress: this.emailAdress,
                         );
                       }));
+            },
+          ),
+          ListTile(
+            title: Text(
+              "Über",
+              style: theme.textTheme.headline6,
+            ),
+            leading: Icon(
+              Icons.info_outline,
+              color: theme.iconTheme.color,
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    fullscreenDialog: false,
+                    builder: (BuildContext context) {
+                      return About();
+                    }),
+              );
             },
           ),
         ],

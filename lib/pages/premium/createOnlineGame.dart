@@ -150,37 +150,59 @@ class _CreateOnlineGameState extends State<CreateOnlineGame> {
                   Text("Zufällige Farbauswahl"),
                 ],
               ),
-              StreamBuilder<Object>(
-                  stream: _friendsBloc.friendsListStream,
-                  initialData: _friendsBloc.friendsList,
-                  builder: (BuildContext context, AsyncSnapshot snapshot) {
-                    if (snapshot.data == null ||
-                        !snapshot.hasData ||
-                        snapshot.data == [] ||
-                        snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: Text(
-                          "Noch keine Freunde hinzugefügt",
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      );
-                    }
-                    return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: snapshot.data.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return ListTile(
-                            title: Text(snapshot.data[index]),
-                            selected:
-                                this.selectedFriend == snapshot.data[index],
-                            onTap: () {
-                              setState(() {
-                                this.selectedFriend = snapshot.data[index];
-                              });
-                            },
-                          );
-                        });
-                  }),
+              _friendsBloc.friendsList.length == 0
+                  ? Center(
+                      child: Text("Noch keine Freunde hinzugefügt"),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _friendsBloc.friendsList.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return ListTile(
+                          title: Text(_friendsBloc.friendsList[index]),
+                          selected: this.selectedFriend ==
+                              _friendsBloc.friendsList[index],
+                          onTap: () {
+                            setState(() {
+                              this.selectedFriend =
+                                  _friendsBloc.friendsList[index];
+                            });
+                          },
+                        );
+                      }),
+              // probably unecessary
+              // TODO: remove this if it proves unecessary
+              // StreamBuilder<Object>(
+              //     stream: _friendsBloc.friendsListStream,
+              //     initialData: _friendsBloc.friendsList,
+              //     builder: (BuildContext context, AsyncSnapshot snapshot) {
+              //       if (snapshot.data == null ||
+              //           !snapshot.hasData ||
+              //           snapshot.data == [] ||
+              //           snapshot.connectionState == ConnectionState.waiting) {
+              //         return Center(
+              //           child: Text(
+              //             "Noch keine Freunde hinzugefügt",
+              //             overflow: TextOverflow.ellipsis,
+              //           ),
+              //         );
+              //       }
+              //       return ListView.builder(
+              //           shrinkWrap: true,
+              //           itemCount: snapshot.data.length,
+              //           itemBuilder: (BuildContext context, int index) {
+              //             return ListTile(
+              //               title: Text(snapshot.data[index]),
+              //               selected:
+              //                   this.selectedFriend == snapshot.data[index],
+              //               onTap: () {
+              //                 setState(() {
+              //                   this.selectedFriend = snapshot.data[index];
+              //                 });
+              //               },
+              //             );
+              //           });
+              //     }),
             ],
           ),
         ),

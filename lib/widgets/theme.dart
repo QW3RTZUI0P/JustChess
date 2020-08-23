@@ -47,10 +47,16 @@ var theme = ThemeData(
       color: Colors.black,
       fontSize: 14.0,
     ),
+    // used for the subtitles in about.dart
+    subtitle2: TextStyle(
+      color: Colors.grey.shade600,
+      fontSize: 12.0,
+    ),
     //
     // used for plain text
     bodyText1: TextStyle(
       color: Colors.black,
+      fontWeight: FontWeight.w400,
       fontSize: 14.0,
     ),
     // used for small text
@@ -79,7 +85,7 @@ var theme = ThemeData(
     size: 24.0,
   ),
   dividerTheme: DividerThemeData(
-    color: Colors.grey.shade800,
+    color: Colors.grey.shade600,
     space: 1,
   ),
   dialogTheme: DialogTheme(
@@ -181,6 +187,10 @@ var darkTheme = ThemeData(
   iconTheme: IconThemeData(
     color: Colors.white,
     size: 24.0,
+  ),
+  dividerTheme: DividerThemeData(
+    color: Colors.grey.shade600,
+    space: 1,
   ),
   dialogTheme: DialogTheme(
     titleTextStyle: TextStyle(

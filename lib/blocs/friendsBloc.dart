@@ -114,10 +114,8 @@ class FriendsBloc {
   // gets the important values
   void getImportantValues() async {
     dynamic user = await authenticationService.currentUser();
-    print("u " + user.toString());
     // only executes when the user is signed in
     if (user != null) {
-      print(user.toString());
       // gets the userID
       this.userID = await authenticationService.currentUserUid();
       // gets the current User's username
@@ -125,34 +123,48 @@ class FriendsBloc {
           userID: this.userID);
       // gets the usernames list from the users collection
       this.usernamesList = await cloudFirestoreDatabase.getUsernamesList();
-      print("2");
+      // gets the friends list
+      List<dynamic> friendsListInFunction =
+          await cloudFirestoreDatabase.getFriendsList(userID: userID);
+      for (String currentFriend in friendsListInFunction) {
+        friendsList.add(currentFriend);
+      }
     }
   }
 
+  // TODO: check whether this works all the time
   // is called when Friends() loads
   void loadFriends() async {
-    // clears the list with the loaded friends (otherwise you'd have multiple times the same friend)
-    this.friendsList.clear();
-    // checks if the user has already added any friends
-    String currentUserID = await authenticationService.currentUserUid();
-    List<dynamic> friendsListInFunction =
-        await cloudFirestoreDatabase.getFriendsList(userID: currentUserID) ??
-            [];
-    for (String currentFriend in friendsListInFunction) {
-      this.friendsList.add(currentFriend);
-    }
-    // probably unneccesary
     // adds all the usernames (except the user's username) to the availableFriendsSink
-    // if (friendsList.isEmpty) {
-    //   this.availableFriendsList = List.from(this.usernamesList);
-    //   this.availableFriendsList.remove(this.username);
-    // }
-    // adds all the friends to the StreamTree
-    friendsListSink.add(this.friendsList ?? []);
-    // for (dynamic friend in friendsList) {
-    //   friendSink.add(friend);
-    // }
+    if (friendsList.isEmpty) {
+      this.availableFriendsList = List.from(this.usernamesList);
+      this.availableFriendsList.remove(this.username);
+    }
+    friendsListSink.add(friendsList ?? []);
   }
+  // void loadFriends() async {
+  //   // clears the list with the loaded friends (otherwise you'd have multiple times the same friend)
+  //   this.friendsList.clear();
+  //   // checks if the user has already added any friends
+  //   String currentUserID = await authenticationService.currentUserUid();
+  //   List<dynamic> friendsListInFunction =
+  //       await cloudFirestoreDatabase.getFriendsList(userID: currentUserID) ??
+  //           [];
+  //   for (String currentFriend in friendsListInFunction) {
+  //     this.friendsList.add(currentFriend);
+  //   }
+  //   // probably unneccesary
+  //   // adds all the usernames (except the user's username) to the availableFriendsSink
+  //   // if (friendsList.isEmpty) {
+  //   //   this.availableFriendsList = List.from(this.usernamesList);
+  //   //   this.availableFriendsList.remove(this.username);
+  //   // }
+  //   // adds all the friends to the StreamTree
+  //   friendsListSink.add(this.friendsList ?? []);
+  //   // for (dynamic friend in friendsList) {
+  //   //   friendSink.add(friend);
+  //   // }
+  // }
 
   // is called when FindNewFriend() loads
   void loadAvailableFriends() async {
