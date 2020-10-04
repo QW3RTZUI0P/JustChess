@@ -176,7 +176,8 @@ class _MenuPremiumState extends State<MenuPremium> {
                 MaterialPageRoute(
                     fullscreenDialog: false,
                     builder: (BuildContext context) {
-                      return Friends();
+                      return Friends(
+                      );
                     }),
               );
             },

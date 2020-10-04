@@ -20,9 +20,18 @@ class Validators {
   }
 
   /// checks whether the passwort is longer than 8 letters
-  String checkPassword({String passwort}) {
-    if (passwort.split("").length < 8) {
+  String checkPassword({String password}) {
+    if (password.split("").length < 8) {
       return "Das Passwort muss mindestens acht Zeichen lang sein";
+    } else {
+      return null;
+    }
+  }
+
+  /// checks whether the sign in passwort is not empty
+  String checkSignInPassword({String password}) {
+    if (password.isEmpty || password == "") {
+      return "Bitte ein Passwort eingeben";
     } else {
       return null;
     }

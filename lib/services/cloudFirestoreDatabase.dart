@@ -21,7 +21,10 @@ abstract class CloudFirestoreDatabaseApi {
   void deleteInvitationFromFirestore(
       {@required String userID, @required InvitationClass invitation});
   // adds a user object with all the important values to the users collection
-  void addUserToFirestore({@required String userID, @required String username});
+  void addUserToFirestore(
+      {@required String userID,
+      @required String username,
+      bool isPremium = true});
   void deleteUserFromFirestore(
       {@required String userID, @required String username});
   //
@@ -167,16 +170,19 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
         .updateData({"invitations": invitations});
   }
 
-  // adds an user to the users collection
+  /// adds an user to the users collection
+  /// also used to mark a user as premium if he is subscribed to justchess_premium
   void addUserToFirestore({
     @required String userID,
     @required String username,
+    bool isPremium = false,
   }) async {
     await _firestore.collection(_userCollection).document(userID).setData({
       "gameIDs": [],
       "invitations": [],
       "friends": [],
       "username": username,
+      "isPremium": isPremium,
     });
     DocumentSnapshot snapshot = await _firestore
         .collection(_userCollection)

@@ -6,6 +6,7 @@ export "package:flutter/material.dart";
 export "package:path_provider/path_provider.dart";
 export "package:shared_preferences/shared_preferences.dart";
 export "package:url_launcher/url_launcher.dart";
+export "package:in_app_purchase/in_app_purchase.dart";
 // Firebase
 export "package:firebase_core/firebase_core.dart";
 export "package:cloud_firestore/cloud_firestore.dart";
@@ -26,6 +27,7 @@ export "./pages/normal/about.dart";
 // home:
 export "./pages/normal/home/home.dart";
 export "./pages/normal/home/menu.dart";
+export "./pages/normal/home/createGameButton.dart";
 
 //
 // premium:
@@ -38,6 +40,7 @@ export "./pages/premium/invitations.dart";
 // homePremium:
 export "./pages/premium/homePremium/homePremium.dart";
 export "./pages/premium/homePremium/menuPremium.dart";
+export "./pages/premium/homePremium/createGameButtonPremium.dart";
 // gamePremium:
 export "./pages/premium/gamePremium/gamePremium.dart";
 export "./pages/premium/gamePremium/chessBoardWidgetPremium.dart";
@@ -74,7 +77,6 @@ export "./blocs/localGamesBloc.dart";
 // widgets:
 export "./widgets/theme.dart";
 export "./widgets/labeling.dart";
-export "./widgets/createGameButton.dart";
 export "./widgets/snackbarMessage.dart";
 //
 //

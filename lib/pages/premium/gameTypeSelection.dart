@@ -2,6 +2,7 @@
 import "../../imports.dart";
 
 class GameTypeSelection extends StatefulWidget {
+
   @override
   _GameTypeSelectionState createState() => _GameTypeSelectionState();
 }
@@ -12,7 +13,7 @@ class _GameTypeSelectionState extends State<GameTypeSelection> {
   @override
   void initState() {
     super.initState();
-    this.currentPage = Scaffold(
+    currentPage = Scaffold(
       appBar: AppBar(
         title: Text("Partie erstellen"),
       ),
@@ -48,7 +49,8 @@ class _GameTypeSelectionState extends State<GameTypeSelection> {
 
   void createGamePremium() {
     setState(() {
-      this.currentPage = CreateOnlineGame();
+      this.currentPage = CreateOnlineGame(
+      );
     });
   }
 

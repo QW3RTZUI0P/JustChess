@@ -14,27 +14,38 @@ class LoginBloc {
     this.cloudFirestoreDatabase,
   });
 
-  Future<String> createAccount({@required String email, @required String password, @required String username}) async {
+  Future<String> createAccount(
+      {@required String email,
+      @required String password,
+      @required String username}) async {
     // creates a new user account in Firebase Auth
-    String userID = await authenticationService
-        .createUserWithEmailAndPassword(email: email, password: password, username: username,);
+    String userID = await authenticationService.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+      username: username,
+    );
     //     .then((_) async {
     //   await authenticationService.sendEmailVerification();
     // });
 
     // creates a new User object in the users collection in Cloud firestore
-    cloudFirestoreDatabase.addUserToFirestore(userID: userID, username: username);
+    cloudFirestoreDatabase.addUserToFirestore(
+      userID: userID,
+      username: username,
+      isPremium: true,
+    );
 
     print("Account created");
 
     return userID;
   }
 
-  Future<String> signIn({@required String email, @required String password}) async {
+  Future<String> signIn(
+      {@required String email, @required String password}) async {
     String userID = await authenticationService.signInWithEmailAndPassword(
         email: email, password: password);
-        print("Signed in");
-        return userID;
+    print("Signed in");
+    return userID;
   }
 
   Future<bool> isUsernameAvailable({@required String username}) async {
@@ -45,6 +56,4 @@ class LoginBloc {
       return true;
     }
   }
-
 }
-

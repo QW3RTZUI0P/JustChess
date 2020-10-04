@@ -1,5 +1,7 @@
 // game.dart
 import "../../imports.dart";
+// for Clipboard
+import "package:flutter/services.dart";
 import 'package:chess/chess.dart' as chess;
 
 // TODO: optimize performance here (maybe dont rebuild every time the user makes a move)
@@ -27,6 +29,8 @@ class _GameState extends State<Game> {
   ChessBoardController _chessBoardController = ChessBoardController();
   // list with the moves the user has undone
   List<chess.Move> movesList = [];
+  // values for the "Backward" and "Forward" buttons
+  bool allowForward = true;
 
   @override
   void initState() {
@@ -64,10 +68,35 @@ class _GameState extends State<Game> {
       actions: <Widget>[
         // TODO: add options to this button
         // button that provides more options for the user (e.g. edit name of game, export pgn, ...)
-        DropdownButton(
-          icon: Icon(Icons.more_vert),
-          items: [],
-          onChanged: (_) {},
+        Builder(
+          builder: (BuildContext currentContext) => PopupMenuButton(
+            icon: Icon(Icons.more_vert),
+            tooltip: "Optionen",
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
+              PopupMenuItem<int>(
+                value: 0,
+                child: Text("PGN exportieren"),
+              ),
+            ],
+            onSelected: (int selectedValue) {
+              switch (selectedValue) {
+                case 0:
+                  // copies the current pgn into the clipboard
+                  Clipboard.setData(
+                    ClipboardData(text: currentGame.pgn),
+                  );
+                  // shows a SnackBar that informs the user that the PGN has been pasted to the clipboard
+                  Scaffold.of(currentContext).showSnackBar(
+                    SnackBar(
+                      content: Text("PGN wurde in die Zwischenablage kopiert"),
+                    ),
+                  );
+                  break;
+                default:
+                  break;
+              }
+            },
+          ),
         ),
       ],
       textTheme: theme.appBarTheme.textTheme,
@@ -116,6 +145,7 @@ class _GameState extends State<Game> {
                         currentGame.moveCount = int.parse(
                             (_chessBoardController.game.history.length / 2)
                                 .toStringAsFixed(0));
+                        allowForward = false;
                         if (widget.isUserPremium) {
                           this._gamesBloc.updateGameSink.add(this.currentGame);
                         } else {
@@ -150,6 +180,7 @@ class _GameState extends State<Game> {
                       onPressed: () {
                         setState(() {
                           this.movesList.clear();
+                          allowForward = true;
                           // loads the last saved state (pgn) of the game
                           this._chessBoardController.loadPGN(widget.game.pgn);
                           currentGame.pgn = _chessBoardController.game.pgn();
@@ -185,6 +216,7 @@ class _GameState extends State<Game> {
                                   (_chessBoardController.game.history.length /
                                           2)
                                       .toStringAsFixed(0));
+                              allowForward = true;
 
                               if (widget.isUserPremium) {
                                 this
@@ -201,7 +233,7 @@ class _GameState extends State<Game> {
                   IconButton(
                     icon: Icon(Icons.arrow_forward_ios),
                     tooltip: "Zug vor",
-                    onPressed: this.movesList.isEmpty
+                    onPressed: this.movesList.isEmpty || allowForward == false
                         ? null
                         : () {
                             setState(() {
@@ -224,6 +256,7 @@ class _GameState extends State<Game> {
                                   (_chessBoardController.game.history.length /
                                           2)
                                       .toStringAsFixed(0));
+                              allowForward = true;
                               if (widget.isUserPremium) {
                                 this
                                     ._gamesBloc

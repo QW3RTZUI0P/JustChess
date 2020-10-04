@@ -5,6 +5,37 @@ class Menu extends StatelessWidget {
   AuthenticationBloc authenticationBloc;
   Menu({@required this.authenticationBloc});
 
+  Future<void> _showGetPremiumScreen(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Card(
+            child: Column(
+              children: [
+                Center(
+                  child: Text("Hello"),
+                ),
+                RaisedButton(
+                  child: Text("Premium kaufen"),
+                  onPressed: () {
+                    ProductDetails productDetails = ProductDetails(
+                        id: "justchess_premium",
+                        description: "JustChess Premium Abonnement",
+                        price: "3.50€",
+                        title: "JustChess Premium");
+                    authenticationBloc.buyProduct(productDetails);
+                  },
+                ),
+                RaisedButton(
+                  child: Text("Schließen"),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -16,13 +47,14 @@ class Menu extends StatelessWidget {
                 children: <Widget>[
                   Icon(Icons.star, color: Colors.yellow.shade600),
                   FlatButton(
-                    child: Text("werde Premium"),
+                    child: Text("Werde Premium"),
                     onPressed: () async {
-                      // makes the user to a premium user
-                      SharedPreferences sharedPreferences =
-                          await SharedPreferences.getInstance();
-                      sharedPreferences.setBool("isUserPremium", true);
-                      authenticationBloc.isUserPremiumSink.add(true);
+                      await _showGetPremiumScreen(context);
+                      // // makes the user to a premium user
+                      // SharedPreferences sharedPreferences =
+                      //     await SharedPreferences.getInstance();
+                      // sharedPreferences.setBool("isUserPremium", true);
+                      // authenticationBloc.isUserPremiumSink.add(true);
                     },
                   ),
                 ],

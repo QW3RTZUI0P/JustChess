@@ -1,5 +1,6 @@
 // gamePremiumOptionsButton.dart
 import "../../../imports.dart";
+// for Clipboard
 import 'package:flutter/services.dart';
 
 extension GamePremiumOptionsButton on GamePremiumState {
@@ -14,6 +15,7 @@ extension GamePremiumOptionsButton on GamePremiumState {
               Icons.more_vert,
               color: theme.appBarTheme.actionsIconTheme.color,
             ),
+            tooltip: "Optionen",
             onSelected: (int selectedValue) {
               switch (selectedValue) {
                 case 0:
@@ -170,6 +172,7 @@ extension GamePremiumOptionsButton on GamePremiumState {
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
+              // if you want to change the order, you have to change the corresponding int values in the preceding switch statement
               PopupMenuItem<int>(
                 value: 0,
                 child: Text("Aufgeben"),

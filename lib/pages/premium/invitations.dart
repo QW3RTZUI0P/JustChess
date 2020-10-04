@@ -35,28 +35,9 @@ class _InvitationsState extends State<Invitations>
     return Scaffold(
       appBar: appBar,
       body: SafeArea(
-        child: invitationsList.isEmpty
-            // TODO: find here and in HomePremium something else to scroll
-            ? RefreshIndicator(
-                onRefresh: () => refresh(),
-                child: ListView(
-                  children: <Widget>[
-                    Container(
-                      height: mediaQueryData.size.height -
-                          appBar.preferredSize.height -
-                          mediaQueryData.padding.top -
-                          mediaQueryData.padding.bottom,
-                      child: Center(
-                        child: Text(
-                          "Noch keine Einladungen bekommen",
-                          style: theme.textTheme.bodyText1,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            : RefreshIndicator(
+        child: 
+            // TODO: find here and in HomePremium something else scrollable (not ListView)
+            RefreshIndicator(
                 onRefresh: () => refresh(),
                 child: StreamBuilder(
                   stream: widget.gamesBloc.invitationsListStream,
@@ -65,6 +46,24 @@ class _InvitationsState extends State<Invitations>
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
                         child: CircularProgressIndicator(),
+                      );
+                    }
+                    if (snapshot.data.isEmpty) {
+                      return ListView(
+                        children: <Widget>[
+                          Container(
+                            height: mediaQueryData.size.height -
+                                appBar.preferredSize.height -
+                                mediaQueryData.padding.top -
+                                mediaQueryData.padding.bottom,
+                            child: Center(
+                              child: Text(
+                                "Noch keine Einladungen bekommen",
+                                style: theme.textTheme.bodyText1,
+                              ),
+                            ),
+                          ),
+                        ],
                       );
                     }
                     return ListView(
@@ -115,8 +114,8 @@ class _InvitationsState extends State<Invitations>
                                                 .remove(currentInvitation);
                                             widget.gamesBloc
                                                 .refreshInvitationListStream();
-                                            // only closes the view is there was only one invitation
-                                            if (snapshot.data.length <= 1) {
+                                            // only closes the view when there aren't any invitations anymore
+                                            if (snapshot.data.length < 1) {
                                               Navigator.pop(context);
                                             }
                                           },

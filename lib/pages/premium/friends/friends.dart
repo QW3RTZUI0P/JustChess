@@ -79,6 +79,20 @@ class _FriendsState extends State<Friends> with AfterLayoutMixin<Friends> {
                     title: Text(
                       snapshot.data[index],
                     ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          fullscreenDialog: true,
+                          builder: (BuildContext context) {
+                            return CreateOnlineGame(
+                              selectedFriend: snapshot.data[index],
+                            );
+                          },
+                        ),
+                      );
+                    },
                     // TODO: besseres Icon finden
                     trailing: IconButton(
                       icon: Icon(Icons.add),

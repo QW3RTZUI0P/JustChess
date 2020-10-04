@@ -20,6 +20,12 @@ class _TryOutChessBoardWidgetState extends State<TryOutChessBoardWidget> {
   ChessBoardController _chessBoardController = ChessBoardController();
   // list with the moves the user has undone
   List<chess.Move> movesList = [];
+  // shows the user the current game status
+  String currentGameStatus = "";
+  // values for the "Backward" and "Forward" buttons
+  bool allowForward = true;
+  // TODO: make this clearer and clean this up
+  String lastSavedGameStatus = "";
 
   @override
   void initState() {
@@ -29,6 +35,7 @@ class _TryOutChessBoardWidgetState extends State<TryOutChessBoardWidget> {
 
   @override
   Widget build(BuildContext context) {
+    print("building try out");
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     Size size = mediaQueryData.size;
 
@@ -56,8 +63,16 @@ class _TryOutChessBoardWidgetState extends State<TryOutChessBoardWidget> {
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
+                    Text(
+                      currentGameStatus ?? "",
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.headline6,
+                    ),
+                    SizedBox(height: boardSize * 0.05),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         widget.isUserWhite
                             ? VerticalNumbersWhite(
@@ -73,9 +88,31 @@ class _TryOutChessBoardWidgetState extends State<TryOutChessBoardWidget> {
                           chessBoardController: _chessBoardController,
                           whiteSideTowardsUser: widget.isUserWhite,
                           size: boardSize,
-                          onMove: (move) {},
-                          onDraw: () {},
-                          onCheckMate: (color) {},
+                          onMove: (String move) {
+                            print("move");
+                            setState(() {
+                              allowForward = false;
+                              currentGameStatus = "";
+                              lastSavedGameStatus = "";
+                              movesList.clear();
+                            });
+                          },
+                          onDraw: () {
+                            setState(() {
+                              currentGameStatus = "Unentschieden";
+                              lastSavedGameStatus = "Unentschieden";
+                            });
+                          },
+                          onCheckMate: (PieceColor color) {
+                            setState(() {
+                              currentGameStatus = color == PieceColor.Black
+                                  ? "Weiß hat gewonnen"
+                                  : "Schwarz hat gewonnen";
+                              lastSavedGameStatus = color == PieceColor.Black
+                                  ? "Weiß hat gewonnen"
+                                  : "Schwarz hat gewonnen";
+                            });
+                          },
                           onCheck: (_) {},
                         ),
                       ],
@@ -109,6 +146,8 @@ class _TryOutChessBoardWidgetState extends State<TryOutChessBoardWidget> {
                                 this.movesList.clear();
                                 // loads the last saved state (pgn) of the game
                                 this._chessBoardController.loadPGN(widget.pgn);
+                                currentGameStatus = "";
+                                allowForward = true;
                               });
                             },
                           ),
@@ -121,25 +160,31 @@ class _TryOutChessBoardWidgetState extends State<TryOutChessBoardWidget> {
                                   ? null
                                   : () {
                                       setState(() {
-                                        this.movesList.add(this
+                                        movesList.add(this
                                             ._chessBoardController
                                             .game
                                             .undo_move());
+                                        currentGameStatus = "";
+                                        allowForward = true;
                                       });
                                     },
                         ),
                         IconButton(
                           icon: Icon(Icons.arrow_forward_ios),
                           tooltip: "Zug vor",
-                          onPressed: this.movesList.isEmpty
+                          onPressed: this.movesList.isEmpty ||
+                                  allowForward == false
                               ? null
                               : () {
                                   setState(() {
-                                    this
-                                        ._chessBoardController
-                                        .game
+                                    _chessBoardController.game
                                         .make_move(movesList.last);
-                                    this.movesList.removeLast();
+                                    movesList.removeLast();
+                                    currentGameStatus = "";
+                                    allowForward = true;
+                                    if (movesList.length == 0) {
+                                      currentGameStatus = lastSavedGameStatus;
+                                    }
                                   });
                                 },
                         ),

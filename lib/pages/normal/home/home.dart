@@ -30,12 +30,10 @@ class _HomeState extends State<Home> {
     ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Home"),
+        title: Text("JustChess"),
         textTheme: theme.appBarTheme.textTheme,
       ),
-      floatingActionButton: CreateGameButton(
-        isUserPremium: false,
-      ),
+      floatingActionButton: CreateGameButton(),
       drawer: Menu(
         authenticationBloc: this._authenticationBloc,
       ),

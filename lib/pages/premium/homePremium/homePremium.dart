@@ -66,6 +66,7 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
                   snapshot.data.isEmpty) {
                 return IconButton(
                   icon: Icon(Icons.local_post_office),
+                  tooltip: "Einladungen",
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -83,8 +84,13 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
               return Stack(
                 children: <Widget>[
                   IconButton(
-                    icon: Icon(Icons.local_post_office),
+                    icon: Icon(
+                      Icons.local_post_office,
+                      color: theme.iconTheme.color,
+                    ),
+                    tooltip: "Einladungen",
                     onPressed: () {
+                      print("hi");
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -108,8 +114,10 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
                         shape: BoxShape.circle,
                       ),
                       constraints: BoxConstraints(
-                        minWidth: mediaQueryData.size.width * 0.049,
-                        minHeight: mediaQueryData.size.width * 0.049,
+                        minWidth: theme.iconTheme.size * 0.7,
+                        minHeight: theme.iconTheme.size * 0.7,
+                        // minWidth: mediaQueryData.size.width * 0.049,
+                        // minHeight: mediaQueryData.size.width * 0.049,
                       ),
                       child: Text(
                         snapshot.data.length.toString(),
@@ -128,9 +136,7 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
     );
     return Scaffold(
       appBar: appBar,
-      floatingActionButton: CreateGameButton(
-        isUserPremium: true,
-      ),
+      floatingActionButton: CreateGameButtonPremium(),
       drawer: MenuPremium(),
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
@@ -177,7 +183,6 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
                         itemBuilder: (BuildContext context, int index) {
                           // current Game
                           GameClass currentGame = snapshot.data[index];
-
                           bool userWhite() {
                             if (currentGame.player01IsWhite &&
                                 _gamesBloc.currentUserID ==
@@ -206,6 +211,20 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
 
                           bool isUsersTurn = usersTurn();
 
+                          // composes the right subtitle for the list tile
+                          String gameSubtitle = "";
+                          if (currentGame.player02.isEmpty ||
+                              !currentGame.isOnline) {
+                            gameSubtitle = "Anzahl der Züge: " +
+                                currentGame.moveCount.toString();
+                          } else {
+                            gameSubtitle = "Anzahl der Züge: " +
+                                currentGame.moveCount.toString();
+                            if (currentGame.title != "") {
+                              gameSubtitle += ", " + currentGame.title;
+                            }
+                          }
+
                           return Dismissible(
                               key: Key(
                                 currentGame.id,
@@ -221,18 +240,26 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
                                         _gamesBloc.gameTitlesList[index] ?? "",
                                         style: theme.textTheme.headline5,
                                       ),
-                                      subtitle: Text(
-                                        currentGame.player02.isEmpty
-                                            ? "Anzahl der Züge: " +
-                                                currentGame.moveCount.toString()
-                                            : "Anzahl der Züge: " +
-                                                    currentGame.moveCount
-                                                        .toString() +
-                                                    ", " +
-                                                    currentGame.title ??
-                                                "",
-                                        style: theme.textTheme.subtitle1,
-                                      ),
+                                      subtitle: Text(gameSubtitle ?? "",
+                                          style: theme.textTheme.subtitle1),
+                                      // subtitle: Text(
+                                      //   // checks whether the game is offline
+                                      //   // TODO: remove .player02.isEmpty reference
+                                      //   currentGame.player02.isEmpty ||
+                                      //           !currentGame.isOnline
+                                      //       ? "Anzahl der Züge: " +
+                                      //           currentGame.moveCount.toString()
+                                      //       : "Anzahl der Züge: " +
+                                      //                   currentGame.moveCount
+                                      //                       .toString() +
+                                      //                   // checks whether the title of the online game is empty
+                                      //                   currentGame.title ==
+                                      //               ""
+                                      //           ? " "
+                                      //           : ", " + currentGame.title ??
+                                      //               "",
+                                      //   style: theme.textTheme.subtitle1,
+                                      // ),
                                       trailing: Icon(
                                         Icons.arrow_forward_ios,
                                         color: theme.iconTheme.color,

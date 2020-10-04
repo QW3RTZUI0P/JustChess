@@ -1,6 +1,5 @@
 // settingsPremium.dart
 import 'package:flutter/services.dart';
-
 import "../../imports.dart";
 
 class SettingsPremium extends StatefulWidget {
@@ -122,19 +121,12 @@ class _SettingsPremiumState extends State<SettingsPremium> {
                               SnackbarMessage(
                                       context: currentContext,
                                       message: platformException.code)
-                                  .showSnackBar();
+                                  ;
                             } catch (error) {
-                              print(error.runtimeType);
+                              print(error.toString());
                               Navigator.pop(context);
                               // shows SnackBar with the thrown error
-                              Scaffold.of(currentContext).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    error.toString(),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              );
+                              SnackbarMessage(context: currentContext, message: error.toString());
                             }
                           },
                         ),

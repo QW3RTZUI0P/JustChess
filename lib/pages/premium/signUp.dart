@@ -1,6 +1,7 @@
 // signUp.dart
 import "../../imports.dart";
 import 'package:JustChess/services/cloudFirestoreDatabase.dart';
+import 'package:flutter/services.dart';
 
 // TODO: make this english
 class SignUp extends StatefulWidget {
@@ -18,7 +19,9 @@ class _SignUpState extends State<SignUp> with Validators {
   final TextEditingController _benutzernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwortController = TextEditingController();
-
+  // value for the Terms of conditions and the Privacy policy
+  bool checkboxValue = false;
+  Color checkboxColor = Colors.black;
   // fields die speichern, ob der Text in den Passwörter Textfeldern angezeigt werden soll
   bool _passwortIstVerdeckt = true;
   // fields die die angezeigten icons in den Passwört Textfeldern speichern
@@ -39,8 +42,20 @@ class _SignUpState extends State<SignUp> with Validators {
     this._gamesBloc = GamesBlocProvider.of(context).gamesBloc;
   }
 
+  void _launchPrivacyPolicy() async {
+    const url = "https://jumelon.github.io/privacy.md";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw "Could not launch $url";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    TextStyle checkboxTextStyle = theme.textTheme.bodyText1;
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Registrierung"),
@@ -115,47 +130,106 @@ class _SignUpState extends State<SignUp> with Validators {
                     _formKey.currentState.validate();
                   },
                   validator: (passwort) {
-                    return checkPassword(passwort: passwort);
+                    return checkPassword(password: passwort);
                   },
                 ),
+                RichText(
+                  maxLines: 10,
+                  text: TextSpan(
+                      text: "Indem Sie fortfahren stimmen Sie unseren ",
+                      children: [
+                        TextSpan(text: "Nutzungsbedingungen "),
+                        TextSpan(text: "und unseren "),
+                        TextSpan(text: "Datenschutzbestimmungen "),
+                        TextSpan(text: "zu.")
+                      ]),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Indem Sie fortfahren stimmen sie unseren ",
+                      style: theme.textTheme.bodyText1,
+                    ),
+                    // TODO: implement Theme here for dark mode
+                    FlatButton(
+                      child: Text(
+                        "Datenschutzbestimmungen",
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                      onPressed: () => _launchPrivacyPolicy(),
+                    ),
+                    Text(" zu!", style: theme.textTheme.bodyText1)
+                  ],
+                ),
+
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.start,
+                //   crossAxisAlignment: CrossAxisAlignment.center,
+                //   children: [
+                //     Checkbox(
+                //       value: checkboxValue,
+                //       onChanged: (bool newValue) {
+                //         setState(() {
+                //           checkboxValue = newValue;
+                //         });
+                //       },
+                //     ),
+                //     Expanded(
+                //       child: Text(
+                //         "Ich stimme den Nutzungsbedingungen und den Datenschutzbestimmungen zu.",
+                //         // TODO: make this compatible with the theme
+                //         overflow: TextOverflow.ellipsis,
+                //         maxLines: 10,
+                //       ),
+                //     ),
+                //   ],
+                // ),
 
                 // TODO: implement Sign In With Apple
-                RaisedButton(
-                  child: Text("Registrieren"),
-                  onPressed: () async {
-                    // TODO: implementieren, was passiert wenn der Account schon benutzt wird
-                    // TODO: make username control prettier
-                    // TODO: implement email is in use control
-                    if (_formKey.currentState.validate()) {
-                      if (await _loginBloc.isUsernameAvailable(
-                          username: _benutzernameController.text)) {
-                        await _loginBloc.createAccount(
-                          email: _emailController.text,
-                          password: _passwortController.text,
-                          username: _benutzernameController.text,
-                        );
-                        // refreshes the list of games (otherwise snapshot wouldn't connect)
-                        _gamesBloc.refreshAll();
+                Builder(
+                  builder: (BuildContext currentContext) => RaisedButton(
+                    child: Text("Account erstellen"),
+                    onPressed: () async {
+                      // TODO: make username control prettier
+                      if (_formKey.currentState.validate() && checkboxValue) {
+                        if (await _loginBloc.isUsernameAvailable(
+                            username: _benutzernameController.text)) {
+                          try {
+                            await _loginBloc.createAccount(
+                              email: _emailController.text,
+                              password: _passwortController.text,
+                              username: _benutzernameController.text,
+                            );
+
+                            // refreshes the list of games (otherwise snapshot wouldn't connect)
+                            _gamesBloc.refreshAllAfterSigningIn();
+                          } on PlatformException catch (platformException) {
+                            SnackbarMessage(
+                              context: currentContext,
+                              message: platformException.message,
+                            );
+                          } catch (error) {
+                            print(error.toString());
+                            SnackbarMessage(
+                                context: currentContext,
+                                message: error.toString());
+                          }
+                        } else {
+                          SnackbarMessage(
+                              context: currentContext,
+                              message:
+                                  "Dieser Benutzername ist schon vergeben");
+                        }
                       } else {
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title:
-                                    Text("Der Benutzername ist schon vergeben"),
-                                content: Text(
-                                    "Wähle bitte einen anderen Benutzernamen"),
-                                actions: <Widget>[
-                                  FlatButton(
-                                    child: Text("OK"),
-                                    onPressed: () => Navigator.pop(context),
-                                  ),
-                                ],
-                              );
-                            });
+                        if (checkboxValue == false) {
+                          // TODO: make the checkbox validation
+
+                        }
                       }
-                    }
-                  },
+                    },
+                  ),
                 ),
                 FlatButton(
                   child: Text("Stattdessen anmelden"),

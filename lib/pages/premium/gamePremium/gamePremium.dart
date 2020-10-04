@@ -80,11 +80,22 @@ class GamePremiumState extends State<GamePremium>
     gamesBloc.updateGameSink.add(game);
   }
 
+  Future<void> makeLastMove({dynamic lastMove}) async {
+    await Future.delayed(
+      Duration(milliseconds: 500),
+    );
+    setState(() {
+      chessBoardController.game.move(lastMove);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     ThemeData theme = Theme.of(context);
     Size size = mediaQueryData.size;
+
+    print("building game");
 
     var appBar = AppBar(
       title: Text(
@@ -95,6 +106,7 @@ class GamePremiumState extends State<GamePremium>
       actions: <Widget>[
         IconButton(
           icon: Icon(Icons.refresh),
+          tooltip: "Neu laden",
           onPressed: () async {
             GameClass updatedGame = await this
                 .gamesBloc
@@ -102,11 +114,16 @@ class GamePremiumState extends State<GamePremium>
                 .getGameFromFirestore(gameID: currentGame.id);
             this.gamesBloc.updateGameSink.add(updatedGame);
             setState(() {
+              
               this.currentGame = GameClass.from(updatedGame);
               this.isUsersTurn = usersTurn();
+              chessBoardController.loadPGN(updatedGame.pgn);
+              lastMove = chessBoardController.game.undo();
+               
             });
-            chessBoardController.loadPGN(currentGame.pgn);
+           
             WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+              makeLastMove(lastMove: lastMove);
               if (currentGame.gameStatus != GameStatus.playing) {
                 gameStatusChanged(
                   currentContext: context,

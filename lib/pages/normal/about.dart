@@ -4,9 +4,9 @@ import "../../imports.dart";
 // TODO: add link to flutter_chess_board LICENSE
 
 class About extends StatelessWidget {
-  _createFeedbackMail() async {
+  void _createFeedbackMail() async {
     const url =
-        "mailto:justchess.app@gmail.com?subject=Feedback%20und%20Verbesserungsvorschläge%20für%20JustChess&body=";
+        "mailto:justchess.app@gmail.com?subject=Feedback%20JustChess&body=";
     bool canLaunchUrl = await canLaunch(url);
     if (canLaunchUrl) {
       await launch(url);
@@ -15,12 +15,30 @@ class About extends StatelessWidget {
     }
   }
 
-  _launchGithubPage() async {
+  void _launchGithubPage() async {
     const url = "https://github.com/QW3RTZUI0P/JustChess";
     if (await canLaunch(url)) {
       await launch(url);
     } else {
       throw 'Could not launch $url';
+    }
+  }
+
+  void _launchCompanySite() async {
+    const url = "https://jumelon.github.io";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  void _launchPrivacyPolicy() async {
+    const url = "https://jumelon.github.io/privacy.md";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw "Could not launch $url";
     }
   }
 
@@ -142,14 +160,41 @@ class About extends StatelessWidget {
                     width: 10.0,
                   ),
                   Text(
-                    "QUELLEN",
+                    "RECHTLICHES",
                     style: theme.textTheme.subtitle2,
                   ),
                 ],
               ),
               Card(
-                child: ListTile(
-                  title: Text("Quellen für App Icon"),
+                child: Column(
+                  children: [
+                    ListTile(
+                      title: Text("Quellen für App Icon"),
+                    ),
+                    ListTile(
+                      title: Text("Flutter Lizenz"),
+                      onTap: () => showAboutDialog(context: context),
+                      // onTap: () => Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     fullscreenDialog: true,
+                      //     builder: (BuildContext context) {
+                      //       return Scaffold(
+                      //         appBar: AppBar(
+                      //           title: Text("Flutter Lizenz"),
+                      //         ),
+                      //         body: SafeArea(
+                      //           child: Padding(
+                      //             padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                      //             child: ,
+                      //           ),
+                      //         ),
+                      //       );
+                      //     },
+                      //   ),
+                      // ),
+                    ),
+                  ],
                 ),
               ),
             ],

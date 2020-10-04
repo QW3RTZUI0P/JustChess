@@ -49,10 +49,10 @@ class _FindNewFriendState extends State<FindNewFriend>
       if (query.isNotEmpty) {
         List<String> searchResultsInFunction = [];
         for (String currentUser in availableFriendsInFunction) {
-          print("for");
           if (currentUser.contains(
-            query,
-          )) {
+                query,
+              ) ||
+              currentUser.toLowerCase().contains(query)) {
             searchResultsInFunction.add(
               currentUser,
             );
@@ -63,7 +63,6 @@ class _FindNewFriendState extends State<FindNewFriend>
           searchResults.addAll(searchResultsInFunction);
         });
       } else {
-        print("else");
         setState(() {
           searchResults.clear();
         });
@@ -83,8 +82,9 @@ class _FindNewFriendState extends State<FindNewFriend>
                 // TODO: make the search bar lazy, so that it fetches only the necessary values
                 TextField(
                   controller: _searchBarController,
-                  onChanged: (String query) =>
-                      searchFor(query, inList: _friendsBloc.availableFriendsList),
+                  onChanged: (String query) => searchFor(query,
+                      inList: _friendsBloc.availableFriendsList),
+                  autocorrect: false,
                   decoration: InputDecoration(
                     labelText: "Suche",
                     hintText: "Name des Freundes",

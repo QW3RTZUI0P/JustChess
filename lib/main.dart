@@ -18,44 +18,46 @@ class JustChess extends StatelessWidget {
         AuthenticationBloc(authenticationService: _authenticationService);
 
     // controls the sign in status of the current user
-    return AuthenticationBlocProvider(
-      authenticationBloc: _authenticationBloc,
-      // checks whether the user is premium or not
-      child: StreamBuilder(
-          stream: _authenticationBloc.isUserPremiumStream,
-          initialData: null,
-          builder: (BuildContext context, AsyncSnapshot userStatusSnapshot) {
-            if (userStatusSnapshot.connectionState == ConnectionState.waiting) {
-              return MaterialApp(
-                home: Scaffold(
+    return MaterialApp(
+      debugShowCheckedModeBanner: true,
+      theme: theme,
+      // TODO: enable darkTheme when darkmode is implemented
+      // darkTheme: darkTheme,
+      home: AuthenticationBlocProvider(
+        authenticationBloc: _authenticationBloc,
+        // checks whether the user is premium or not
+        child: StreamBuilder(
+            stream: _authenticationBloc.isUserPremiumStream,
+            initialData: null,
+            builder: (BuildContext context, AsyncSnapshot userStatusSnapshot) {
+              if (userStatusSnapshot.connectionState ==
+                  ConnectionState.waiting) {
+                return Scaffold(
+                  appBar: AppBar(
+                    title: Text("JustChess"),
+                  ),
                   body: Center(
                     child: CircularProgressIndicator(),
                   ),
-                ),
-              );
-            } else if (userStatusSnapshot.hasData &&
-                userStatusSnapshot.data == true) {
-              // controls the loading and saving of the user's games
-              return GamesBlocProvider(
-                gamesBloc: GamesBloc(
-                  cloudFirestoreDatabase: _cloudFirestoreDatabase,
-                  authenticationService: _authenticationService,
-                ),
-                // controls the loading, adding and deleting of the user's friends
-                child: FriendsBlocProvider(
-                  friendsBloc: FriendsBloc(
-                    authenticationService: _authenticationService,
+                );
+              } else if (userStatusSnapshot.hasData &&
+                  userStatusSnapshot.data == true) {
+                // controls the loading and saving of the user's games
+                return GamesBlocProvider(
+                  gamesBloc: GamesBloc(
                     cloudFirestoreDatabase: _cloudFirestoreDatabase,
+                    authenticationService: _authenticationService,
                   ),
-                  // the app for premium user
-                  child: LocalGamesBlocProvider(
-                    localGamesBloc: LocalGamesBloc(),
-                    child: MaterialApp(
-                      debugShowCheckedModeBanner: true,
-                      theme: theme,
-                      // TODO: enable darkTheme when darkmode is implemented
-                      // darkTheme: darkTheme,
-                      home: StreamBuilder(
+                  // controls the loading, adding and deleting of the user's friends
+                  child: FriendsBlocProvider(
+                    friendsBloc: FriendsBloc(
+                      authenticationService: _authenticationService,
+                      cloudFirestoreDatabase: _cloudFirestoreDatabase,
+                    ),
+                    // the app for premium user
+                    child: LocalGamesBlocProvider(
+                      localGamesBloc: LocalGamesBloc(),
+                      child: StreamBuilder(
                           initialData: null,
                           // based on the user's authentication status either Home() or SignUp() is being built
                           stream: _authenticationBloc.user,
@@ -80,21 +82,16 @@ class JustChess extends StatelessWidget {
                           }),
                     ),
                   ),
-                ),
-              );
-            } else {
-              // the app for non premium user
-              return LocalGamesBlocProvider(
-                localGamesBloc: LocalGamesBloc(),
-                child: MaterialApp(
-                  debugShowCheckedModeBanner: true,
-                  theme: theme,
-                  darkTheme: darkTheme,
-                  home: Home(),
-                ),
-              );
-            }
-          }),
+                );
+              } else {
+                // the app for non premium user
+                return LocalGamesBlocProvider(
+                  localGamesBloc: LocalGamesBloc(),
+                  child: Home(),
+                );
+              }
+            }),
+      ),
     );
   }
 }

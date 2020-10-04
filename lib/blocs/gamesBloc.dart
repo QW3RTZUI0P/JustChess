@@ -93,6 +93,7 @@ class GamesBloc {
       this.gamesList.add(game);
       // only executes for the last game
       if (game.id == this.gameIDsList.last) {
+        print(game.id);
         // adds updated gamesList to the gamesListStream
         this.gamesListSink.add(this.gamesList);
       }
@@ -250,7 +251,6 @@ class GamesBloc {
       if (gameIDsInFunction.length == 0 || gameIDsInFunction.isEmpty) {
         this.gamesListSink.add(this.gamesList);
       }
-
       // adds all the fetched gameIDs to gameIDsList
       // adds each gameID to the gameIDSink, which passes it down the Stream Tree
       for (String currentGameID in gameIDsInFunction) {
@@ -276,6 +276,21 @@ class GamesBloc {
     if (gameIDsList.isEmpty) {
       return;
     }
+    gameIDsList.clear();
+    gamesList.clear();
+    localGamesList.clear();
+    gameTitlesList.clear();
+    invitationsList.clear();
+    await getGamesAndImportantValues();
+    if (updateInvitationsListStream) {
+      invitationsListSink.add(invitationsList);
+    }
+  }
+
+  // TODO: make this better (maybe reuse some other function)
+  // refreshes, reloads and refetches the list of games from Firebase
+  Future<void> refreshAllAfterSigningIn(
+      {bool updateInvitationsListStream = false}) async {
     gameIDsList.clear();
     gamesList.clear();
     localGamesList.clear();

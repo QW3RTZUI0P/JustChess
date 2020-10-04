@@ -42,6 +42,7 @@ class LocalDatabaseFileRoutines {
     final File file = await _localFile;
     return file.writeAsString('$jsonString');
   }
+
 }
 
 //

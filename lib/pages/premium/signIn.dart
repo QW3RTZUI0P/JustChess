@@ -1,7 +1,6 @@
 // signIn.dart
-import 'package:flutter/services.dart';
-
 import "../../imports.dart";
+import 'package:flutter/services.dart';
 
 class SignIn extends StatefulWidget {
   // loginBloc aus registrierung.dart
@@ -17,6 +16,7 @@ class _SignInState extends State<SignIn> with Validators {
 
   LoginBloc _loginBloc;
   GamesBloc _gameBloc;
+  FriendsBloc _friendsBloc;
 
   // authenticationService to sign in the user
   AuthenticationService authenticationService = AuthenticationService();
@@ -40,6 +40,7 @@ class _SignInState extends State<SignIn> with Validators {
   void didChangeDependencies() {
     super.didChangeDependencies();
     this._gameBloc = GamesBlocProvider.of(context).gamesBloc;
+    this._friendsBloc = FriendsBlocProvider.of(context).friendsBloc;
   }
 
   // gets called when the user wants to reset his password
@@ -152,9 +153,7 @@ class _SignInState extends State<SignIn> with Validators {
                   keyboardType: TextInputType.emailAddress,
                   maxLines: 1,
                   autocorrect: false,
-                  validator: (String email) {
-                    return checkEmail(email: email);
-                  },
+                  validator: (String email) => checkEmail(email: email),
                 ),
                 TextFormField(
                   decoration: InputDecoration(
@@ -175,39 +174,54 @@ class _SignInState extends State<SignIn> with Validators {
                         }
                       },
                     ),
-                    counter: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Builder(
-                        builder: (BuildContext currentContext) => FlatButton(
-                          child: Text(
-                            "Passwort zurücksetzen",
-                          ),
-                          onPressed: () => resetPassword(currentContext),
-                        ),
-                      ),
-                    ),
                   ),
                   controller: _passwortController,
                   obscureText: _passwortIstVerdeckt,
                   maxLines: 1,
                   autocorrect: false,
-                  validator: (String passwort) {
-                    return checkPassword(passwort: passwort);
-                  },
+                  validator: (String password) =>
+                      checkSignInPassword(password: password),
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Builder(
+                    builder: (BuildContext currentContext) => FlatButton(
+                      child: Text(
+                        "Passwort zurücksetzen",
+                      ),
+                      onPressed: () => resetPassword(currentContext),
+                    ),
+                  ),
                 ),
                 // TODO: dem User eine Benachrichtigung / ein Feedback anzeigen, z.B. "Passwort ist falsch"
-                RaisedButton(
-                  child: Text("Anmelden"),
-                  onPressed: () async {
-                    if (_formKey.currentState.validate()) {
-                      await _loginBloc.signIn(
-                          email: _emailController.text,
-                          password: _passwortController.text);
-                      // refreshes the list of games (otherwise snapshot wouldn't connect)
-                      _gameBloc.refreshAll();
-                      Navigator.pop(context);
-                    }
-                  },
+                Builder(
+                  builder: (BuildContext currentContext) => RaisedButton(
+                    child: Text("Anmelden"),
+                    onPressed: () async {
+                      if (_formKey.currentState.validate()) {
+                        try {
+                          await _loginBloc.signIn(
+                              email: _emailController.text,
+                              password: _passwortController.text);
+                          // refreshes the list of games (otherwise snapshot wouldn't connect)
+                          _gameBloc.refreshAllAfterSigningIn();
+                          _friendsBloc.refresh();
+                          Navigator.pop(context);
+                        } on PlatformException catch (platformException) {
+                          SnackbarMessage(
+                            context: currentContext,
+                            message: platformException.message,
+                          );
+                        } catch (error) {
+                          print(error.toString());
+                          SnackbarMessage(
+                            context: currentContext,
+                            message: error.toString(),
+                          );
+                        }
+                      }
+                    },
+                  ),
                 ),
               ],
             ),

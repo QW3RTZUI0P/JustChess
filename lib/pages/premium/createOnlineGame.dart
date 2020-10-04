@@ -5,7 +5,9 @@ import '../../imports.dart';
 // page that is shown when CreateGameButton has been pressed
 class CreateOnlineGame extends StatefulWidget {
   final String selectedFriend;
-  CreateOnlineGame({this.selectedFriend = ""});
+  CreateOnlineGame({
+    this.selectedFriend = "",
+  });
   @override
   _CreateOnlineGameState createState() => _CreateOnlineGameState();
 }
@@ -99,10 +101,10 @@ class _CreateOnlineGameState extends State<CreateOnlineGame> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: Padding(
           padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               TextField(
                 controller: _neuePartieNameController,
@@ -150,59 +152,40 @@ class _CreateOnlineGameState extends State<CreateOnlineGame> {
                   Text("Zufällige Farbauswahl"),
                 ],
               ),
+              const SizedBox(
+                height: 10,
+              ),
+
+              Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text("Gegner auswählen:",
+                      style: theme.textTheme.headline6)),
+              const SizedBox(
+                height: 10,
+              ),
               _friendsBloc.friendsList.length == 0
                   ? Center(
                       child: Text("Noch keine Freunde hinzugefügt"),
                     )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: _friendsBloc.friendsList.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return ListTile(
-                          title: Text(_friendsBloc.friendsList[index]),
-                          selected: this.selectedFriend ==
-                              _friendsBloc.friendsList[index],
-                          onTap: () {
-                            setState(() {
-                              this.selectedFriend =
-                                  _friendsBloc.friendsList[index];
-                            });
-                          },
-                        );
-                      }),
-              // probably unecessary
-              // TODO: remove this if it proves unecessary
-              // StreamBuilder<Object>(
-              //     stream: _friendsBloc.friendsListStream,
-              //     initialData: _friendsBloc.friendsList,
-              //     builder: (BuildContext context, AsyncSnapshot snapshot) {
-              //       if (snapshot.data == null ||
-              //           !snapshot.hasData ||
-              //           snapshot.data == [] ||
-              //           snapshot.connectionState == ConnectionState.waiting) {
-              //         return Center(
-              //           child: Text(
-              //             "Noch keine Freunde hinzugefügt",
-              //             overflow: TextOverflow.ellipsis,
-              //           ),
-              //         );
-              //       }
-              //       return ListView.builder(
-              //           shrinkWrap: true,
-              //           itemCount: snapshot.data.length,
-              //           itemBuilder: (BuildContext context, int index) {
-              //             return ListTile(
-              //               title: Text(snapshot.data[index]),
-              //               selected:
-              //                   this.selectedFriend == snapshot.data[index],
-              //               onTap: () {
-              //                 setState(() {
-              //                   this.selectedFriend = snapshot.data[index];
-              //                 });
-              //               },
-              //             );
-              //           });
-              //     }),
+                  : Expanded(
+                      child: ListView.builder(
+                          // shrinkWrap: true,
+
+                          itemCount: _friendsBloc.friendsList.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return ListTile(
+                              title: Text(_friendsBloc.friendsList[index]),
+                              selected: this.selectedFriend ==
+                                  _friendsBloc.friendsList[index],
+                              onTap: () {
+                                setState(() {
+                                  this.selectedFriend =
+                                      _friendsBloc.friendsList[index];
+                                });
+                              },
+                            );
+                          }),
+                    ),
             ],
           ),
         ),
