@@ -1,6 +1,6 @@
 // settingsPremium.dart
 import 'package:flutter/services.dart';
-import "../../imports.dart";
+import "../imports.dart";
 
 class SettingsPremium extends StatefulWidget {
   final String username;
@@ -27,26 +27,26 @@ class _SettingsPremiumState extends State<SettingsPremium> {
   }
 
   // gets called when the isUserPremium Switch changes value (only for debugging purposes)
-  void switchValueChanged(bool updatedSwitchValue) async {
-    print("hi" + this._authenticationBloc.runtimeType.toString());
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.setBool("isUserPremium", updatedSwitchValue);
-    this._authenticationBloc.isUserPremiumSink.add(updatedSwitchValue);
-    setState(() {
-      this.switchValue = false;
-    });
-  }
+  // void switchValueChanged(bool updatedSwitchValue) async {
+  //   print("hi" + this._authenticationBloc.runtimeType.toString());
+  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  //   sharedPreferences.setBool("isUserPremium", updatedSwitchValue);
+  //   this._authenticationBloc.isUserPremiumSink.add(updatedSwitchValue);
+  //   setState(() {
+  //     this.switchValue = false;
+  //   });
+  // }
 
   // gets called when the user wants to reset his password
-  void resetPassword(BuildContext currentContext) {
-    _authenticationBloc.authenticationService
-        .sendResetPasswortEmail()
-        .then((_) {
-      Scaffold.of(currentContext).showSnackBar(SnackBar(
-        content: Text("Passwort zurücksetzen Mail geschickt"),
-      ));
-    });
-  }
+  // void resetPassword(BuildContext currentContext) {
+  //   _authenticationBloc.authenticationService
+  //       .sendResetPasswortEmail()
+  //       .then((_) {
+  //     Scaffold.of(currentContext).showSnackBar(SnackBar(
+  //       content: Text("Passwort zurücksetzen Mail geschickt"),
+  //     ));
+  //   });
+  // }
 
   // gets called when the user wants to delete his accout
   void deleteAccount(BuildContext currentContext) async {
@@ -119,14 +119,15 @@ class _SettingsPremiumState extends State<SettingsPremium> {
                             } on PlatformException catch (platformException) {
                               Navigator.pop(context);
                               SnackbarMessage(
-                                      context: currentContext,
-                                      message: platformException.code)
-                                  ;
+                                  context: currentContext,
+                                  message: platformException.code);
                             } catch (error) {
                               print(error.toString());
                               Navigator.pop(context);
                               // shows SnackBar with the thrown error
-                              SnackbarMessage(context: currentContext, message: error.toString());
+                              SnackbarMessage(
+                                  context: currentContext,
+                                  message: error.toString());
                             }
                           },
                         ),
@@ -208,12 +209,12 @@ class _SettingsPremiumState extends State<SettingsPremium> {
                         _gamesBloc.signOut();
                       },
                     ),
-                    Divider(),
-                    ListTile(
-                      title: Text("Passwort zurücksetzen"),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () => resetPassword(currentContext),
-                    ),
+                    // Divider(),
+                    // ListTile(
+                    //   title: Text("Passwort zurücksetzen"),
+                    //   trailing: Icon(Icons.arrow_forward_ios),
+                    //   onTap: () => resetPassword(currentContext),
+                    // ),
                     Divider(),
                     ListTile(
                       title: Text("Account löschen"),

@@ -1,6 +1,8 @@
 // imports.dart
+
+// TODO: make everything here like this "export "package:JustChess/lib/...""
+
 // 1
-export "dart:io";
 export "dart:async";
 export "package:flutter/material.dart";
 export "package:path_provider/path_provider.dart";
@@ -16,40 +18,31 @@ export "package:firebase_dynamic_links/firebase_dynamic_links.dart";
 //
 //
 // 2
-export "./main.dart";
+// export "./main.dart";
 // pages
-
-// normal:
-export "./pages/normal/game.dart";
-export "./pages/normal/settings.dart";
-export "./pages/normal/createGame.dart";
-export "./pages/normal/about.dart";
+export "./pages/signIn.dart";
+export "./pages/signUp.dart";
+export "./pages/settings.dart";
+export "./pages/invitations.dart";
+export "./pages/about.dart";
 // home:
-export "./pages/normal/home/home.dart";
-export "./pages/normal/home/menu.dart";
-export "./pages/normal/home/createGameButton.dart";
-
-//
-// premium:
-export "./pages/premium/signUp.dart";
-export "./pages/premium/signIn.dart";
-export "./pages/premium/settingsPremium.dart";
-export 'pages/premium/createOnlineGame.dart';
-export "./pages/premium/gameTypeSelection.dart";
-export "./pages/premium/invitations.dart";
-// homePremium:
-export "./pages/premium/homePremium/homePremium.dart";
-export "./pages/premium/homePremium/menuPremium.dart";
-export "./pages/premium/homePremium/createGameButtonPremium.dart";
-// gamePremium:
-export "./pages/premium/gamePremium/gamePremium.dart";
-export "./pages/premium/gamePremium/chessBoardWidgetPremium.dart";
-export "./pages/premium/gamePremium/tryOutChessBoardWidget.dart";
-export "./pages/premium/gamePremium/gameStatusDialogs.dart";
-export "./pages/premium/gamePremium/gamePremiumOptionsButton.dart";
+export "./pages/home/home.dart";
+export "./pages/home/menu.dart";
+// game:
+export "./pages/game/game.dart";
+export "./pages/game/onlineGame.dart";
+export "./pages/game/chessBoardWidget.dart";
+export "./pages/game/tryOutChessBoardWidget.dart";
+export "./pages/game/gameStatusDialogs.dart";
+export "./pages/game/gameOptionsButton.dart";
+// createGame:
+export "./pages/createGame/createGameButton.dart";
+export "./pages/createGame/createGame.dart";
+export "./pages/createGame/createOnlineGame.dart";
+export "./pages/createGame/gameTypeSelection.dart";
 // friends:
-export "./pages/premium/friends/friends.dart";
-export "./pages/premium/friends/findNewFriend.dart";
+export "./pages/friends/friends.dart";
+export "./pages/friends/findNewFriend.dart";
 
 //
 //

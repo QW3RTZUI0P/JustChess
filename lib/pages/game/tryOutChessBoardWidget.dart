@@ -1,5 +1,5 @@
-// tryOutChessBoardWidgetPremium.dart
-import "../../../imports.dart";
+// tryOutChessBoardWidget.dart
+import "../../imports.dart";
 import "package:chess/chess.dart" as chess;
 
 class TryOutChessBoardWidget extends StatefulWidget {

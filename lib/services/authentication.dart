@@ -63,6 +63,7 @@ class AuthenticationService implements AuthenticationApi {
   }) async {
     AuthResult result = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email, password: password);
+    print(result.toString());
     UserUpdateInfo updateInfo = UserUpdateInfo();
     updateInfo.displayName = username;
     result.user.updateProfile(updateInfo);

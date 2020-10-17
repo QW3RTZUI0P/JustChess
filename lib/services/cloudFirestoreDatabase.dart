@@ -1,5 +1,7 @@
 // cloudFirestoreDatabase.dart
 import 'package:JustChess/imports.dart';
+// for PlatformException
+import "package:flutter/services.dart";
 
 // abstract class to make CloudFirestoreDatabase platform independent
 abstract class CloudFirestoreDatabaseApi {
@@ -21,10 +23,10 @@ abstract class CloudFirestoreDatabaseApi {
   void deleteInvitationFromFirestore(
       {@required String userID, @required InvitationClass invitation});
   // adds a user object with all the important values to the users collection
-  void addUserToFirestore(
-      {@required String userID,
-      @required String username,
-      bool isPremium = true});
+  void addUserToFirestore({
+    @required String userID,
+    @required String username,
+  });
   void deleteUserFromFirestore(
       {@required String userID, @required String username});
   //
@@ -83,7 +85,7 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   Future<String> getUsernameForUserID({@required String userID}) async {
     DocumentSnapshot snapshot =
         await _firestore.collection(_userCollection).document(userID).get();
-    return snapshot.data["username"];
+    return snapshot?.data["username"];
   }
 
   // gets the uid for the given username
@@ -175,14 +177,12 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   void addUserToFirestore({
     @required String userID,
     @required String username,
-    bool isPremium = false,
   }) async {
     await _firestore.collection(_userCollection).document(userID).setData({
       "gameIDs": [],
       "invitations": [],
       "friends": [],
       "username": username,
-      "isPremium": isPremium,
     });
     DocumentSnapshot snapshot = await _firestore
         .collection(_userCollection)
@@ -251,10 +251,17 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   // functions in the games collection:
   // functions for getting values:
   Future<GameClass> getGameFromFirestore({@required String gameID}) async {
-    DocumentSnapshot snapshot =
-        await _firestore.collection(_gamesCollection).document(gameID).get();
-    GameClass game = GameClass.fromDocumentSnapshot(snapshot);
-    return game;
+    try {
+      DocumentSnapshot snapshot =
+          await _firestore.collection(_gamesCollection).document(gameID).get();
+      GameClass game = GameClass.fromDocumentSnapshot(snapshot);
+      return game;
+    } on PlatformException catch (platformException) {
+      print(platformException.toString());
+      throw platformException;
+    } catch (error) {
+      print(error.toString());
+    }
   }
 
   //

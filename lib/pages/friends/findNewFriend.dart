@@ -1,6 +1,5 @@
 // findNewFriend.dart
-
-import "../../../imports.dart";
+import "../../imports.dart";
 
 // TODO: show list of all available friends in the beginning
 

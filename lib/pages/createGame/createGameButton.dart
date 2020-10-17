@@ -1,13 +1,12 @@
-// createGameButtonPremium.dart
-import '../../../imports.dart';
+// createGameButton.dart
+import '../../imports.dart';
 
-class CreateGameButtonPremium extends StatefulWidget {
+class CreateGameButton extends StatefulWidget {
   @override
-  _CreateGameButtonPremiumState createState() =>
-      _CreateGameButtonPremiumState();
+  _CreateGameButtonState createState() => _CreateGameButtonState();
 }
 
-class _CreateGameButtonPremiumState extends State<CreateGameButtonPremium> {
+class _CreateGameButtonState extends State<CreateGameButton> {
   GamesBloc _gamesBloc;
 
   @override

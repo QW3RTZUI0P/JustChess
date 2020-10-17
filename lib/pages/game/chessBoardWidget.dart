@@ -1,17 +1,17 @@
-// chessBoardWidgetPremium.dart
+// chessBoardWidget.dart
 
-import "../../../imports.dart";
+import "../../imports.dart";
 import "package:chess/chess.dart" as chess;
 
 // TODO: add text widget which says who's turn it is
-class ChessBoardWidgetPremium extends StatefulWidget {
+class ChessBoardWidget extends StatefulWidget {
   final GameClass currentGame;
   final ChessBoardController chessBoardController;
   final bool isUserWhite;
   final bool isUsersTurn;
   final double boardSize;
   final dynamic lastMove;
-  ChessBoardWidgetPremium({
+  ChessBoardWidget({
     @required this.currentGame,
     @required this.chessBoardController,
     @required this.isUserWhite,
@@ -21,11 +21,10 @@ class ChessBoardWidgetPremium extends StatefulWidget {
   });
 
   @override
-  _ChessBoardWidgetPremiumState createState() =>
-      _ChessBoardWidgetPremiumState();
+  _ChessBoardWidgetState createState() => _ChessBoardWidgetState();
 }
 
-class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium>
+class _ChessBoardWidgetState extends State<ChessBoardWidget>
     with AfterLayoutMixin {
   GamesBloc _gamesBloc;
   GameClass _currentGame;
@@ -47,7 +46,7 @@ class _ChessBoardWidgetPremiumState extends State<ChessBoardWidgetPremium>
   }
 
   @override
-  void didUpdateWidget(ChessBoardWidgetPremium oldWidget) {
+  void didUpdateWidget(ChessBoardWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     this.isUsersTurn = widget.isUsersTurn;
   }

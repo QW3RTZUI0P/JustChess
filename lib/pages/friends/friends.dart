@@ -1,5 +1,5 @@
 // friends.dart
-import "../../../imports.dart";
+import "../../imports.dart";
 
 // TODO: enable auto reload after adding a friend
 class Friends extends StatefulWidget {

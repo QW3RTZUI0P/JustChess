@@ -7,11 +7,9 @@ import 'package:chess/chess.dart' as chess;
 // TODO: optimize performance here (maybe dont rebuild every time the user makes a move)
 // TODO: include labeling into the chessboard widget
 class Game extends StatefulWidget {
-  GameClass game;
-  bool isUserPremium;
+  final GameClass game;
   Game({
     @required this.game,
-    @required this.isUserPremium,
   });
 
   @override
@@ -19,8 +17,6 @@ class Game extends StatefulWidget {
 }
 
 class _GameState extends State<Game> {
-  // bloc that controls the loading and saving of the local games
-  LocalGamesBloc _localGamesBloc;
   // bloc that controls the loading and saving of all the games
   GamesBloc _gamesBloc;
   // the current game loaded onto the ChessBoard
@@ -43,15 +39,28 @@ class _GameState extends State<Game> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (widget.isUserPremium) {
-      this._gamesBloc = GamesBlocProvider.of(context).gamesBloc;
-    } else {
-      this._localGamesBloc = LocalGamesBlocProvider.of(context).localGamesBloc;
-    }
+    this._gamesBloc = GamesBlocProvider.of(context).gamesBloc;
   }
 
   // saves the game to the local file system
-  void saveGame() {}
+  void saveGame() {
+    setState(() {
+      currentGame.pgn = _chessBoardController.game.pgn();
+      currentGame.moveCount = int.parse(
+          (_chessBoardController.game.history.length / 2).toStringAsFixed(0));
+      allowForward = false;
+      this._gamesBloc.updateGameSink.add(this.currentGame);
+    });
+  }
+
+  void _openPGNHelp() async {
+    const String url = "https://de.wikipedia.org/wiki/Portable_Game_Notation";
+    if (await canLaunch(url)) {
+      launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +75,6 @@ class _GameState extends State<Game> {
         this.currentGame.title,
       ),
       actions: <Widget>[
-        // TODO: add options to this button
         // button that provides more options for the user (e.g. edit name of game, export pgn, ...)
         Builder(
           builder: (BuildContext currentContext) => PopupMenuButton(
@@ -75,7 +83,24 @@ class _GameState extends State<Game> {
             itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
               PopupMenuItem<int>(
                 value: 0,
-                child: Text("PGN exportieren"),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text("PGN exportieren"),
+                    const SizedBox(
+                      width: 5.0,
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        child: Icon(
+                          Icons.help_outline,
+                          color: Colors.black,
+                        ),
+                        onTap: () => _openPGNHelp(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
             onSelected: (int selectedValue) {
@@ -139,21 +164,7 @@ class _GameState extends State<Game> {
                     onCheck: (_) {},
                     onCheckMate: (_) {},
                     onDraw: () {},
-                    onMove: (_) {
-                      setState(() {
-                        currentGame.pgn = _chessBoardController.game.pgn();
-                        currentGame.moveCount = int.parse(
-                            (_chessBoardController.game.history.length / 2)
-                                .toStringAsFixed(0));
-                        allowForward = false;
-                        if (widget.isUserPremium) {
-                          this._gamesBloc.updateGameSink.add(this.currentGame);
-                        } else {
-                          _localGamesBloc.localGameUpdated(
-                              updatedGame: currentGame);
-                        }
-                      });
-                    },
+                    onMove: (_) => saveGame(),
                   ),
                   const SizedBox(width: 5),
                   currentGame.player01IsWhite
@@ -187,15 +198,8 @@ class _GameState extends State<Game> {
                           currentGame.moveCount = int.parse(
                               (_chessBoardController.game.history.length / 2)
                                   .toStringAsFixed(0));
-                          if (widget.isUserPremium) {
-                            this
-                                ._gamesBloc
-                                .updateGameSink
-                                .add(this.currentGame);
-                          } else {
-                            _localGamesBloc.localGameUpdated(
-                                updatedGame: currentGame);
-                          }
+
+                          this._gamesBloc.updateGameSink.add(this.currentGame);
                         });
                       },
                     ),
@@ -218,15 +222,10 @@ class _GameState extends State<Game> {
                                       .toStringAsFixed(0));
                               allowForward = true;
 
-                              if (widget.isUserPremium) {
-                                this
-                                    ._gamesBloc
-                                    .updateGameSink
-                                    .add(this.currentGame);
-                              } else {
-                                _localGamesBloc.localGameUpdated(
-                                    updatedGame: currentGame);
-                              }
+                              this
+                                  ._gamesBloc
+                                  .updateGameSink
+                                  .add(this.currentGame);
                             });
                           },
                   ),
@@ -257,15 +256,11 @@ class _GameState extends State<Game> {
                                           2)
                                       .toStringAsFixed(0));
                               allowForward = true;
-                              if (widget.isUserPremium) {
-                                this
-                                    ._gamesBloc
-                                    .updateGameSink
-                                    .add(this.currentGame);
-                              } else {
-                                _localGamesBloc.localGameUpdated(
-                                    updatedGame: currentGame);
-                              }
+
+                              this
+                                  ._gamesBloc
+                                  .updateGameSink
+                                  .add(this.currentGame);
                             });
                           },
                   ),

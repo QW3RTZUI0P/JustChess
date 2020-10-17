@@ -1,6 +1,6 @@
-// homePremium.dart
-import "../../../imports.dart";
-
+// home.dart
+import "../../imports.dart";
+import "dart:io";
 // TODO: clean everything up, split some widgets up and improve performance
 
 // TODO: add routes to MaterialApp and make everything Navigator.pushNamed
@@ -9,15 +9,15 @@ import "../../../imports.dart";
 // bigger projects:
 // TODO: add in app purchases
 // TODO: add starter tutorial
-class HomePremium extends StatefulWidget {
+class Home extends StatefulWidget {
   @override
-  _HomePremiumState createState() => _HomePremiumState();
+  _HomeState createState() => _HomeState();
 }
 
 // WidgetsBindingObserver helps observing the AppLifecycleState (to refresh _gamesBloc when app is resumed)
-class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
+class _HomeState extends State<Home> with WidgetsBindingObserver {
   GamesBloc _gamesBloc;
-  int invitationsBadge;
+  int _invitationsBadge;
 
   @override
   void initState() {
@@ -40,10 +40,36 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
 
   // this has to be like this; onRefresh has to get a value
   Future<void> refresh() async {
-    await _gamesBloc.refreshAll(
-      updateInvitationsListStream: true,
-    );
+    await _gamesBloc.refreshAll(updateInvitationsListStream: true);
     return;
+  }
+
+  Future<bool> _checkInternetConnection({BuildContext currentContext}) async {
+    try {
+      final result = await InternetAddress.lookup("google.com");
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+      // probably unnecessary
+      else {
+        SnackbarMessage(
+            context: currentContext,
+            message: "Nicht mit dem Internet verbunden");
+        return false;
+      }
+    } on SocketException catch (error) {
+      print(error.toString());
+      SnackbarMessage(
+          context: currentContext, message: "Nicht mit dem Internet verbunden");
+      return false;
+    } catch (error) {
+      print(error.toString());
+      SnackbarMessage(
+        context: currentContext,
+        message: error.toString(),
+      );
+      return false;
+    }
   }
 
   @override
@@ -90,7 +116,6 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
                     ),
                     tooltip: "Einladungen",
                     onPressed: () {
-                      print("hi");
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -136,50 +161,57 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
     );
     return Scaffold(
       appBar: appBar,
-      floatingActionButton: CreateGameButtonPremium(),
-      drawer: MenuPremium(),
+      floatingActionButton: CreateGameButton(),
+      drawer: Menu(),
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () => refresh(),
-          child: StreamBuilder(
-              initialData: _gamesBloc.gamesList,
-              stream: _gamesBloc.gamesListStream,
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting ||
-                    snapshot.data.isEmpty) {
-                  // has to be scrollable (to enable pull to refresh)
-                  return ListView(
-                    children: [
-                      Container(
-                        height: mediaQueryData.size.height -
-                            appBar.preferredSize.height -
-                            mediaQueryData.padding.top -
-                            mediaQueryData.padding.bottom,
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                    ],
-                  );
-                } else if (snapshot.data == []) {
-                  // has to be scrollable (to enable pull to refresh)
-                  return ListView(
-                    children: <Widget>[
-                      Container(
-                        height: MediaQuery.of(context).size.height,
-                        child: Center(
-                          child: Text(
-                            "Noch keine Partien hinzugefügt",
-                            style: theme.textTheme.bodyText1,
+        child: Builder(
+          builder: (BuildContext currentContext) => RefreshIndicator(
+            onRefresh: () async {
+              if (await _checkInternetConnection(
+                  currentContext: currentContext)) {
+                refresh();
+              }
+            },
+            child: StreamBuilder(
+                // initialData: _gamesBloc.gamesList,
+                stream: _gamesBloc.gamesListStream,
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting ||
+                      snapshot.data.isEmpty) {
+                    // has to be scrollable (to enable pull to refresh)
+                    return ListView(
+                      children: [
+                        Container(
+                          height: mediaQueryData.size.height -
+                              appBar.preferredSize.height -
+                              mediaQueryData.padding.top -
+                              mediaQueryData.padding.bottom,
+                          child: Center(
+                            child: CircularProgressIndicator(),
                           ),
                         ),
-                      ),
-                    ],
-                  );
-                } else {
-                  return Scrollbar(
-                    child: ListView.builder(
+                      ],
+                    );
+                  } else if (snapshot.data == []) {
+                    // has to be scrollable (to enable pull to refresh)
+                    return ListView(
+                      children: <Widget>[
+                        Container(
+                          height: MediaQuery.of(context).size.height,
+                          child: Center(
+                            child: Text(
+                              "Noch keine Partien hinzugefügt",
+                              style: theme.textTheme.bodyText1,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Scrollbar(
+                      child: ListView.builder(
+                        itemCount: snapshot.data.length,
                         itemBuilder: (BuildContext context, int index) {
                           // current Game
                           GameClass currentGame = snapshot.data[index];
@@ -275,10 +307,9 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
                                                     !currentGame.isOnline) {
                                                   return Game(
                                                     game: currentGame,
-                                                    isUserPremium: true,
                                                   );
                                                 } else {
-                                                  return GamePremium(
+                                                  return OnlineGame(
                                                     currentGame: currentGame,
                                                     opponentsName: _gamesBloc
                                                         .gameTitlesList[index],
@@ -343,10 +374,11 @@ class _HomePremiumState extends State<HomePremium> with WidgetsBindingObserver {
                                 });
                               });
                         },
-                        itemCount: snapshot.data.length),
-                  );
-                }
-              }),
+                      ),
+                    );
+                  }
+                }),
+          ),
         ),
       ),
     );

@@ -1,12 +1,12 @@
 // menuPremium.dart
-import "../../../imports.dart";
+import "../../imports.dart";
 
-class MenuPremium extends StatefulWidget {
+class Menu extends StatefulWidget {
   @override
-  _MenuPremiumState createState() => _MenuPremiumState();
+  _MenuState createState() => _MenuState();
 }
 
-class _MenuPremiumState extends State<MenuPremium> {
+class _MenuState extends State<Menu> {
   AuthenticationBloc _authenticationBloc;
   GamesBloc _gameBloc;
 
@@ -115,6 +115,7 @@ class _MenuPremiumState extends State<MenuPremium> {
       child: Column(
         children: <Widget>[
           DrawerHeader(
+            margin: EdgeInsets.zero,
             child: Center(
               child: Text(""),
             ),
@@ -146,6 +147,7 @@ class _MenuPremiumState extends State<MenuPremium> {
           //     ],
           //   ),
           // ),
+
           ListTile(
             title: Text(
               "Partien",
@@ -160,6 +162,8 @@ class _MenuPremiumState extends State<MenuPremium> {
               Navigator.pop(context);
             },
           ),
+          Divider(),
+
           ListTile(
             title: Text(
               "Freunde",
@@ -176,12 +180,13 @@ class _MenuPremiumState extends State<MenuPremium> {
                 MaterialPageRoute(
                     fullscreenDialog: false,
                     builder: (BuildContext context) {
-                      return Friends(
-                      );
+                      return Friends();
                     }),
               );
             },
           ),
+          Divider(),
+
           ListTile(
             title: Text(
               "Einstellungen",
@@ -205,6 +210,7 @@ class _MenuPremiumState extends State<MenuPremium> {
                       }));
             },
           ),
+          Divider(),
           ListTile(
             title: Text(
               "Über",
@@ -226,6 +232,7 @@ class _MenuPremiumState extends State<MenuPremium> {
               );
             },
           ),
+          Divider(),
         ],
       ),
     );

@@ -1,7 +1,8 @@
 // signUp.dart
-import "../../imports.dart";
+import "../imports.dart";
 import 'package:JustChess/services/cloudFirestoreDatabase.dart';
 import 'package:flutter/services.dart';
+import "package:flutter/gestures.dart";
 
 // TODO: make this english
 class SignUp extends StatefulWidget {
@@ -17,15 +18,18 @@ class _SignUpState extends State<SignUp> with Validators {
   GamesBloc _gamesBloc;
   // TextEditingController für die Textfelder
   final TextEditingController _benutzernameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwortController = TextEditingController();
   // value for the Terms of conditions and the Privacy policy
-  bool checkboxValue = false;
-  Color checkboxColor = Colors.black;
+  bool _checkboxValue = false;
+  Color _checkboxColor = Colors.grey.shade50;
   // fields die speichern, ob der Text in den Passwörter Textfeldern angezeigt werden soll
   bool _passwortIstVerdeckt = true;
   // fields die die angezeigten icons in den Passwört Textfeldern speichern
   Icon _passwortIcon = Icon(Icons.visibility);
+
+  // gesture recognizer for the hyperlinks to TermsOfUse and PrivacyPolicy
+  TapGestureRecognizer _termsOfUseTapRecognizer;
+  TapGestureRecognizer _privacyPolicyTapRecognizer;
 
   @override
   void initState() {
@@ -34,6 +38,10 @@ class _SignUpState extends State<SignUp> with Validators {
       authenticationService: AuthenticationService(),
       cloudFirestoreDatabase: CloudFirestoreDatabase(),
     );
+    _termsOfUseTapRecognizer = TapGestureRecognizer()
+      ..onTap = _launchTermsOfUse;
+    _privacyPolicyTapRecognizer = TapGestureRecognizer()
+      ..onTap = _launchPrivacyPolicy;
   }
 
   @override
@@ -42,8 +50,24 @@ class _SignUpState extends State<SignUp> with Validators {
     this._gamesBloc = GamesBlocProvider.of(context).gamesBloc;
   }
 
+  @override
+  void dispose() {
+    _termsOfUseTapRecognizer.dispose();
+    _privacyPolicyTapRecognizer.dispose();
+    super.dispose();
+  }
+
+  void _launchTermsOfUse() async {
+    const url = "https://justchess.github.io/termsOfUse.md";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw "Could not launch $url";
+    }
+  }
+
   void _launchPrivacyPolicy() async {
-    const url = "https://jumelon.github.io/privacy.md";
+    const url = "https://justchess.github.io/privacyPolicy.md";
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -69,7 +93,7 @@ class _SignUpState extends State<SignUp> with Validators {
             0,
           ),
           child: Form(
-            autovalidate: false,
+            autovalidateMode: AutovalidateMode.disabled,
             key: _formKey,
             child: Column(
               children: <Widget>[
@@ -88,21 +112,7 @@ class _SignUpState extends State<SignUp> with Validators {
                     return checkUsername(benutzername: benutzername);
                   },
                 ),
-                // Textfled für die Email Addresse
-                TextFormField(
-                  decoration: InputDecoration(labelText: "E-Mail Adresse"),
-                  controller: _emailController,
-                  maxLines: 1,
-                  keyboardType: TextInputType.emailAddress,
-                  autocorrect: false,
-                  onFieldSubmitted: (_) {
-                    _formKey.currentState.validate();
-                  },
-                  validator: (email) {
-                    return checkEmail(email: email);
-                  },
-                ),
-                // Textfeld für das Passwort
+                // textfield for the password
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: "Passwort",
@@ -133,72 +143,81 @@ class _SignUpState extends State<SignUp> with Validators {
                     return checkPassword(password: passwort);
                   },
                 ),
-                RichText(
-                  maxLines: 10,
-                  text: TextSpan(
-                      text: "Indem Sie fortfahren stimmen Sie unseren ",
-                      children: [
-                        TextSpan(text: "Nutzungsbedingungen "),
-                        TextSpan(text: "und unseren "),
-                        TextSpan(text: "Datenschutzbestimmungen "),
-                        TextSpan(text: "zu.")
-                      ]),
+                const SizedBox(
+                  height: 5.0,
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
                   children: [
-                    Text(
-                      "Indem Sie fortfahren stimmen sie unseren ",
-                      style: theme.textTheme.bodyText1,
-                    ),
-                    // TODO: implement Theme here for dark mode
-                    FlatButton(
-                      child: Text(
-                        "Datenschutzbestimmungen",
-                        style: TextStyle(color: Colors.blue),
+                    Container(
+                      padding: EdgeInsets.zero,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          width: 4.0,
+                          style: BorderStyle.solid,
+                          color: _checkboxColor,
+                        ),
                       ),
-                      onPressed: () => _launchPrivacyPolicy(),
+                      child: Checkbox(
+                          value: _checkboxValue,
+                          onChanged: (bool newValue) {
+                            setState(() {
+                              _checkboxValue = newValue;
+                              if (newValue) {
+                                _checkboxColor = Colors.grey.shade50;
+                              }
+                            });
+                          }),
                     ),
-                    Text(" zu!", style: theme.textTheme.bodyText1)
+                    const SizedBox(
+                      width: 5.0,
+                    ),
+                    Expanded(
+                      child: RichText(
+                        maxLines: 10,
+                        textAlign: TextAlign.start,
+                        text: TextSpan(
+                            text: "Indem Sie fortfahren stimmen Sie unseren ",
+                            style: TextStyle(
+                              color: Colors.black,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: "Nutzungsbedingungen ",
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                                recognizer: _termsOfUseTapRecognizer,
+                              ),
+                              TextSpan(text: "und unseren "),
+                              TextSpan(
+                                text: "Datenschutzbestimmungen ",
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                                recognizer: _privacyPolicyTapRecognizer,
+                              ),
+                              TextSpan(text: "zu.")
+                            ]),
+                      ),
+                    ),
                   ],
                 ),
+                const SizedBox(
+                  height: 5.0,
+                ),
 
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.start,
-                //   crossAxisAlignment: CrossAxisAlignment.center,
-                //   children: [
-                //     Checkbox(
-                //       value: checkboxValue,
-                //       onChanged: (bool newValue) {
-                //         setState(() {
-                //           checkboxValue = newValue;
-                //         });
-                //       },
-                //     ),
-                //     Expanded(
-                //       child: Text(
-                //         "Ich stimme den Nutzungsbedingungen und den Datenschutzbestimmungen zu.",
-                //         // TODO: make this compatible with the theme
-                //         overflow: TextOverflow.ellipsis,
-                //         maxLines: 10,
-                //       ),
-                //     ),
-                //   ],
-                // ),
-
-                // TODO: implement Sign In With Apple
                 Builder(
                   builder: (BuildContext currentContext) => RaisedButton(
                     child: Text("Account erstellen"),
                     onPressed: () async {
                       // TODO: make username control prettier
-                      if (_formKey.currentState.validate() && checkboxValue) {
+                      if (_formKey.currentState.validate() && _checkboxValue) {
                         if (await _loginBloc.isUsernameAvailable(
                             username: _benutzernameController.text)) {
                           try {
+                            print("trying create account");
                             await _loginBloc.createAccount(
-                              email: _emailController.text,
                               password: _passwortController.text,
                               username: _benutzernameController.text,
                             );
@@ -206,6 +225,7 @@ class _SignUpState extends State<SignUp> with Validators {
                             // refreshes the list of games (otherwise snapshot wouldn't connect)
                             _gamesBloc.refreshAllAfterSigningIn();
                           } on PlatformException catch (platformException) {
+                            print(platformException.toString());
                             SnackbarMessage(
                               context: currentContext,
                               message: platformException.message,
@@ -223,9 +243,11 @@ class _SignUpState extends State<SignUp> with Validators {
                                   "Dieser Benutzername ist schon vergeben");
                         }
                       } else {
-                        if (checkboxValue == false) {
+                        if (_checkboxValue == false) {
                           // TODO: make the checkbox validation
-
+                          setState(() {
+                            _checkboxColor = Colors.red;
+                          });
                         }
                       }
                     },

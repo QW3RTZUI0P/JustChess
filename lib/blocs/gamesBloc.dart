@@ -7,16 +7,18 @@ class GamesBloc {
 
   // userUID of the current logged in user
   String currentUserID = "";
-  // list of the current user's games (offline and online games)
-  List<GameClass> gamesList = [];
+  // list of the local games (for saving to the local file system)
+  List<GameClass> localGamesList = [];
   // list with the gameIDs of the logged in user (from the current user's user document)
   List<String> gameIDsList = [];
+  // list of the current user's games (offline and online games)
+  List<GameClass> gamesList = [];
+
   // list with the names/titles of the games
   // - the user-given name in an offline game
   // - the opponent's name in an online game
   List<String> gameTitlesList = [];
-  // list of the local games (for saving to the local file system)
-  List<GameClass> localGamesList = [];
+
   // list of the user's invitations (the ones he hasn't accepted yet)
   List<InvitationClass> invitationsList = [];
 
@@ -88,6 +90,7 @@ class GamesBloc {
           (game.player01 == currentUserID) ? game.player02 : game.player01;
       String opponentsName = await cloudFirestoreDatabase.getUsernameForUserID(
           userID: opponentsUserID);
+
       this.gameTitlesList.add("Partie gegen " + opponentsName);
       // adds game locally
       this.gamesList.add(game);

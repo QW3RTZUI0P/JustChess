@@ -1,9 +1,20 @@
-// gamePremiumOptionsButton.dart
-import "../../../imports.dart";
+// gameOptionsButton.dart
+import 'package:flutter/gestures.dart';
+
+import "../../imports.dart";
 // for Clipboard
 import 'package:flutter/services.dart';
 
-extension GamePremiumOptionsButton on GamePremiumState {
+extension GameOptionsButton on OnlineGameState {
+  void _openPGNHelp() async {
+    const String url = "https://de.wikipedia.org/wiki/Portable_Game_Notation";
+    if (await canLaunch(url)) {
+      launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
 // button that provides more options for the user (e.g. edit name of game, export pgn, give up, propose remis, ...)
   Widget buildOptionsButton({
     @required GameClass currentGame,
@@ -183,9 +194,26 @@ extension GamePremiumOptionsButton on GamePremiumState {
                 child: Text("Remis vorschlagen"),
                 enabled: canUserProposeDraw(currentGame.gameStatus),
               ),
-              const PopupMenuItem<int>(
+              PopupMenuItem<int>(
                 value: 2,
-                child: Text("PGN exportieren"),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text("PGN exportieren"),
+                    const SizedBox(
+                      width: 5.0,
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        child: Icon(
+                          Icons.help_outline,
+                          color: Colors.black,
+                        ),
+                        onTap: () => _openPGNHelp(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           );

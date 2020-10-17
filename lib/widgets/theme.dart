@@ -3,8 +3,7 @@ import "../imports.dart";
 
 /// theme for normal use
 var theme = ThemeData(
-  primaryColor: Colors.blue,
-  accentColor: Colors.black,
+  primaryColor: Colors.black,
   textTheme: TextTheme(
     // bold, very large headline (sized like the AppBar title)
     headline1: TextStyle(
@@ -66,7 +65,7 @@ var theme = ThemeData(
     ),
   ),
   appBarTheme: AppBarTheme(
-    color: Colors.blue,
+    color: Colors.black,
     textTheme: TextTheme(
       headline6: TextStyle(
         color: Colors.white,
@@ -78,7 +77,7 @@ var theme = ThemeData(
     ),
   ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
-    backgroundColor: Colors.blue,
+    backgroundColor: Colors.black,
   ),
   iconTheme: IconThemeData(
     color: Colors.black,
@@ -115,6 +114,7 @@ var theme = ThemeData(
 //
 /// theme for dark mode (ios) or dark theme (android)
 var darkTheme = ThemeData(
+  primaryColor: Colors.black,
   textTheme: TextTheme(
     // bold, very large headline (sized like the AppBar title)
     headline1: TextStyle(

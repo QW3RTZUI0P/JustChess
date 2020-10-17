@@ -1,5 +1,5 @@
 // about.dart
-import "../../imports.dart";
+import "../imports.dart";
 
 // TODO: add link to flutter_chess_board LICENSE
 
@@ -118,8 +118,9 @@ class About extends StatelessWidget {
                 child: Column(
                   children: [
                     ListTile(
-                      title: Text("Unsere Website"),
+                      title: Text("Meine Website"),
                       trailing: Icon(Icons.arrow_forward_ios),
+                      onTap: () {},
                     ),
                     Divider(),
                     ListTile(
@@ -144,15 +145,23 @@ class About extends StatelessWidget {
               ),
               Card(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  padding: const EdgeInsets.fromLTRB(
+                    8.0,
+                    4.0,
+                    8.0,
+                    4.0,
+                  ),
                   child: Text(
                     "Vielen Dank an alle meine Beta Tester auf Testflight!",
                     maxLines: 100,
-                    textAlign: TextAlign.justify,
+                    textAlign: TextAlign.start,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodyText1,
                   ),
                 ),
+              ),
+              const SizedBox(
+                height: 5.0,
               ),
               Row(
                 children: [
@@ -168,12 +177,28 @@ class About extends StatelessWidget {
               Card(
                 child: Column(
                   children: [
+                    // sources for app icon:
+                    // brown wood: https://commons.wikimedia.org/wiki/File:Macassar01.jpg
+                    // white wood:
                     ListTile(
-                      title: Text("Quellen für App Icon"),
+                      title: Text("Quellen für das App Icon"),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      onTap: () {},
                     ),
+                    Divider(),
                     ListTile(
                       title: Text("Flutter Lizenz"),
-                      onTap: () => showAboutDialog(context: context),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      onTap: () => showAboutDialog(
+                        context: context,
+                        applicationName: "JustChess",
+                        applicationIcon: Image.asset(
+                          "assets/icon/JustChessIcon.png",
+                          height: 50.0,
+                          width: 50.0,
+                        ),
+                        applicationVersion: "0.3.4",
+                      ),
                       // onTap: () => Navigator.push(
                       //   context,
                       //   MaterialPageRoute(

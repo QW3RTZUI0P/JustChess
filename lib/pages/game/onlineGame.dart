@@ -1,24 +1,24 @@
-// gamePremium.dart
-import "../../../imports.dart";
+// onlineGame.dart
+import "../../imports.dart";
 import "package:chess/chess.dart" as chess;
 
 // TODO: implement chessBoard to try out ones move
-class GamePremium extends StatefulWidget {
+class OnlineGame extends StatefulWidget {
   final GameClass currentGame;
   final String opponentsName;
-  bool isUserWhite;
-  GamePremium({
+  final bool isUserWhite;
+  OnlineGame({
     @required this.currentGame,
     @required this.opponentsName,
     @required this.isUserWhite,
   });
 
   @override
-  GamePremiumState createState() => GamePremiumState();
+  OnlineGameState createState() => OnlineGameState();
 }
 
-class GamePremiumState extends State<GamePremium>
-    with AfterLayoutMixin<GamePremium> {
+class OnlineGameState extends State<OnlineGame>
+    with AfterLayoutMixin<OnlineGame> {
   // bloc that controls the loading, updating and saving of the games
   GamesBloc gamesBloc;
   // the current game (given from Home())
@@ -52,19 +52,7 @@ class GamePremiumState extends State<GamePremium>
   }
 
   @override
-  afterFirstLayout(BuildContext context) {
-    // if the current GameStatus has changed, the right dialog is shown
-    if (currentGame.gameStatus != GameStatus.playing) {
-      // TODO: find out why I have to instantiate this extension ??
-      // GameStatusDialogs(this).
-      // no idea why this has to be so complicated
-      gameStatusChanged(
-        currentContext: context,
-        gameStatus: currentGame.gameStatus,
-        durationInMilliseconds: 400,
-      );
-    }
-  }
+  afterFirstLayout(BuildContext context) {}
 
   bool usersTurn() {
     if (currentGame.whitesTurn && widget.isUserWhite) {
@@ -114,14 +102,12 @@ class GamePremiumState extends State<GamePremium>
                 .getGameFromFirestore(gameID: currentGame.id);
             this.gamesBloc.updateGameSink.add(updatedGame);
             setState(() {
-              
               this.currentGame = GameClass.from(updatedGame);
               this.isUsersTurn = usersTurn();
               chessBoardController.loadPGN(updatedGame.pgn);
               lastMove = chessBoardController.game.undo();
-               
             });
-           
+
             WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
               makeLastMove(lastMove: lastMove);
               if (currentGame.gameStatus != GameStatus.playing) {
@@ -146,76 +132,92 @@ class GamePremiumState extends State<GamePremium>
 
     return Scaffold(
       appBar: appBar,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Text(currentGame.canBeDeleted
-                  ? "Dein Gegner hat diese Partie gelöscht"
-                  : ""),
-              const SizedBox(height: 5),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  widget.isUserWhite
-                      ? VerticalNumbersWhite(
-                          height: boardSize,
-                        )
-                      : VerticalNumbersBlack(
-                          height: boardSize,
-                        ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  ChessBoardWidgetPremium(
-                    currentGame: this.currentGame,
-                    chessBoardController: this.chessBoardController,
-                    isUserWhite: widget.isUserWhite,
-                    isUsersTurn: this.isUsersTurn,
-                    boardSize: boardSize,
-                    lastMove: lastMove,
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              widget.isUserWhite
-                  ? Center(
-                      child: HorizontalLettersWhite(
-                        width: boardSize,
-                      ),
-                    )
-                  : Center(
-                      child: HorizontalLettersBlack(
-                        width: boardSize,
-                      ),
+      body: Builder(builder: (BuildContext currentContext) {
+        // if the current GameStatus has changed, the right dialog is shown
+        if (currentGame.gameStatus != GameStatus.playing) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            // TODO: find out why I have to instantiate this extension ??
+            // GameStatusDialogs(this).
+            // no idea why this has to be so complicated
+            gameStatusChanged(
+              currentContext: currentContext,
+              gameStatus: currentGame.gameStatus,
+              durationInMilliseconds: 400,
+            );
+          });
+        }
+
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Text(currentGame.canBeDeleted
+                    ? "Dein Gegner hat diese Partie gelöscht"
+                    : ""),
+                const SizedBox(height: 5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    widget.isUserWhite
+                        ? VerticalNumbersWhite(
+                            height: boardSize,
+                          )
+                        : VerticalNumbersBlack(
+                            height: boardSize,
+                          ),
+                    const SizedBox(
+                      width: 5,
                     ),
-              RaisedButton(
-                child: Text("Zug ausprobieren"),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        fullscreenDialog: true,
-                        builder: (BuildContext context) {
-                          return TryOutChessBoardWidget(
-                            pgn: this.currentGame.pgn,
-                            isUserWhite: widget.isUserWhite,
-                            appBarHeight: appBar.preferredSize.height,
-                          );
-                        }),
-                  );
-                },
-              ),
-            ],
+                    ChessBoardWidget(
+                      currentGame: this.currentGame,
+                      chessBoardController: this.chessBoardController,
+                      isUserWhite: widget.isUserWhite,
+                      isUsersTurn: this.isUsersTurn,
+                      boardSize: boardSize,
+                      lastMove: lastMove,
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                widget.isUserWhite
+                    ? Center(
+                        child: HorizontalLettersWhite(
+                          width: boardSize,
+                        ),
+                      )
+                    : Center(
+                        child: HorizontalLettersBlack(
+                          width: boardSize,
+                        ),
+                      ),
+                RaisedButton(
+                  child: Text("Zug ausprobieren"),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          fullscreenDialog: true,
+                          builder: (BuildContext context) {
+                            return TryOutChessBoardWidget(
+                              pgn: this.currentGame.pgn,
+                              isUserWhite: widget.isUserWhite,
+                              appBarHeight: appBar.preferredSize.height,
+                            );
+                          }),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 

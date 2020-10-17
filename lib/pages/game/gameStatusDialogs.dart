@@ -1,8 +1,8 @@
 // gameStatusDialogs.dart
-import "../../../imports.dart";
+import "../../imports.dart";
 
 // extension with the gameStatusChanged() method
-extension GameStatusDialogs on GamePremiumState {
+extension GameStatusDialogs on OnlineGameState {
   // executes one or two seconds after build()
   // shows the right dialog
 
@@ -210,6 +210,10 @@ extension GameStatusDialogs on GamePremiumState {
       case GameStatus.whiteProposedDraw:
         gameStatusDialog = Dialog(
           child: Container(
+            padding: EdgeInsets.only(
+              top: 4.0,
+              bottom: 4.0,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -276,6 +280,10 @@ extension GameStatusDialogs on GamePremiumState {
       case GameStatus.blackProposedDraw:
         gameStatusDialog = Dialog(
           child: Container(
+            padding: EdgeInsets.only(
+              top: 4.0,
+              bottom: 4.0,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -341,6 +349,10 @@ extension GameStatusDialogs on GamePremiumState {
       case GameStatus.whiteGaveUp:
         gameStatusDialog = Dialog(
           child: Container(
+            padding: EdgeInsets.only(
+              top: 4.0,
+              bottom: 4.0,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -351,6 +363,7 @@ extension GameStatusDialogs on GamePremiumState {
                   style: theme.dialogTheme.titleTextStyle,
                 ),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     FlatButton(
                       child: Text("Partie löschen"),
@@ -386,6 +399,10 @@ extension GameStatusDialogs on GamePremiumState {
       case GameStatus.blackGaveUp:
         gameStatusDialog = Dialog(
           child: Container(
+            padding: EdgeInsets.only(
+              top: 4.0,
+              bottom: 4.0,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -396,6 +413,7 @@ extension GameStatusDialogs on GamePremiumState {
                   style: theme.dialogTheme.titleTextStyle,
                 ),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     FlatButton(
                       child: Text("Partie löschen"),
