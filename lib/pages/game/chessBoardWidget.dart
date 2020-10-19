@@ -53,11 +53,18 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget>
 
   @override
   void afterFirstLayout(BuildContext context) {
-    makeLastMove(lastMove: widget.lastMove);
+    // makes a promotion if the last move has been a promotion
+    if (widget.lastMove["flags"].contains("p")) {
+      makeLastMoveWithPromotion(lastMove: widget.lastMove);
+    } else {
+      makeLastMove(lastMove: widget.lastMove);
+      String hello = "hello";
+    }
   }
 
-  void confirmMove() {
-    showModalBottomSheet(
+  Future<void> confirmMove() async {
+    print("confirm move");
+    await showModalBottomSheet(
         isDismissible: false,
         context: context,
         builder: (BuildContext context) {
@@ -116,13 +123,13 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget>
                           // TODO: maybe invent a better and more secure way
                           _currentGame.whitesTurn =
                               widget.isUserWhite ? false : true;
+                          widget.chessBoardController
+                              .loadPGN(updatedGame.pgn ?? "");
                         });
                         saveGame(game: updatedGame);
 
                         Navigator.pop(context);
 
-                        widget.chessBoardController
-                            .loadPGN(this._currentGame.pgn ?? "");
                         if (widget.chessBoardController.game.in_checkmate) {
                           PieceColor loserColor = onCheckmate();
                           updatedGame.gameStatus =
@@ -139,18 +146,33 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget>
             ),
           );
         });
+    return;
   }
 
   void saveGame({GameClass game}) {
     _gamesBloc.updateGameSink.add(game);
   }
 
-  void makeLastMove({dynamic lastMove}) async {
+  Future<void> makeLastMove({dynamic lastMove}) async {
     await Future.delayed(
       Duration(milliseconds: 500),
     );
     setState(() {
       widget.chessBoardController.game.move(widget.lastMove);
+    });
+  }
+
+  // makes the last move with a promotion
+  Future<void> makeLastMoveWithPromotion({dynamic lastMove}) async {
+    await Future.delayed(
+      Duration(milliseconds: 500),
+    );
+    setState(() {
+      widget.chessBoardController.game.move({
+        "from": lastMove["from"],
+        "to": lastMove["to"],
+        "promotion": lastMove["san"].split("").last.toLowerCase()
+      });
     });
   }
 
@@ -225,10 +247,10 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget>
       whiteSideTowardsUser: widget.isUserWhite,
       enableUserMoves: this.isUsersTurn,
       onMove: (move) {
-        confirmMove();
-        // partie.anzahlDerZuege += 0.5;
         print(move);
+        confirmMove();
       },
+
       onCheckMate: (_) {},
       // (color) {
       //   print("checkMate");

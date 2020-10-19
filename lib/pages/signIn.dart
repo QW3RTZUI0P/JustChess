@@ -242,7 +242,6 @@ class _SignInState extends State<SignIn> with Validators {
     String username,
     String userID,
   }) async {
-    // maybe this works better: if (username.contains("@justchess.com") == false)
     if (username.contains("@") && username.contains(".")) {
       CloudFirestoreDatabaseApi cloudFirestoreDatabase =
           CloudFirestoreDatabase();

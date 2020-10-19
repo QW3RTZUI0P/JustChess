@@ -108,6 +108,7 @@ class _CreateOnlineGameState extends State<CreateOnlineGame> {
             children: <Widget>[
               TextField(
                 controller: _neuePartieNameController,
+                maxLength: 100,
                 decoration:
                     InputDecoration(hintText: "der Untertitel der Partie"),
               ),
@@ -126,6 +127,7 @@ class _CreateOnlineGameState extends State<CreateOnlineGame> {
                 children: <Widget>[
                   Radio(
                     value: 0,
+                    activeColor: theme.primaryColor,
                     onChanged: (value) => radioButtonChanged(value),
                     groupValue: radioButtonGroupValue,
                   ),
@@ -136,6 +138,7 @@ class _CreateOnlineGameState extends State<CreateOnlineGame> {
                 children: <Widget>[
                   Radio(
                     value: 1,
+                    activeColor: theme.primaryColor,
                     onChanged: (value) => radioButtonChanged(value),
                     groupValue: radioButtonGroupValue,
                   ),
@@ -146,6 +149,7 @@ class _CreateOnlineGameState extends State<CreateOnlineGame> {
                 children: <Widget>[
                   Radio(
                     value: 2,
+                    activeColor: theme.primaryColor,
                     onChanged: (value) => radioButtonChanged(value),
                     groupValue: radioButtonGroupValue,
                   ),
@@ -175,8 +179,10 @@ class _CreateOnlineGameState extends State<CreateOnlineGame> {
                           itemBuilder: (BuildContext context, int index) {
                             return ListTile(
                               title: Text(_friendsBloc.friendsList[index]),
-                              selected: this.selectedFriend ==
-                                  _friendsBloc.friendsList[index],
+                              tileColor: selectedFriend ==
+                                      _friendsBloc.friendsList[index]
+                                  ? theme.focusColor
+                                  : null,
                               onTap: () {
                                 setState(() {
                                   this.selectedFriend =

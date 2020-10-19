@@ -114,12 +114,6 @@ class _MenuState extends State<Menu> {
     return Drawer(
       child: Column(
         children: <Widget>[
-          DrawerHeader(
-            margin: EdgeInsets.zero,
-            child: Center(
-              child: Text(""),
-            ),
-          ),
           // display some basic information (number of games, number of wins, number of moves) instead
           //
           // DrawerHeader(

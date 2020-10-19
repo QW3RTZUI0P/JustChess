@@ -17,8 +17,7 @@ class OnlineGame extends StatefulWidget {
   OnlineGameState createState() => OnlineGameState();
 }
 
-class OnlineGameState extends State<OnlineGame>
-    with AfterLayoutMixin<OnlineGame> {
+class OnlineGameState extends State<OnlineGame> {
   // bloc that controls the loading, updating and saving of the games
   GamesBloc gamesBloc;
   // the current game (given from Home())
@@ -51,9 +50,6 @@ class OnlineGameState extends State<OnlineGame>
     this.gamesBloc = GamesBlocProvider.of(context).gamesBloc;
   }
 
-  @override
-  afterFirstLayout(BuildContext context) {}
-
   bool usersTurn() {
     if (currentGame.whitesTurn && widget.isUserWhite) {
       return true;
@@ -74,6 +70,20 @@ class OnlineGameState extends State<OnlineGame>
     );
     setState(() {
       chessBoardController.game.move(lastMove);
+    });
+  }
+
+  // makes the last move with a promotion
+  Future<void> makeLastMoveWithPromotion({dynamic lastMove}) async {
+    await Future.delayed(
+      Duration(milliseconds: 500),
+    );
+    setState(() {
+      chessBoardController.game.move({
+        "from": lastMove["from"],
+        "to": lastMove["to"],
+        "promotion": lastMove["san"].split("").last.toLowerCase()
+      });
     });
   }
 
@@ -106,10 +116,17 @@ class OnlineGameState extends State<OnlineGame>
               this.isUsersTurn = usersTurn();
               chessBoardController.loadPGN(updatedGame.pgn);
               lastMove = chessBoardController.game.undo();
+              print("lastMove: " + lastMove.toString());
             });
 
             WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-              makeLastMove(lastMove: lastMove);
+              // makes a promotion if the last move has been a promotion
+              if (lastMove["flags"].contains("p")) {
+                makeLastMoveWithPromotion(lastMove: lastMove);
+              } else {
+                makeLastMove(lastMove: lastMove);
+                String hello = "hello";
+              }
               if (currentGame.gameStatus != GameStatus.playing) {
                 gameStatusChanged(
                   currentContext: context,

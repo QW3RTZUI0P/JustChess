@@ -187,7 +187,7 @@ class About extends StatelessWidget {
                     ),
                     Divider(),
                     ListTile(
-                      title: Text("Flutter Lizenz"),
+                      title: Text("Lizenzen"),
                       trailing: Icon(Icons.arrow_forward_ios),
                       onTap: () => showAboutDialog(
                         context: context,
@@ -197,7 +197,7 @@ class About extends StatelessWidget {
                           height: 50.0,
                           width: 50.0,
                         ),
-                        applicationVersion: "0.3.4",
+                        applicationVersion: "1.0.0",
                       ),
                       // onTap: () => Navigator.push(
                       //   context,

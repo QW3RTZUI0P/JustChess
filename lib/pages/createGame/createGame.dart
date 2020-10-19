@@ -47,7 +47,7 @@ class _CreateGameState extends State<CreateGame> with Validators {
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: Form(
-            autovalidate: false,
+            autovalidateMode: AutovalidateMode.disabled,
             key: this._formKey,
             child: Column(
               children: <Widget>[
@@ -69,12 +69,14 @@ class _CreateGameState extends State<CreateGame> with Validators {
                     ),
                     Radio(
                       value: true,
+                      activeColor: theme.primaryColor,
                       groupValue: _radioGroupValue,
                       onChanged: (value) => radioButtonChanged(toValue: value),
                     ),
                     Expanded(child: Text("Weiß")),
                     Radio(
                       value: false,
+                      activeColor: theme.primaryColor,
                       groupValue: _radioGroupValue,
                       onChanged: (value) => radioButtonChanged(toValue: value),
                     ),

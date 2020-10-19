@@ -112,7 +112,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   IconButton(
                     icon: Icon(
                       Icons.local_post_office,
-                      color: theme.iconTheme.color,
+                      color: Colors.white,
                     ),
                     tooltip: "Einladungen",
                     onPressed: () {
@@ -167,6 +167,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       body: SafeArea(
         child: Builder(
           builder: (BuildContext currentContext) => RefreshIndicator(
+            color: theme.primaryColor,
             onRefresh: () async {
               if (await _checkInternetConnection(
                   currentContext: currentContext)) {
@@ -188,7 +189,12 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                               mediaQueryData.padding.top -
                               mediaQueryData.padding.bottom,
                           child: Center(
-                            child: CircularProgressIndicator(),
+                            // makes the indicator black
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.black,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -223,6 +229,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                             } else if (!currentGame.player01IsWhite &&
                                 _gamesBloc.currentUserID ==
                                     currentGame.player02) {
+                              // TODO: aminationen einbauen
                               return true;
                             } else {
                               return false;

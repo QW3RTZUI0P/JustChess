@@ -108,6 +108,7 @@ var theme = ThemeData(
     ),
   ),
   indicatorColor: Colors.green.shade200,
+  focusColor: Colors.grey.shade500,
 );
 //
 //

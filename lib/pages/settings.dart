@@ -83,18 +83,22 @@ class _SettingsPremiumState extends State<SettingsPremium> {
                             style: TextStyle(color: Colors.red),
                           ),
                           onPressed: () async {
-                            // gets the current user's email (so that he doesn't have to type it in for himself)
-                            String emailAdress = await _authenticationBloc
-                                .authenticationService
-                                .currentUserEmail();
-                            // gets the users current credentials
-                            String userID = await _authenticationBloc
-                                .authenticationService
-                                .currentUserUid();
-                            String username = await _gamesBloc
-                                .cloudFirestoreDatabase
-                                .getUsernameForUserID(userID: userID);
+                            if (_passwordController.text.isEmpty ||
+                                _passwordController.text.length < 8) {
+                              return;
+                            }
                             try {
+                              // gets the current user's email (so that he doesn't have to type it in for himself)
+                              String emailAdress = await _authenticationBloc
+                                  .authenticationService
+                                  .currentUserEmail();
+                              // gets the users current credentials
+                              String userID = await _authenticationBloc
+                                  .authenticationService
+                                  .currentUserUid();
+                              String username = await _gamesBloc
+                                  .cloudFirestoreDatabase
+                                  .getUsernameForUserID(userID: userID);
                               // reauthenticates the user and deletes the account
                               // actions like deleting the account need a recent sign in process
                               await _authenticationBloc.authenticationService
@@ -102,7 +106,9 @@ class _SettingsPremiumState extends State<SettingsPremium> {
                                 email: emailAdress,
                                 password: _passwordController.text,
                               );
-
+                              // deletes the account from FirebaseAuth
+                              _authenticationBloc.authenticationService
+                                  .deleteAccount();
                               // deletes the username and the userID from the usernames document in the users collection
                               _gamesBloc.cloudFirestoreDatabase
                                   .deleteUserFromFirestore(
@@ -119,8 +125,9 @@ class _SettingsPremiumState extends State<SettingsPremium> {
                             } on PlatformException catch (platformException) {
                               Navigator.pop(context);
                               SnackbarMessage(
-                                  context: currentContext,
-                                  message: platformException.code);
+                                context: currentContext,
+                                message: platformException.message,
+                              );
                             } catch (error) {
                               print(error.toString());
                               Navigator.pop(context);
@@ -145,7 +152,6 @@ class _SettingsPremiumState extends State<SettingsPremium> {
             ),
           );
         });
-    _authenticationBloc.authenticationService.deleteAccount();
   }
 
   @override

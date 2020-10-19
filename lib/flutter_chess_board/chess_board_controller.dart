@@ -29,7 +29,8 @@ class ChessBoardController {
   /// pieceToPromoteTo String will be changed to enum in a future update and this method will be deprecated in the future
   void makeMoveWithPromotion(String from, String to, String pieceToPromoteTo) {
     game?.move({"from": from, "to": to, "promotion": pieceToPromoteTo});
-    refreshBoard == null ? this._throwNotAttachedException() : refreshBoard();
+    refreshBoard();
+    // refreshBoard == null ? this._throwNotAttachedException() : refreshBoard();
   }
 
   /// Resets square

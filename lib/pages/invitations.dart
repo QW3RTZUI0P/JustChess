@@ -38,6 +38,7 @@ class _InvitationsState extends State<Invitations>
         child:
             // TODO: find here and in HomePremium something else scrollable (not ListView)
             RefreshIndicator(
+          color: theme.primaryColor,
           onRefresh: () => refresh(),
           child: StreamBuilder(
             stream: widget.gamesBloc.invitationsListStream,

@@ -85,7 +85,7 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   Future<String> getUsernameForUserID({@required String userID}) async {
     DocumentSnapshot snapshot =
         await _firestore.collection(_userCollection).document(userID).get();
-    return snapshot?.data["username"];
+    return snapshot.data["username"];
   }
 
   // gets the uid for the given username
