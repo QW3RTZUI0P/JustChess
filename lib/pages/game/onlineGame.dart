@@ -121,11 +121,12 @@ class OnlineGameState extends State<OnlineGame> {
 
             WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
               // makes a promotion if the last move has been a promotion
-              if (lastMove["flags"].contains("p")) {
-                makeLastMoveWithPromotion(lastMove: lastMove);
-              } else {
-                makeLastMove(lastMove: lastMove);
-                String hello = "hello";
+              if (lastMove != null) {
+                if (lastMove["flags"].contains("p")) {
+                  makeLastMoveWithPromotion(lastMove: lastMove);
+                } else {
+                  makeLastMove(lastMove: lastMove);
+                }
               }
               if (currentGame.gameStatus != GameStatus.playing) {
                 gameStatusChanged(

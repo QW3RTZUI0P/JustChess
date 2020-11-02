@@ -76,7 +76,7 @@ class _CreateOnlineGameState extends State<CreateOnlineGame> {
       moveCount: 0,
       gameStatus: GameStatus.playing,
       isOnline: true,
-      canBeDeleted: false,
+      canBeDeleted: true,
     );
     neuePartie.createUniqueID();
     _gameBloc.addGameSink.add(neuePartie);

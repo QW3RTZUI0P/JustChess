@@ -2,7 +2,6 @@
 import "../../imports.dart";
 
 class GameTypeSelection extends StatefulWidget {
-
   @override
   _GameTypeSelectionState createState() => _GameTypeSelectionState();
 }
@@ -49,16 +48,13 @@ class _GameTypeSelectionState extends State<GameTypeSelection> {
 
   void createGamePremium() {
     setState(() {
-      this.currentPage = CreateOnlineGame(
-      );
+      this.currentPage = CreateOnlineGame();
     });
   }
 
   void createOfflineGame() {
     setState(() {
-      this.currentPage = CreateGame(
-        isUserPremium: true,
-      );
+      this.currentPage = CreateGame();
     });
   }
 

@@ -17,7 +17,6 @@ class Home extends StatefulWidget {
 // WidgetsBindingObserver helps observing the AppLifecycleState (to refresh _gamesBloc when app is resumed)
 class _HomeState extends State<Home> with WidgetsBindingObserver {
   GamesBloc _gamesBloc;
-  int _invitationsBadge;
 
   @override
   void initState() {
@@ -84,7 +83,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       ),
       textTheme: theme.appBarTheme.textTheme,
       actions: <Widget>[
-        // TODO: move the notification badge to the right side (in release mode)
         StreamBuilder(
             stream: _gamesBloc.invitationsListStream,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -131,7 +129,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   // notification badge
                   Positioned(
                     top: 5,
-                    left: 5,
+                    right: 5,
                     child: Container(
                       padding: EdgeInsets.all(2),
                       decoration: BoxDecoration(
@@ -179,7 +177,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                 stream: _gamesBloc.gamesListStream,
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting ||
-                      snapshot.data.isEmpty) {
+                      snapshot.data == null) {
                     // has to be scrollable (to enable pull to refresh)
                     return ListView(
                       children: [
@@ -199,12 +197,13 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                         ),
                       ],
                     );
-                  } else if (snapshot.data == []) {
+                  } else if (snapshot.data == [] || snapshot.data.isEmpty) {
                     // has to be scrollable (to enable pull to refresh)
                     return ListView(
                       children: <Widget>[
                         Container(
-                          height: MediaQuery.of(context).size.height,
+                          height: MediaQuery.of(context).size.height -
+                              appBar.preferredSize.height,
                           child: Center(
                             child: Text(
                               "Noch keine Partien hinzugefügt",

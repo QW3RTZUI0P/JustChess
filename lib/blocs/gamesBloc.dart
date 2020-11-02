@@ -79,6 +79,7 @@ class GamesBloc {
   // starts the listeners for the three streams
   void _startListeners() async {
     this.gameIDStream.listen((gameID) async {
+      gameIDsList.add(gameID);
       // fetches game and passes it to fetchedGameStream
       GameClass currentGameInFunction =
           await cloudFirestoreDatabase.getGameFromFirestore(gameID: gameID);
@@ -95,7 +96,7 @@ class GamesBloc {
       // adds game locally
       this.gamesList.add(game);
       // only executes for the last game
-      if (game.id == this.gameIDsList.last) {
+      if (game.id == gameIDsList.last) {
         print(game.id);
         // adds updated gamesList to the gamesListStream
         this.gamesListSink.add(this.gamesList);
@@ -232,7 +233,7 @@ class GamesBloc {
     String jsonString = await LocalDatabaseFileRoutines().readFileAsString();
     this.localGamesList = gamesListFromJsonString(jsonString);
     // adds something to the gamesListSink Stream (otherwise the snapshot wouldn't get anything because the for loop wouldn't execute)
-    if (this.localGamesList.isEmpty) {
+    if (this.localGamesList.isEmpty || localGamesList.length == 0) {
       this.gamesListSink.add(this.gamesList);
     }
     // adds each local game to gamesListSink
@@ -256,8 +257,12 @@ class GamesBloc {
       }
       // adds all the fetched gameIDs to gameIDsList
       // adds each gameID to the gameIDSink, which passes it down the Stream Tree
+      // could be removed
+      // for (String currentGameID in gameIDsInFunction) {
+      //   gameIDsList.add(currentGameID);
+      // }
+      // // has to be like this, otherwise an error would occur when the user has no games and accepts an invitation
       for (String currentGameID in gameIDsInFunction) {
-        gameIDsList.add(currentGameID);
         gameIDSink.add(currentGameID);
       }
       // fetches the invitations from CloudFirestore
@@ -277,6 +282,23 @@ class GamesBloc {
   Future<void> refreshAll({bool updateInvitationsListStream = false}) async {
     // resolves the issue of showing the same games multiple times
     if (gameIDsList.isEmpty) {
+      invitationsList.clear();
+      // only executes when the user is signed in
+      if (await authenticationService.currentUser() != null) {
+        // userID of the current user
+        String currentUserIDInFunction =
+            await authenticationService.currentUserUid();
+        List<dynamic> invitationsInFunction = await cloudFirestoreDatabase
+            .getInvitations(userID: currentUserIDInFunction);
+        // adds each Invitation to invitationList
+        for (Map<String, dynamic> currentInvitationMap
+            in invitationsInFunction) {
+          InvitationClass currentInvitation =
+              InvitationClass.fromJsonMap(currentInvitationMap);
+          this.invitationsList.add(currentInvitation);
+        }
+        invitationsListSink.add(invitationsList);
+      }
       return;
     }
     gameIDsList.clear();
@@ -285,6 +307,7 @@ class GamesBloc {
     gameTitlesList.clear();
     invitationsList.clear();
     await getGamesAndImportantValues();
+    print("invitationsList: " + invitationsList.toString());
     if (updateInvitationsListStream) {
       invitationsListSink.add(invitationsList);
     }

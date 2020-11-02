@@ -64,7 +64,6 @@ export "./blocs/authenticationBloc.dart";
 export "./blocs/gamesBloc.dart";
 export "./blocs/loginBloc.dart";
 export "./blocs/friendsBloc.dart";
-export "./blocs/localGamesBloc.dart";
 //
 //
 // widgets:

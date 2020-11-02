@@ -184,18 +184,7 @@ class _SignInState extends State<SignIn> with Validators {
                   validator: (String password) =>
                       checkSignInPassword(password: password),
                 ),
-                // Align(
-                //   alignment: Alignment.centerLeft,
-                //   child: Builder(
-                //     builder: (BuildContext currentContext) => FlatButton(
-                //       child: Text(
-                //         "Passwort zurücksetzen",
-                //       ),
-                //       onPressed: () => resetPassword(currentContext),
-                //     ),
-                //   ),
-                // ),
-                // TODO: dem User eine Benachrichtigung / ein Feedback anzeigen, z.B. "Passwort ist falsch"
+
                 Builder(
                   builder: (BuildContext currentContext) => RaisedButton(
                     child: Text("Anmelden"),

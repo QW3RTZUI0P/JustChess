@@ -1,17 +1,17 @@
-// settingsPremium.dart
+// settings.dart
 import 'package:flutter/services.dart';
 import "../imports.dart";
 
-class SettingsPremium extends StatefulWidget {
+class Settings extends StatefulWidget {
   final String username;
   final String emailAdress;
-  SettingsPremium({@required this.username, @required this.emailAdress});
+  Settings({@required this.username, @required this.emailAdress});
 
   @override
-  _SettingsPremiumState createState() => _SettingsPremiumState();
+  _SettingsState createState() => _SettingsState();
 }
 
-class _SettingsPremiumState extends State<SettingsPremium> {
+class _SettingsState extends State<Settings> {
   AuthenticationBloc _authenticationBloc;
   GamesBloc _gamesBloc;
   // only necessary during development
@@ -99,6 +99,10 @@ class _SettingsPremiumState extends State<SettingsPremium> {
                               String username = await _gamesBloc
                                   .cloudFirestoreDatabase
                                   .getUsernameForUserID(userID: userID);
+                              // deletes the username and the userID from the usernames document in the users collection
+                              _gamesBloc.cloudFirestoreDatabase
+                                  .deleteUserFromFirestore(
+                                      userID: userID, username: username);
                               // reauthenticates the user and deletes the account
                               // actions like deleting the account need a recent sign in process
                               await _authenticationBloc.authenticationService
@@ -106,13 +110,7 @@ class _SettingsPremiumState extends State<SettingsPremium> {
                                 email: emailAdress,
                                 password: _passwordController.text,
                               );
-                              // deletes the account from FirebaseAuth
-                              _authenticationBloc.authenticationService
-                                  .deleteAccount();
-                              // deletes the username and the userID from the usernames document in the users collection
-                              _gamesBloc.cloudFirestoreDatabase
-                                  .deleteUserFromFirestore(
-                                      userID: userID, username: username);
+
                               // clears the current data
                               _gamesBloc.signOut();
                               Navigator.pop(context);

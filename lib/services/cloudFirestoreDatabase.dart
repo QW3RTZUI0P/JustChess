@@ -158,18 +158,20 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   }
 
   // deletes an invitation from the user's document
-  void deleteInvitationFromFirestore(
+  Future<void> deleteInvitationFromFirestore(
       {@required String userID, @required InvitationClass invitation}) async {
     DocumentSnapshot snapshot =
         await _firestore.collection(_userCollection).document(userID).get();
     List<dynamic> invitations = snapshot.data["invitations"] ?? [];
     invitations.removeWhere(
         (invitationToTest) => invitationToTest["gameID"] == invitation.gameID);
-    // print(invitations.remove(invitation.toJsonMap()).toString());
+
     await _firestore
         .collection(_userCollection)
         .document(userID)
         .updateData({"invitations": invitations});
+
+    return;
   }
 
   /// adds an user to the users collection
@@ -207,8 +209,8 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
         .collection(_userCollection)
         .document("usernames")
         .get();
-    List<dynamic> usernames = snapshot["usernames"];
-    Map<String, dynamic> userIDs = snapshot["userIDs"];
+    List<dynamic> usernames = snapshot.data["usernames"];
+    Map<String, dynamic> userIDs = snapshot.data["userIDs"];
     // removes username from the usernames list
     usernames.remove(username);
     // removes the MapEntry with the username as the key and the userID as the value from the map
@@ -261,6 +263,7 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
       throw platformException;
     } catch (error) {
       print(error.toString());
+      throw error;
     }
   }
 
@@ -307,47 +310,3 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   //   );
   // }
 }
-
-// // DAS HIER ALLES IST SCHEIßE!!!!!!!!!!!!!!
-//   Stream<List<PartieKlasse>> getGames({List<String> gameIDs}) {
-//     StreamController<List<PartieKlasse>> streamController =
-//         StreamController<List<PartieKlasse>>();
-//     Sink<List<PartieKlasse>> _addGame = streamController.sink;
-//     Stream<List<PartieKlasse>> games = streamController.stream;
-//     for (String currentID in gameIDs) {
-//       _firestore
-//           .collection(_gamesCollection)
-//           .document(currentID)
-//           .snapshots()
-//           .map((currentSnapshot) async {
-//         List<PartieKlasse> gamesList = await games.single;
-//         gamesList.add(PartieKlasse.vonDocumentSnapshot(currentSnapshot));
-//         _addGame.add(gamesList);
-//       });
-//       return games;
-//     }
-//     streamController.close();
-//     // wahrscheinlich unnötig
-//     // gameIDs.map((currentID) async {
-//     //   DocumentSnapshot snapshot = await _firestore.collection(_gamesCollection).document(currentID).get();
-//     //   return PartieKlasse.vonDocumentSnapshot(snapshot);
-//     // }).toList(growable: true);
-//   }
-
-//   // wahrscheinlich unnötig
-//   // leider darf man in Blocs nur Streams benutzen, deswegen geht das hier leider nicht
-//   // aber ich behalte es mal da, weil diese Klasse ja eigentlich kein Bloc ist
-
-//   // Future<List<PartieKlasse>> getGames({List<String> gameIDs}) async {
-//   //   List<PartieKlasse> games = [];
-//   //   for (String currentID in gameIDs) {
-//   //     DocumentSnapshot snapshot = await _firestore.collection(_gamesCollection).document(currentID).get();
-//   //     games.add(PartieKlasse.vonDocumentSnapshot(snapshot));
-//   //   }
-//   //   return games;
-//   //   // wahrscheinlich unnötig
-//   //   // gameIDs.map((currentID) async {
-//   //   //   DocumentSnapshot snapshot = await _firestore.collection(_gamesCollection).document(currentID).get();
-//   //   //   return PartieKlasse.vonDocumentSnapshot(snapshot);
-//   //   // }).toList(growable: true);
-//   // }

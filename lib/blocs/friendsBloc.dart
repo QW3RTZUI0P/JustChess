@@ -112,7 +112,7 @@ class FriendsBloc {
   }
 
   // gets the important values
-  void getImportantValues() async {
+  Future<void> getImportantValues() async {
     dynamic user = await authenticationService.currentUser();
     // only executes when the user is signed in
     if (user != null) {
@@ -130,6 +130,7 @@ class FriendsBloc {
         friendsList.add(currentFriend);
       }
     }
+    return;
   }
 
   // TODO: check whether this works all the time
@@ -155,7 +156,6 @@ class FriendsBloc {
     friendsList.clear();
     getImportantValues();
   }
-
 }
 
 // Provider for the friendsBloc

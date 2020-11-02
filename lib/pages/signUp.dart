@@ -16,6 +16,7 @@ class _SignUpState extends State<SignUp> with Validators {
   // loginBloc für die gesamte Registrierungslogik
   LoginBloc _loginBloc;
   GamesBloc _gamesBloc;
+  FriendsBloc _friendsBloc;
   // TextEditingController für die Textfelder
   final TextEditingController _benutzernameController = TextEditingController();
   final TextEditingController _passwortController = TextEditingController();
@@ -48,6 +49,7 @@ class _SignUpState extends State<SignUp> with Validators {
   void didChangeDependencies() {
     super.didChangeDependencies();
     this._gamesBloc = GamesBlocProvider.of(context).gamesBloc;
+    this._friendsBloc = FriendsBlocProvider.of(context).friendsBloc;
   }
 
   @override
@@ -78,7 +80,6 @@ class _SignUpState extends State<SignUp> with Validators {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    TextStyle checkboxTextStyle = theme.textTheme.bodyText1;
 
     return Scaffold(
       appBar: AppBar(
@@ -160,6 +161,8 @@ class _SignUpState extends State<SignUp> with Validators {
                       ),
                       child: Checkbox(
                           value: _checkboxValue,
+                          checkColor: Colors.white,
+                          activeColor: Colors.black,
                           onChanged: (bool newValue) {
                             setState(() {
                               _checkboxValue = newValue;
@@ -223,7 +226,9 @@ class _SignUpState extends State<SignUp> with Validators {
                             );
 
                             // refreshes the list of games (otherwise snapshot wouldn't connect)
-                            _gamesBloc.refreshAllAfterSigningIn();
+                            await _gamesBloc.refreshAllAfterSigningIn(
+                                updateInvitationsListStream: false);
+                            await _friendsBloc.getImportantValues();
                           } on PlatformException catch (platformException) {
                             print(platformException.toString());
                             SnackbarMessage(
@@ -244,7 +249,6 @@ class _SignUpState extends State<SignUp> with Validators {
                         }
                       } else {
                         if (_checkboxValue == false) {
-                          // TODO: make the checkbox validation
                           setState(() {
                             _checkboxColor = Colors.red;
                           });

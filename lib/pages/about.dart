@@ -1,7 +1,6 @@
 // about.dart
 import "../imports.dart";
-
-// TODO: add link to flutter_chess_board LICENSE
+import "dart:io";
 
 class About extends StatelessWidget {
   void _createFeedbackMail() async {
@@ -24,17 +23,34 @@ class About extends StatelessWidget {
     }
   }
 
-  void _launchCompanySite() async {
-    const url = "https://jumelon.github.io";
+  void _launchJustChessInStore() async {
+    // launches the App in the respective stores: for iOS in the App Store and for Android in the Play Store
+    String url = "";
+    if (Platform.isIOS) {
+      url = "https://apps.apple.com/de/app/justchess/id1522164510";
+    }
+    // TODO: implement cases for web, Windows and Mac OS
+    else {
+      url = "";
+    }
     if (await canLaunch(url)) {
       await launch(url);
     } else {
-      throw 'Could not launch $url';
+      throw "Could not launch $url";
+    }
+  }
+
+  void _launchTermsOfUse() async {
+    const url = "https://justchess.github.io/termsOfUse.md";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw "Could not launch $url";
     }
   }
 
   void _launchPrivacyPolicy() async {
-    const url = "https://jumelon.github.io/privacy.md";
+    const url = "https://justchess.github.io/privacyPolicy.md";
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -85,19 +101,19 @@ class About extends StatelessWidget {
                     ListTile(
                       title: Text("Im App Store bewerten"),
                       trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () {},
-                    ),
-                    Divider(),
-                    ListTile(
-                      title: Text("Datenschutzerklärung"),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () {},
+                      onTap: () => _launchJustChessInStore(),
                     ),
                     Divider(),
                     ListTile(
                       title: Text("Nutzungsbedingungen"),
                       trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () {},
+                      onTap: () => _launchTermsOfUse(),
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text("Datenschutzerklärung"),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      onTap: () => _launchPrivacyPolicy(),
                     ),
                   ],
                 ),
@@ -120,7 +136,6 @@ class About extends StatelessWidget {
                     ListTile(
                       title: Text("Meine Website"),
                       trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () {},
                     ),
                     Divider(),
                     ListTile(
@@ -197,27 +212,8 @@ class About extends StatelessWidget {
                           height: 50.0,
                           width: 50.0,
                         ),
-                        applicationVersion: "1.0.0",
+                        applicationVersion: "1.0.1",
                       ),
-                      // onTap: () => Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     fullscreenDialog: true,
-                      //     builder: (BuildContext context) {
-                      //       return Scaffold(
-                      //         appBar: AppBar(
-                      //           title: Text("Flutter Lizenz"),
-                      //         ),
-                      //         body: SafeArea(
-                      //           child: Padding(
-                      //             padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                      //             child: ,
-                      //           ),
-                      //         ),
-                      //       );
-                      //     },
-                      //   ),
-                      // ),
                     ),
                   ],
                 ),

@@ -26,8 +26,6 @@ class _InvitationsState extends State<Invitations>
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     MediaQueryData mediaQueryData = MediaQuery.of(context);
-    List<InvitationClass> invitationsList =
-        List.from(this.widget.gamesBloc.invitationsList);
 
     var appBar = AppBar(
       title: Text("Einladungen"),

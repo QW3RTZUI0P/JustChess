@@ -54,11 +54,12 @@ class _ChessBoardWidgetState extends State<ChessBoardWidget>
   @override
   void afterFirstLayout(BuildContext context) {
     // makes a promotion if the last move has been a promotion
-    if (widget.lastMove["flags"].contains("p")) {
-      makeLastMoveWithPromotion(lastMove: widget.lastMove);
-    } else {
-      makeLastMove(lastMove: widget.lastMove);
-      String hello = "hello";
+    if (widget.lastMove != null) {
+      if (widget.lastMove["flags"].contains("p")) {
+        makeLastMoveWithPromotion(lastMove: widget.lastMove);
+      } else {
+        makeLastMove(lastMove: widget.lastMove);
+      }
     }
   }
 

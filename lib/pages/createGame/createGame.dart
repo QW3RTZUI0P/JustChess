@@ -3,8 +3,7 @@ import "../../imports.dart";
 
 class CreateGame extends StatefulWidget {
   // whether _gameBloc should be instantiated
-  bool isUserPremium;
-  CreateGame({@required this.isUserPremium});
+
   @override
   _CreateGameState createState() => _CreateGameState();
 }
@@ -12,8 +11,6 @@ class CreateGame extends StatefulWidget {
 class _CreateGameState extends State<CreateGame> with Validators {
   // key for the Form widget
   final _formKey = GlobalKey<FormState>();
-  // bloc that manages the local saving of the games
-  LocalGamesBloc _localGamesBloc;
   // bloc for refreshing the gamesList
   GamesBloc _gamesBloc;
   // TextEditingcontroller for the name of the created game
@@ -24,11 +21,8 @@ class _CreateGameState extends State<CreateGame> with Validators {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (widget.isUserPremium) {
-      this._gamesBloc = GamesBlocProvider.of(context).gamesBloc;
-    } else {
-      this._localGamesBloc = LocalGamesBlocProvider.of(context).localGamesBloc;
-    }
+
+    this._gamesBloc = GamesBlocProvider.of(context).gamesBloc;
   }
 
   void radioButtonChanged({bool toValue}) {
@@ -94,11 +88,8 @@ class _CreateGameState extends State<CreateGame> with Validators {
                       );
                       newGame.createUniqueID();
 
-                      if (widget.isUserPremium) {
-                        _gamesBloc.addGameSink.add(newGame);
-                      } else {
-                        _localGamesBloc.localGameCreated(newGame: newGame);
-                      }
+                      _gamesBloc.addGameSink.add(newGame);
+
                       this._nameController.text = "";
                       Navigator.pop(context);
                     }

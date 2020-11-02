@@ -38,6 +38,7 @@ class JustChess extends StatelessWidget {
           ),
           // the app for premium user
           child: MaterialApp(
+            debugShowCheckedModeBanner: false,
             theme: theme,
             // TODO: enable darkTheme when darkmode is implemented
             // darkTheme: darkTheme,
