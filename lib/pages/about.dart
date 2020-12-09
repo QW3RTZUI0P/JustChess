@@ -69,157 +69,155 @@ class About extends StatelessWidget {
     return Scaffold(
       appBar: appBar,
       body: SafeArea(
-        child: Padding(
+        child: ListView(
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-          child: ListView(
-            children: <Widget>[
-              const SizedBox(height: 5.0),
-              Row(
-                children: [
-                  const SizedBox(
-                    width: 10.0,
+          children: <Widget>[
+            const SizedBox(height: 5.0),
+            Row(
+              children: [
+                const SizedBox(
+                  width: 10.0,
+                ),
+                Text(
+                  "ALLGEMEIN",
+                  style: theme.textTheme.subtitle2,
+                ),
+              ],
+            ),
+            Card(
+              child: Column(
+                children: <Widget>[
+                  ListTile(
+                    title: Text(
+                      "Feedback und Verbesserungsvorschläge",
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    subtitle: Text("via E-Mail"),
+                    trailing: Icon(Icons.arrow_forward_ios),
+                    onTap: () => _createFeedbackMail(),
                   ),
-                  Text(
-                    "ALLGEMEIN",
-                    style: theme.textTheme.subtitle2,
+                  Divider(),
+                  ListTile(
+                    title: Text("Im App Store bewerten"),
+                    trailing: Icon(Icons.arrow_forward_ios),
+                    onTap: () => _launchJustChessInStore(),
+                  ),
+                  Divider(),
+                  ListTile(
+                    title: Text("Nutzungsbedingungen"),
+                    trailing: Icon(Icons.arrow_forward_ios),
+                    onTap: () => _launchTermsOfUse(),
+                  ),
+                  Divider(),
+                  ListTile(
+                    title: Text("Datenschutzerklärung"),
+                    trailing: Icon(Icons.arrow_forward_ios),
+                    onTap: () => _launchPrivacyPolicy(),
                   ),
                 ],
               ),
-              Card(
-                child: Column(
-                  children: <Widget>[
-                    ListTile(
-                      title: Text(
-                        "Feedback und Verbesserungsvorschläge",
-                        overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 5.0),
+            Row(
+              children: [
+                const SizedBox(
+                  width: 10.0,
+                ),
+                Text(
+                  "ÜBER UNS",
+                  style: theme.textTheme.subtitle2,
+                ),
+              ],
+            ),
+            Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text("Meine Website"),
+                    trailing: Icon(Icons.arrow_forward_ios),
+                  ),
+                  Divider(),
+                  ListTile(
+                    title: Text("Auf GitHub beitragen"),
+                    trailing: Icon(Icons.arrow_forward_ios),
+                    onTap: () => _launchGithubPage(),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 5.0),
+            Row(
+              children: [
+                SizedBox(
+                  width: 10.0,
+                ),
+                Text(
+                  "DANKSAGUNG",
+                  style: theme.textTheme.subtitle2,
+                ),
+              ],
+            ),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  8.0,
+                  4.0,
+                  8.0,
+                  4.0,
+                ),
+                child: Text(
+                  "Vielen Dank an alle meine Beta Tester auf Testflight!",
+                  maxLines: 100,
+                  textAlign: TextAlign.start,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyText1,
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 5.0,
+            ),
+            Row(
+              children: [
+                SizedBox(
+                  width: 10.0,
+                ),
+                Text(
+                  "RECHTLICHES",
+                  style: theme.textTheme.subtitle2,
+                ),
+              ],
+            ),
+            Card(
+              child: Column(
+                children: [
+                  // sources for app icon:
+                  // brown wood: https://commons.wikimedia.org/wiki/File:Macassar01.jpg
+                  // white wood:
+                  ListTile(
+                    title: Text("Quellen für das App Icon"),
+                    trailing: Icon(Icons.arrow_forward_ios),
+                    onTap: () {},
+                  ),
+                  Divider(),
+                  ListTile(
+                    title: Text("Lizenzen"),
+                    trailing: Icon(Icons.arrow_forward_ios),
+                    onTap: () => showAboutDialog(
+                      context: context,
+                      applicationName: "JustChess",
+                      applicationIcon: Image.asset(
+                        "assets/icon/JustChessIcon.png",
+                        height: 50.0,
+                        width: 50.0,
                       ),
-                      subtitle: Text("via E-Mail"),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () => _createFeedbackMail(),
+                      applicationVersion: "1.0.1",
                     ),
-                    Divider(),
-                    ListTile(
-                      title: Text("Im App Store bewerten"),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () => _launchJustChessInStore(),
-                    ),
-                    Divider(),
-                    ListTile(
-                      title: Text("Nutzungsbedingungen"),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () => _launchTermsOfUse(),
-                    ),
-                    Divider(),
-                    ListTile(
-                      title: Text("Datenschutzerklärung"),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () => _launchPrivacyPolicy(),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 5.0),
-              Row(
-                children: [
-                  const SizedBox(
-                    width: 10.0,
-                  ),
-                  Text(
-                    "ÜBER UNS",
-                    style: theme.textTheme.subtitle2,
                   ),
                 ],
               ),
-              Card(
-                child: Column(
-                  children: [
-                    ListTile(
-                      title: Text("Meine Website"),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                    ),
-                    Divider(),
-                    ListTile(
-                      title: Text("Auf Github beitragen"),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () => _launchGithubPage(),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 5.0),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 10.0,
-                  ),
-                  Text(
-                    "DANKSAGUNG",
-                    style: theme.textTheme.subtitle2,
-                  ),
-                ],
-              ),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    8.0,
-                    4.0,
-                    8.0,
-                    4.0,
-                  ),
-                  child: Text(
-                    "Vielen Dank an alle meine Beta Tester auf Testflight!",
-                    maxLines: 100,
-                    textAlign: TextAlign.start,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyText1,
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 5.0,
-              ),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 10.0,
-                  ),
-                  Text(
-                    "RECHTLICHES",
-                    style: theme.textTheme.subtitle2,
-                  ),
-                ],
-              ),
-              Card(
-                child: Column(
-                  children: [
-                    // sources for app icon:
-                    // brown wood: https://commons.wikimedia.org/wiki/File:Macassar01.jpg
-                    // white wood:
-                    ListTile(
-                      title: Text("Quellen für das App Icon"),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () {},
-                    ),
-                    Divider(),
-                    ListTile(
-                      title: Text("Lizenzen"),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () => showAboutDialog(
-                        context: context,
-                        applicationName: "JustChess",
-                        applicationIcon: Image.asset(
-                          "assets/icon/JustChessIcon.png",
-                          height: 50.0,
-                          width: 50.0,
-                        ),
-                        applicationVersion: "1.0.1",
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

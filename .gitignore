@@ -1,3 +1,6 @@
+# My Configuration
+android/key.properties
+ios/Flutter/.last_build_id
 # Miscellaneous
 *.class
 *.log
