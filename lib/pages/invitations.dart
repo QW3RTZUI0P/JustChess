@@ -18,7 +18,9 @@ class _InvitationsState extends State<Invitations>
   }
 
   Future<void> refresh() async {
-    await widget.gamesBloc.refreshInvitations();
+    setState(() {
+         widget.gamesBloc.refreshInvitations(); 
+    });
     return;
   }
 
@@ -66,7 +68,8 @@ class _InvitationsState extends State<Invitations>
                 );
               }
               return ListView(
-                children: snapshot.data
+                children: snapshot
+                    .data()
                     .map<Widget>(
                       (currentInvitation) => Column(
                         children: [

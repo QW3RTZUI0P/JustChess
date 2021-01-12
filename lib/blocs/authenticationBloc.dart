@@ -28,10 +28,7 @@ class AuthenticationBloc {
   void startListeners() async {
     await authenticationService.getFirebaseAuth();
     // is executed when the user logs in or logs out
-    authenticationService
-        .getFirebaseAuth()
-        .onAuthStateChanged
-        .listen((FirebaseUser user) async {
+    authenticationService.getFirebaseAuth().authStateChanges().listen((User user) async {
       final String uid = user != null ? user.uid : null;
       addUser.add(uid);
     });

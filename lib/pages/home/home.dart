@@ -39,7 +39,9 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   // this has to be like this; onRefresh has to get a value
   Future<void> refresh() async {
-    await _gamesBloc.refreshAll(updateInvitationsListStream: true);
+    setState(() {
+      _gamesBloc.refreshAll(updateInvitationsListStream: true);
+    });
     return;
   }
 
@@ -219,7 +221,13 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                         itemCount: snapshot.data.length,
                         itemBuilder: (BuildContext context, int index) {
                           // current Game
-                          GameClass currentGame = snapshot.data[index];
+                          GameClass currentGame;
+                          try {
+                            currentGame = snapshot.data[index];
+                          } on RangeError catch (error) {
+                            currentGame = GameClass();
+                          }
+
                           bool userWhite() {
                             if (currentGame.player01IsWhite &&
                                 _gamesBloc.currentUserID ==
@@ -264,9 +272,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                           }
 
                           return Dismissible(
-                              key: Key(
-                                currentGame.id,
-                              ),
+                              key: UniqueKey(),
                               child: Column(
                                 children: [
                                   Container(

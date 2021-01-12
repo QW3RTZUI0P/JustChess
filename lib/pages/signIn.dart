@@ -236,7 +236,7 @@ class _SignInState extends State<SignIn> with Validators {
           CloudFirestoreDatabase();
       String usernameInFunction =
           await cloudFirestoreDatabase.getUsernameForUserID(userID: userID);
-      FirebaseUser user = await authenticationService.currentUser();
+      User user = await authenticationService.currentUser();
       user.updateEmail(usernameInFunction + "@justchess.com");
     }
   }

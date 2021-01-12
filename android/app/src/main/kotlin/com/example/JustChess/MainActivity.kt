@@ -1,4 +1,4 @@
-package com.example.JustChess
+package com.jumelon.JustChess
 
 import io.flutter.embedding.android.FlutterActivity
 

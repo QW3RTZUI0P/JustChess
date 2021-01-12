@@ -66,7 +66,7 @@ class _FriendsState extends State<Friends> with AfterLayoutMixin<Friends> {
             return Center(
               child: Text("Noch keine Freunde hinzugefügt"),
             );
-          } else if (snapshot.hasData) {
+          } else {
             return ListView.separated(
               itemBuilder: (BuildContext context, int index) {
                 return Dismissible(

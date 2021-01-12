@@ -8,12 +8,11 @@ export "package:flutter/material.dart";
 export "package:path_provider/path_provider.dart";
 export "package:shared_preferences/shared_preferences.dart";
 export "package:url_launcher/url_launcher.dart";
-export "package:in_app_purchase/in_app_purchase.dart";
+
 // Firebase
 export "package:firebase_core/firebase_core.dart";
 export "package:cloud_firestore/cloud_firestore.dart";
 export "package:firebase_auth/firebase_auth.dart";
-export "package:firebase_dynamic_links/firebase_dynamic_links.dart";
 //
 //
 //
@@ -22,7 +21,6 @@ export "package:firebase_dynamic_links/firebase_dynamic_links.dart";
 // pages
 export "./pages/signIn.dart";
 export "./pages/signUp.dart";
-export "./pages/settings.dart";
 export "./pages/invitations.dart";
 export "./pages/about.dart";
 // home:

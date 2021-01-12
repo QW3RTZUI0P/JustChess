@@ -17,7 +17,7 @@ abstract class AuthenticationApi {
     String username,
   });
   Future<void> sendEmailVerification();
-  Future<AuthResult> deleteAccount({String email, String password});
+  Future<UserCredential> deleteAccount({String email, String password});
   Future<void> sendResetPasswortEmail({String email});
   Future<bool> isEmailVerified();
 }
@@ -30,18 +30,18 @@ class AuthenticationService implements AuthenticationApi {
 
   Future<dynamic> currentUser() async {
     print("hello");
-    dynamic user = await _firebaseAuth.currentUser();
+    dynamic user = _firebaseAuth.currentUser;
     print("world");
     return user;
   }
 
   Future<String> currentUserUid() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
+    User user = _firebaseAuth.currentUser;
     return user != null ? user.uid : "";
   }
 
   Future<String> currentUserEmail() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
+    User user = _firebaseAuth.currentUser;
     return user.email;
   }
 
@@ -51,9 +51,9 @@ class AuthenticationService implements AuthenticationApi {
 
   Future<String> signInWithEmailAndPassword(
       {String email, String password}) async {
-    AuthResult result = await _firebaseAuth.signInWithEmailAndPassword(
+    UserCredential credential = await _firebaseAuth.signInWithEmailAndPassword(
         email: email, password: password);
-    return result.user.uid;
+    return credential.user.uid;
   }
 
   Future<String> createUserWithEmailAndPassword({
@@ -61,30 +61,29 @@ class AuthenticationService implements AuthenticationApi {
     String password,
     String username,
   }) async {
-    AuthResult result = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email, password: password);
-    print(result.toString());
-    UserUpdateInfo updateInfo = UserUpdateInfo();
-    updateInfo.displayName = username;
-    result.user.updateProfile(updateInfo);
-    return result.user.uid;
+    UserCredential credential = await _firebaseAuth
+        .createUserWithEmailAndPassword(email: email, password: password);
+    print(credential.toString());
+    credential.user.updateProfile(displayName: username);
+    return credential.user.uid;
   }
 
   // Future<String> reauthenticateWithEmailAndPassword({String email, String password}) async {
-  //   FirebaseUser user = await _firebaseAuth.currentUser();
+  //   User user = await _firebaseAuth.currentUser();
 
   //   user.reauthenticateWithCredential()
   // }
 
   // reauthenticates and deletes the current user's account in Firebase Authentication
-  Future<AuthResult> deleteAccount({String email, String password}) async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
+  Future<UserCredential> deleteAccount({String email, String password}) async {
+    User user = _firebaseAuth.currentUser;
 
     try {
       AuthCredential credentials =
-          EmailAuthProvider.getCredential(email: email, password: password);
+          EmailAuthProvider.credential(email: email, password: password);
       // reauthenticates the user
-      AuthResult result = await user.reauthenticateWithCredential(credentials);
+      UserCredential result =
+          await user.reauthenticateWithCredential(credentials);
       // deletes the user
       await result.user.delete();
       return result;
@@ -99,7 +98,7 @@ class AuthenticationService implements AuthenticationApi {
     String emailInFunction = email;
     // if the user is signed in, the stored user email is used
     if (email == null) {
-      FirebaseUser user = await _firebaseAuth.currentUser();
+      User user = _firebaseAuth.currentUser;
       emailInFunction = user.email;
     }
     try {
@@ -111,12 +110,12 @@ class AuthenticationService implements AuthenticationApi {
   }
 
   Future<void> sendEmailVerification() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
+    User user = _firebaseAuth.currentUser;
     await user.sendEmailVerification();
   }
 
   Future<bool> isEmailVerified() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
-    return user.isEmailVerified;
+    User user = _firebaseAuth.currentUser;
+    return user.emailVerified;
   }
 }

@@ -52,7 +52,7 @@ abstract class CloudFirestoreDatabaseApi {
 // implements CloudFirestoreDatabaseApi
 // manages the communication with the CloudFirestore database in Firebase
 class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
-  Firestore _firestore = Firestore.instance;
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String _userCollection = "users";
   String _gamesCollection = "games";
 
@@ -64,16 +64,14 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   Future<List<dynamic>> getGameIDsFromFirestore(
       {@required String userID}) async {
     DocumentSnapshot snapshot =
-        await _firestore.collection(_userCollection).document(userID).get();
-    return snapshot.data["gameIDs"] ?? [];
+        await _firestore.collection(_userCollection).doc(userID).get();
+    return snapshot.data()["gameIDs"] ?? [];
   }
 
   // gets a list with all the usernames in use
   Future<List<String>> getUsernamesList() async {
-    DocumentSnapshot snapshot = await _firestore
-        .collection(_userCollection)
-        .document("usernames")
-        .get();
+    DocumentSnapshot snapshot =
+        await _firestore.collection(_userCollection).doc("usernames").get();
     List<String> usernamesList = List.generate(
       snapshot["usernames"].length,
       (index) => snapshot["usernames"][index].toString(),
@@ -84,32 +82,30 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   // gets the username for the given userID
   Future<String> getUsernameForUserID({@required String userID}) async {
     DocumentSnapshot snapshot =
-        await _firestore.collection(_userCollection).document(userID).get();
-    return snapshot.data["username"];
+        await _firestore.collection(_userCollection).doc(userID).get();
+    return snapshot.data()["username"];
   }
 
   // gets the uid for the given username
   Future<String> getUserIDForUsername({@required String username}) async {
-    DocumentSnapshot snapshot = await _firestore
-        .collection(_userCollection)
-        .document("usernames")
-        .get();
-    String userID = snapshot.data["userIDs"][username];
+    DocumentSnapshot snapshot =
+        await _firestore.collection(_userCollection).doc("usernames").get();
+    String userID = snapshot.data()["userIDs"][username];
     return userID;
   }
 
   // gets the user's invitations
   Future<List<dynamic>> getInvitations({@required String userID}) async {
     DocumentSnapshot snapshot =
-        await _firestore.collection(_userCollection).document(userID).get();
-    return snapshot.data["invitations"] ?? [];
+        await _firestore.collection(_userCollection).doc(userID).get();
+    return snapshot.data()["invitations"] ?? [];
   }
 
   // gets the List of friends of the user with the given userID
   Future<List<dynamic>> getFriendsList({@required String userID}) async {
     DocumentSnapshot snapshot =
-        await _firestore.collection(_userCollection).document(userID).get();
-    List<dynamic> friendsList = snapshot.data["friends"] ?? [];
+        await _firestore.collection(_userCollection).doc(userID).get();
+    List<dynamic> friendsList = snapshot.data()["friends"] ?? [];
     return friendsList;
   }
 
@@ -119,10 +115,10 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   void addGameIDToFirestore(
       {@required String userID, @required String gameID}) async {
     DocumentSnapshot snapshot =
-        await _firestore.collection(_userCollection).document(userID).get();
-    List<dynamic> gameIDs = snapshot.data["gameIDs"] ?? [];
+        await _firestore.collection(_userCollection).doc(userID).get();
+    List<dynamic> gameIDs = snapshot.data()["gameIDs"] ?? [];
     gameIDs.add(gameID);
-    await _firestore.collection(_userCollection).document(userID).updateData({
+    await _firestore.collection(_userCollection).doc(userID).update({
       "gameIDs": gameIDs,
     });
   }
@@ -131,11 +127,11 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   void deleteGameIDFromFirestore(
       {@required String userID, @required String gameID}) async {
     DocumentSnapshot snapshot =
-        await _firestore.collection(_userCollection).document(userID).get();
-    List<dynamic> gameIDs = snapshot.data["gameIDs"];
-    // String username = snapshot.data["username"];
+        await _firestore.collection(_userCollection).doc(userID).get();
+    List<dynamic> gameIDs = snapshot.data()["gameIDs"];
+    // String username = snapshot.data()["username"];
     gameIDs.remove(gameID);
-    await _firestore.collection(_userCollection).document(userID).updateData({
+    await _firestore.collection(_userCollection).doc(userID).update({
       "gameIDs": gameIDs,
       // "username": username,
     });
@@ -145,31 +141,31 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   void addInvitationToFirestore(
       {@required String userID, @required InvitationClass invitation}) async {
     DocumentSnapshot snapshot =
-        await _firestore.collection(_userCollection).document(userID).get();
-    List<dynamic> invitations = snapshot.data["invitations"] ?? [];
+        await _firestore.collection(_userCollection).doc(userID).get();
+    List<dynamic> invitations = snapshot.data()["invitations"] ?? [];
     print(
       "add invitation " + invitation.toJsonMap().toString(),
     );
     invitations.add(invitation.toJsonMap());
     await _firestore
         .collection(_userCollection)
-        .document(userID)
-        .updateData({"invitations": invitations});
+        .doc(userID)
+        .update({"invitations": invitations});
   }
 
   // deletes an invitation from the user's document
   Future<void> deleteInvitationFromFirestore(
       {@required String userID, @required InvitationClass invitation}) async {
     DocumentSnapshot snapshot =
-        await _firestore.collection(_userCollection).document(userID).get();
-    List<dynamic> invitations = snapshot.data["invitations"] ?? [];
+        await _firestore.collection(_userCollection).doc(userID).get();
+    List<dynamic> invitations = snapshot.data()["invitations"] ?? [];
     invitations.removeWhere(
         (invitationToTest) => invitationToTest["gameID"] == invitation.gameID);
 
     await _firestore
         .collection(_userCollection)
-        .document(userID)
-        .updateData({"invitations": invitations});
+        .doc(userID)
+        .update({"invitations": invitations});
 
     return;
   }
@@ -180,72 +176,62 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
     @required String userID,
     @required String username,
   }) async {
-    await _firestore.collection(_userCollection).document(userID).setData({
+    await _firestore.collection(_userCollection).doc(userID).set({
       "gameIDs": [],
       "invitations": [],
       "friends": [],
       "username": username,
     });
-    DocumentSnapshot snapshot = await _firestore
-        .collection(_userCollection)
-        .document("usernames")
-        .get();
+    DocumentSnapshot snapshot =
+        await _firestore.collection(_userCollection).doc("usernames").get();
     List<dynamic> usernames = snapshot["usernames"];
     Map<String, dynamic> userIDs = snapshot["userIDs"];
     usernames.add(username);
     userIDs.addEntries([MapEntry(username, userID)]);
     await _firestore
         .collection(_userCollection)
-        .document("usernames")
-        .updateData({"usernames": usernames, "userIDs": userIDs});
+        .doc("usernames")
+        .update({"usernames": usernames, "userIDs": userIDs});
   }
 
   void deleteUserFromFirestore(
       {@required String userID, @required String username}) async {
     // deletes the user's document in the users collection
-    await _firestore.collection(_userCollection).document(userID).delete();
+    await _firestore.collection(_userCollection).doc(userID).delete();
     // gets the document with the usernames list and with the Map<username, userID>
-    DocumentSnapshot snapshot = await _firestore
-        .collection(_userCollection)
-        .document("usernames")
-        .get();
-    List<dynamic> usernames = snapshot.data["usernames"];
-    Map<String, dynamic> userIDs = snapshot.data["userIDs"];
+    DocumentSnapshot snapshot =
+        await _firestore.collection(_userCollection).doc("usernames").get();
+    List<dynamic> usernames = snapshot.data()["usernames"];
+    Map<String, dynamic> userIDs = snapshot.data()["userIDs"];
     // removes username from the usernames list
     usernames.remove(username);
     // removes the MapEntry with the username as the key and the userID as the value from the map
     userIDs.remove(username);
     await _firestore
         .collection(_userCollection)
-        .document("usernames")
-        .updateData({"usernames": usernames, "userIDs": userIDs});
+        .doc("usernames")
+        .update({"usernames": usernames, "userIDs": userIDs});
   }
 
   // adds a friend to firestore
   void addFriendToFirestore(
       {@required String userID, @required String nameOfTheFriend}) async {
     DocumentSnapshot snapshot =
-        await _firestore.collection(_userCollection).document(userID).get();
+        await _firestore.collection(_userCollection).doc(userID).get();
 
-    Map<String, dynamic> newMap = snapshot.data;
+    Map<String, dynamic> newMap = snapshot.data();
     newMap["friends"].add(nameOfTheFriend);
-    await _firestore
-        .collection(_userCollection)
-        .document(userID)
-        .updateData(newMap);
+    await _firestore.collection(_userCollection).doc(userID).update(newMap);
   }
 
   void deleteFriendFromFirestore(
       {@required String userID, @required String nameOfTheFriend}) async {
     DocumentSnapshot snapshot =
-        await _firestore.collection(_userCollection).document(userID).get();
+        await _firestore.collection(_userCollection).doc(userID).get();
 
-    Map<String, dynamic> newMap = snapshot.data;
+    Map<String, dynamic> newMap = snapshot.data();
     newMap["friends"].remove(nameOfTheFriend);
-    await _firestore
-        .collection(_userCollection)
-        .document(userID)
-        .updateData(newMap);
+    await _firestore.collection(_userCollection).doc(userID).update(newMap);
   }
 
   //
@@ -255,7 +241,7 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   Future<GameClass> getGameFromFirestore({@required String gameID}) async {
     try {
       DocumentSnapshot snapshot =
-          await _firestore.collection(_gamesCollection).document(gameID).get();
+          await _firestore.collection(_gamesCollection).doc(gameID).get();
       GameClass game = GameClass.fromDocumentSnapshot(snapshot);
       return game;
     } on PlatformException catch (platformException) {
@@ -271,19 +257,19 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   // functions for manipulating values:
   void addGameToFirestore({@required GameClass game}) async {
     // adds a game to the games collection
-    await _firestore.collection(_gamesCollection).document(game.id).setData(
+    await _firestore.collection(_gamesCollection).doc(game.id).set(
           game.toJson(),
         );
   }
 
   void updateGameFromFirestore({@required GameClass game}) async {
-    await _firestore.collection(_gamesCollection).document(game.id).updateData(
+    await _firestore.collection(_gamesCollection).doc(game.id).update(
           game.toJson(),
         );
   }
 
   void deleteGameFromFirestore({@required String gameID}) async {
-    await _firestore.collection(_gamesCollection).document(gameID).delete();
+    await _firestore.collection(_gamesCollection).doc(gameID).delete();
   }
 
   // void inviteOpponentToGame({
@@ -304,7 +290,7 @@ class CloudFirestoreDatabase implements CloudFirestoreDatabaseApi {
   //       .collection(_userCollection)
   //       .document(opponentUserID)
   //       .get();
-  //   Map<String, dynamic> data = snapshot.data;
+  //   Map<String, dynamic> data = snapshot.data();
   //   data["invitations"].add(
   //     invitation.toJson(),
   //   );

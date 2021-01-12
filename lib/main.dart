@@ -1,7 +1,11 @@
 // main.dart
 import "imports.dart";
 
-void main() => runApp(JustChess());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(JustChess());
+}
 
 class JustChess extends StatelessWidget {
   @override

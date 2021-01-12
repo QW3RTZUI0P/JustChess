@@ -82,7 +82,7 @@ class GameClass {
 
   // transforms a DocumentSnapshot from CloudFirestore to a GameClass object
   factory GameClass.fromDocumentSnapshot(DocumentSnapshot snapshot) {
-    Map<String, dynamic> data = snapshot.data ?? {};
+    Map<String, dynamic> data = snapshot.data() ?? {};
     return GameClass(
       id: data["id"],
       title: data["subtitle"] ?? data["title"],
@@ -110,7 +110,9 @@ class GameClass {
       player01IsWhite: jsonObject["player01IsWhite"] ?? "",
       whitesTurn: jsonObject["whitesTurn"],
       moveCount: jsonObject["moveCount"],
-      gameStatus: transformStringToGameStatus(string: jsonObject["gameStatus"]) ?? GameStatus.playing,
+      gameStatus:
+          transformStringToGameStatus(string: jsonObject["gameStatus"]) ??
+              GameStatus.playing,
       isOnline: jsonObject["isOnline"] ?? false,
       canBeDeleted: jsonObject["canBeDeleted"],
     );

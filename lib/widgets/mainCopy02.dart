@@ -41,7 +41,7 @@
 //                 ),
 //               );
 //             } else if (userStatusSnapshot.hasData &&
-//                 userStatusSnapshot.data == true) {
+//                 userStatussnapshot.data() == true) {
 //               // controls the loading and saving of the user's games
 //               return GamesBlocProvider(
 //                 gamesBloc: GamesBloc(
